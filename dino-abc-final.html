@@ -126,6 +126,14 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
 .confirm-btns{display:flex;gap:10px}
 .confirm-yes{flex:1;background:linear-gradient(135deg,#4caf50,#2e7d32);border:none;border-radius:99px;padding:12px;color:#fff;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer}
 .confirm-no{flex:1;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:99px;padding:12px;color:#aaa;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer}
+.leave-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:400;display:none;align-items:center;justify-content:center}
+.leave-ov.open{display:flex}
+.leave-box{background:linear-gradient(160deg,#1a2f1a,#0d1f0d);border:2px solid rgba(255,100,100,.3);border-radius:24px;padding:28px 24px;max-width:300px;width:88%;text-align:center}
+.leave-title{font-size:1.3rem;color:#fff;margin-bottom:8px}
+.leave-sub{font-size:.85rem;color:#81c784;margin-bottom:20px;line-height:1.6}
+.leave-btns{display:flex;gap:10px}
+.leave-yes{flex:1;background:linear-gradient(135deg,#ef5350,#b71c1c);border:none;border-radius:99px;padding:12px;color:#fff;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer}
+.leave-no{flex:1;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:99px;padding:12px;color:#aaa;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer}
 </style>
 </head>
 <body>
@@ -260,6 +268,16 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
 </div>
 
 <div class="toast hide" id="toast"></div>
+<div class="leave-ov" id="leaveOv">
+  <div class="leave-box">
+    <div class="leave-title">🎮 離開遊戲？</div>
+    <div class="leave-sub" id="leaveMsg">遊戲進行中！<br>確定要切換嗎？</div>
+    <div class="leave-btns">
+      <button class="leave-no" onclick="closeLeave()">⬅️ 繼續玩</button>
+      <button class="leave-yes" onclick="confirmLeave()">✅ 離開</button>
+    </div>
+  </div>
+</div>
 <div class="confirm-ov" id="confirmOv">
   <div class="confirm-box">
     <div class="confirm-emoji" id="confirmEmoji">⭐</div>
@@ -357,19 +375,53 @@ function saveStars(){localStorage.setItem('stars',stars);}
 function saveHabits(){localStorage.setItem('hlog_'+todayKey,JSON.stringify(habitLog));}
 
 // ══ TABS ══
+let _pendingTab=null, _pendingTabBtn=null, _pendingTabType='tab';
 function setTab(name,btn){
+  if(gameActive){
+    _pendingTab=name; _pendingTabBtn=btn; _pendingTabType='tab';
+    document.getElementById('leaveMsg').textContent='遊戲進行中！\n確定要切換嗎？';
+    document.getElementById('leaveOv').classList.add('open');
+    return;
+  }
+  _doSetTab(name,btn);
+}
+function _doSetTab(name,btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('show');
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
   if(name==='habits') renderHabits();
   if(name==='rewards') renderRewards();
 }
+function closeLeave(){
+  document.getElementById('leaveOv').classList.remove('open');
+  _pendingTab=null; _pendingTabBtn=null;
+}
+function confirmLeave(){
+  document.getElementById('leaveOv').classList.remove('open');
+  if(gameActive) endGame();
+  const type=_pendingTabType;
+  const tab=_pendingTab;
+  const btn=_pendingTabBtn;
+  _pendingTab=null; _pendingTabBtn=null;
+  if(type==='tab') _doSetTab(tab,btn);
+  else if(type==='math') _doGoMath(btn);
+  else if(type==='zhuyin') _doGoZhuyin(btn);
+}
 function goMath(btn){
+  if(gameActive){
+    _pendingTab=null; _pendingTabBtn=btn; _pendingTabType='math';
+    document.getElementById('leaveMsg').textContent='遊戲進行中！\n確定要切換嗎？';
+    document.getElementById('leaveOv').classList.add('open');
+    return;
+  }
+  _doGoMath(btn);
+}
+function _doGoMath(btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-math').classList.add('show');
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
   const fr=document.getElementById('mathFrame');
   if(!fr.getAttribute('data-loaded')){
     fr.setAttribute('data-loaded','1');
@@ -377,10 +429,19 @@ function goMath(btn){
   }
 }
 function goZhuyin(btn){
+  if(gameActive){
+    _pendingTab=null; _pendingTabBtn=btn; _pendingTabType='zhuyin';
+    document.getElementById('leaveMsg').textContent='遊戲進行中！\n確定要切換嗎？';
+    document.getElementById('leaveOv').classList.add('open');
+    return;
+  }
+  _doGoZhuyin(btn);
+}
+function _doGoZhuyin(btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-zhuyin').classList.add('show');
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
   const fr=document.getElementById('zhuyinFrame');
   if(!fr.getAttribute('data-loaded')){
     fr.setAttribute('data-loaded','1');
