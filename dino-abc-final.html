@@ -419,6 +419,7 @@ function scheduleBGM(ctx,start){
 }
 function startBGM(){
   if(bgmPlaying) return;
+  try{
   bgmPlaying=true;
   bgmCtx=new(window.AudioContext||window.webkitAudioContext)();
   bgmCtx.resume().then(()=>{
@@ -431,6 +432,7 @@ function startBGM(){
     }
     loop();
   });
+  }catch(e){bgmPlaying=false;}
 }
 function stopBGM(){
   bgmPlaying=false;
@@ -606,7 +608,7 @@ function startGame(){
   document.getElementById('goScreen').style.display='none';
   stopIdle();
   pickTarget();
-  startBGM();
+  try{startBGM();}catch(e){}
   fallerTimer=setInterval(spawnFaller,1800);
   gameLoop();
 }
