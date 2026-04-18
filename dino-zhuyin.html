@@ -225,11 +225,11 @@ function pick(arr,n){return shuffle(arr).slice(0,n);}
 
 function startGame(){
   score=0;lives=3;levelIdx=0;totalCorrect=0;totalQ=0;
-  startBGM();
   document.getElementById('endScreen').classList.remove('show');
   document.getElementById('questionArea').style.display='';
   document.getElementById('scoreNum').textContent=0;
   updateLives();startLevel();
+  try{startBGM();}catch(e){}
 }
 
 function startLevel(){
@@ -457,6 +457,7 @@ function _sched(ctx,t){
   return dur;
 }
 function startBGM(){
+  try{
   if(_bgmPlaying)return;
   _bgmPlaying=true;
   _bgmCtx=new(window.AudioContext||window.webkitAudioContext)();
@@ -470,6 +471,7 @@ function startBGM(){
     }
     loop();
   });
+  }catch(e){}
 }
 function stopBGM(){
   _bgmPlaying=false;
