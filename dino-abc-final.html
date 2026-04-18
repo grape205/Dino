@@ -87,8 +87,8 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
 #panel-math, #panel-zhuyin{padding:0}
 .game-frame{width:100%;height:calc(100vh - 130px);border:none;border-radius:12px;display:block}
 .frame-loading{text-align:center;padding:60px 20px;color:#81c784;font-size:1.2rem}
-.egg-ov{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;display:none;align-items:center;justify-content:center}
-.egg-ov.open{display:flex}
+.egg-ov{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;display:none;align-items:center;justify-content:center;pointer-events:none}
+.egg-ov.open{display:flex;pointer-events:auto}
 .egg-box{background:linear-gradient(160deg,#1a2f1a,#0d1f0d);border:2px solid rgba(92,184,92,.3);border-radius:24px;padding:24px 20px;max-width:320px;width:90%;text-align:center}
 .egg-title{font-size:1.3rem;color:#fff;margin-bottom:8px}
 .egg-sub{font-size:.82rem;color:#81c784;margin-bottom:16px;line-height:1.5}
@@ -109,16 +109,16 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
 .egg-cont{display:none;margin-top:10px;background:linear-gradient(135deg,#4caf50,#2e7d32);border:none;border-radius:99px;padding:10px 28px;color:#fff;font-family:'Fredoka One',Arial Rounded MT Bold,Arial,sans-serif;font-size:1rem;cursor:pointer}
 .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:10px 22px;border-radius:99px;font-size:.9rem;z-index:200;transition:opacity .4s;pointer-events:none}
 .toast.hide{opacity:0}
-.rest-ov{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px}
-.rest-ov.open{display:flex}
+.rest-ov{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px;pointer-events:none}
+.rest-ov.open{display:flex;pointer-events:auto}
 .rest-title{font-size:2rem;color:#fff;margin-bottom:12px}
 .rest-sub{font-size:1rem;color:#81c784;margin-bottom:24px;line-height:1.6}
 .rest-count{font-size:4rem;color:#ffb300;margin-bottom:16px}
 .rest-bar-wrap{width:80%;max-width:300px;height:12px;background:rgba(255,255,255,.15);border-radius:99px;overflow:hidden;margin-bottom:24px}
 .rest-bar{height:100%;background:linear-gradient(90deg,#4caf50,#ffb300);border-radius:99px;transition:width 1s linear}
 .rest-btn{background:linear-gradient(135deg,#4caf50,#2e7d32);border:none;border-radius:99px;padding:12px 32px;color:#fff;font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;display:none}
-.confirm-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:400;display:none;align-items:center;justify-content:center}
-.confirm-ov.open{display:flex}
+.confirm-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:400;display:none;align-items:center;justify-content:center;pointer-events:none}
+.confirm-ov.open{display:flex;pointer-events:auto}
 .confirm-box{background:linear-gradient(160deg,#1a2f1a,#0d1f0d);border:2px solid rgba(92,184,92,.3);border-radius:24px;padding:28px 24px;max-width:300px;width:88%;text-align:center}
 .confirm-emoji{font-size:3rem;margin-bottom:8px}
 .confirm-title{font-size:1.2rem;color:#fff;margin-bottom:6px}
@@ -126,8 +126,8 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
 .confirm-btns{display:flex;gap:10px}
 .confirm-yes{flex:1;background:linear-gradient(135deg,#4caf50,#2e7d32);border:none;border-radius:99px;padding:12px;color:#fff;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer}
 .confirm-no{flex:1;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:99px;padding:12px;color:#aaa;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer}
-.leave-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:400;display:none;align-items:center;justify-content:center}
-.leave-ov.open{display:flex}
+.leave-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:400;display:none;align-items:center;justify-content:center;pointer-events:none}
+.leave-ov.open{display:flex;pointer-events:auto}
 .leave-box{background:linear-gradient(160deg,#1a2f1a,#0d1f0d);border:2px solid rgba(255,100,100,.3);border-radius:24px;padding:28px 24px;max-width:300px;width:88%;text-align:center}
 .leave-title{font-size:1.3rem;color:#fff;margin-bottom:8px}
 .leave-sub{font-size:.85rem;color:#81c784;margin-bottom:20px;line-height:1.6}
