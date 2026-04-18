@@ -829,10 +829,6 @@ function confirmRedeem(){
 }
 
 // ══ TIMER ══
-function getRemainingSeconds(){
-  const used=parseInt(localStorage.getItem('used_'+todayKey)||'0');
-  return Math.max(0,DAILY_LIMIT-used);
-}
 function updateTimerDisplay(sec){
   const m=Math.floor(sec/60),s=sec%60;
   document.getElementById('timeLeft').textContent='⏱️ '+m+':'+(s<10?'0':'')+s;
