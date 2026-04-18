@@ -375,6 +375,18 @@ body{font-family:'Nunito',sans-serif;background:#080f08;min-height:100vh;overflo
 </style>
 </head>
 <body>
+<div id="errBox" style="display:none;position:fixed;top:0;left:0;right:0;background:red;color:white;z-index:9999;padding:10px;font-size:12px;word-break:break-all;max-height:200px;overflow:auto"></div>
+<script>
+window.onerror=function(msg,src,line,col,err){
+  var b=document.getElementById('errBox');
+  if(b){b.style.display='block';b.textContent='ERROR: '+msg+' (line '+line+')';}
+  return true;
+};
+window.addEventListener('unhandledrejection',function(e){
+  var b=document.getElementById('errBox');
+  if(b){b.style.display='block';b.textContent='PROMISE ERROR: '+e.reason;}
+});
+</script>
 <div class="jbg"></div>
 <div class="tree" style="left:1%;font-size:5.5rem;animation-delay:0s">🌴</div>
 <div class="tree" style="left:15%;font-size:3.2rem;animation-delay:.8s">🌿</div>
