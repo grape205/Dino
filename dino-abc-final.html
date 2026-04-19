@@ -50,7 +50,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
 .faller{position:absolute;top:-50px;font-size:1.6rem;font-weight:800;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.8);background:rgba(0,0,0,.5);border:2px solid rgba(92,184,92,.3);border-radius:10px;padding:4px 10px;cursor:pointer;user-select:none;transition:background .1s}
 .faller.correct{background:rgba(76,175,80,.5)!important;border-color:#4caf50!important}
 .faller.wrong{background:rgba(239,83,80,.5)!important;border-color:#ef5350!important}
-.go-screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.75);border-radius:16px;z-index:20}
+.go-screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.75);border-radius:18px;z-index:20}
 .go-d{font-size:3.5rem;animation:bob 1.5s ease-in-out infinite}
 .go-t{font-size:1.4rem;color:#fff;text-align:center;margin:8px 0}
 .go-s{font-size:.85rem;color:#81c784;text-align:center;margin-bottom:14px}
@@ -193,10 +193,12 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
       <div class="grow-track"><div id="growBar"></div></div>
       <span id="growNext">+5分長大</span>
     </div>
-    <div class="arena" id="arena">
-      <div class="dino-wrap" id="dinoWrap">
-        <canvas id="dinoCanvas" width="80" height="80"></canvas>
-        <div class="basket">🧺</div>
+    <div style="position:relative">
+      <div class="arena" id="arena">
+        <div class="dino-wrap" id="dinoWrap">
+          <canvas id="dinoCanvas" width="80" height="80"></canvas>
+          <div class="basket">🧺</div>
+        </div>
       </div>
       <div class="go-screen" id="goScreen">
         <div class="go-d">🦖</div>
