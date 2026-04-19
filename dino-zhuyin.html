@@ -237,6 +237,7 @@ function startGame(){
   document.getElementById('scoreNum').textContent=0;
   updateLives();startLevel();
   try{startBGM();}catch(e){}
+  try{parent.postMessage('gameStarted','*');}catch(e){}
 }
 
 function startLevel(){
@@ -430,6 +431,7 @@ function closeLevelPopup(){
 function endGame(){
   stopTimer();
   stopBGM();
+  try{parent.postMessage('gameEnded','*');}catch(e){}
   document.getElementById('timerWrap').classList.remove('show');
   document.getElementById('questionArea').style.display='none';
   document.getElementById('endScreen').classList.add('show');
@@ -514,6 +516,7 @@ function startBGM(){
 }
 function beginGame(){
   document.getElementById('introScreen').style.display='none';
+  try{const el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}catch(e){}
   startGame();
 }
 function stopBGM(){

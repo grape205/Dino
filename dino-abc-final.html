@@ -469,10 +469,18 @@ function showToast(msg){
 }
 
 // TAB
+let iframeGameActive=false;
+window.addEventListener('message',function(e){
+  if(e.data==='gameStarted') iframeGameActive=true;
+  if(e.data==='gameEnded') iframeGameActive=false;
+});
 function switchTab(name,btn){
   if(name===currentTab)return;
-  const iframeActive=(currentTab==='math'&&document.getElementById('mathFrame').getAttribute('data-loaded'))||(currentTab==='zhuyin'&&document.getElementById('zhuyinFrame').getAttribute('data-loaded'));
-  if(gameActive||iframeActive){pendingTab=name;pendingBtn=btn;document.getElementById('leaveOv').classList.add('open');return;}
+  if(gameActive||iframeGameActive){
+    pendingTab=name;pendingBtn=btn;
+    document.getElementById('leaveOv').classList.add('open');
+    return;
+  }
   doSwitchTab(name,btn);
 }
 function cancelLeave(){document.getElementById('leaveOv').classList.remove('open');pendingTab=null;pendingBtn=null;}
@@ -541,6 +549,49 @@ function spawnFaller(){
   const el=document.createElement('div');el.className='faller';el.textContent=letter;el.style.left=Math.random()*(W-60)+10+'px';el.dataset.correct=isCorrect?'1':'0';
   arena.appendChild(el);fallers.push({el,y:-50,speed:1.2+level*0.3+Math.random()*0.8});
 }
+
+function sndCorrect(){
+  try{
+    const c=new(window.AudioContext||window.webkitAudioContext)();
+    [[523,.08],[659,.08],[784,.12]].forEach(([f,t],i)=>{
+      const o=c.createOscillator(),g=c.createGain();
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0,c.currentTime+i*.1);
+      g.gain.linearRampToValueAtTime(0.3,c.currentTime+i*.1+.02);
+      g.gain.linearRampToValueAtTime(0,c.currentTime+i*.1+t);
+      o.connect(g);g.connect(c.destination);
+      o.start(c.currentTime+i*.1);o.stop(c.currentTime+i*.1+t+.05);
+    });
+    setTimeout(()=>c.close(),600);
+  }catch(e){}
+}
+function sndWrong(){
+  try{
+    const c=new(window.AudioContext||window.webkitAudioContext)();
+    [[300,.15],[220,.2]].forEach(([f,t],i)=>{
+      const o=c.createOscillator(),g=c.createGain();
+      o.type='sawtooth';o.frequency.value=f;
+      g.gain.setValueAtTime(0.25,c.currentTime+i*.18);
+      g.gain.linearRampToValueAtTime(0,c.currentTime+i*.18+t);
+      o.connect(g);g.connect(c.destination);
+      o.start(c.currentTime+i*.18);o.stop(c.currentTime+i*.18+t+.05);
+    });
+    setTimeout(()=>c.close(),600);
+  }catch(e){}
+}
+function sndMiss(){
+  try{
+    const c=new(window.AudioContext||window.webkitAudioContext)();
+    const o=c.createOscillator(),g=c.createGain();
+    o.type='sine';o.frequency.value=440;
+    o.frequency.linearRampToValueAtTime(220,c.currentTime+.3);
+    g.gain.setValueAtTime(0.2,c.currentTime);
+    g.gain.linearRampToValueAtTime(0,c.currentTime+.3);
+    o.connect(g);g.connect(c.destination);
+    o.start();o.stop(c.currentTime+.35);
+    setTimeout(()=>c.close(),500);
+  }catch(e){}
+}
 function gameLoop(){
   if(!gameActive)return;
   const arena=document.getElementById('arena');const aH=arena.clientHeight;const dRect=document.getElementById('dinoWrap').getBoundingClientRect();
@@ -549,9 +600,10 @@ function gameLoop(){
     const fR=f.el.getBoundingClientRect();const caught=fR.bottom>=dRect.top&&fR.top<=dRect.bottom&&fR.right>=dRect.left&&fR.left<=dRect.right;
     if(f.y>aH||caught){
       if(caught){
-        if(f.el.dataset.correct==='1'){score++;document.getElementById('sScore').textContent=score;checkGrow();f.el.classList.add('correct');if(score%10===0&&score>0){level++;document.getElementById('sLevel').textContent=level;showToast('⚡ 升級！Level '+level);}pickTarget();}
-        else{lives--;updateLivesUI();f.el.classList.add('wrong');if(lives<=0){f.el.remove();fallers.splice(i,1);endGame();return;}}
+        if(f.el.dataset.correct==='1'){score++;document.getElementById('sScore').textContent=score;checkGrow();sndCorrect();f.el.classList.add('correct');if(score%10===0&&score>0){level++;document.getElementById('sLevel').textContent=level;showToast('⚡ 升級！Level '+level);}pickTarget();}
+        else{lives--;updateLivesUI();sndWrong();f.el.classList.add('wrong');if(lives<=0){f.el.remove();fallers.splice(i,1);endGame();return;}}
       }
+      if(!caught&&f.el.dataset.correct==='1') sndMiss();
       f.el.remove();fallers.splice(i,1);
     }
   });
