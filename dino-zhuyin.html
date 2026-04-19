@@ -121,6 +121,7 @@ body{font-family:'Fredoka One','Noto Sans TC',sans-serif;background:#1B5E20;min-
 </style>
 </head>
 <body>
+<button onclick="goBackZhuyin()" style="position:fixed;top:12px;left:12px;z-index:999;background:rgba(0,0,0,.6);border:1.5px solid rgba(255,255,255,.3);border-radius:99px;padding:8px 16px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:.85rem;cursor:pointer">⬅️ 返回</button>
 <div class="jungle-bg"></div>
 <div class="jungle-floor"></div>
 <div class="leaf-layer">
@@ -469,9 +470,9 @@ function praise(){
 // Game starts when user taps button
 // ══ BGM ══
 let _bgmCtx=null,_bgmPlaying=false,_bgmLoopTimer=null,_bgmStart=0;
-const _MELODY=[76,0,77,76,74,0,76,0,77,0,79,77,76,0,77,0,79,81,79,77,76,74,72,0,71,72,74,76,74,72,71,0];
-const _BASS=[64,0,67,0,64,0,67,0,65,0,69,0,65,0,69,0,64,0,67,0,64,0,67,0,60,0,64,0,60,0,64,0];
-const _TEMPO=0.18;
+const _MELODY=[79,77,76,74,76,79,81,0,79,77,76,0,74,0,76,0,77,79,81,82,81,79,77,0,76,0,74,0,72,0,0,0];
+const _BASS=[67,0,67,0,67,0,67,0,65,0,65,0,65,0,65,0,64,0,64,0,64,0,64,0,62,0,62,0,60,0,60,0];
+const _TEMPO=0.17;
 function _hz(n){return 440*Math.pow(2,(n-69)/12);}
 function _sched(ctx,t){
   const dur=_MELODY.length*_TEMPO;
@@ -518,6 +519,13 @@ function beginGame(){
   document.getElementById('introScreen').style.display='none';
   try{const el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}catch(e){}
   startGame();
+}
+function goBackZhuyin(){
+  try{stopBGM();}catch(e){}
+  stopTimer();
+  try{if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();}catch(e){}
+  try{parent.postMessage('gameEnded','*');}catch(e){}
+  try{parent.doSwitchTab('habits',null);}catch(e){}
 }
 function stopBGM(){
   _bgmPlaying=false;

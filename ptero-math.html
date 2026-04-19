@@ -146,6 +146,7 @@ body{font-family:'Nunito',sans-serif;background:#0a0a1a;min-height:100vh;overflo
 </style>
 </head>
 <body>
+<button id="backBtn" onclick="goBack()" style="position:fixed;top:12px;left:12px;z-index:999;background:rgba(0,0,0,.6);border:1.5px solid rgba(255,255,255,.3);border-radius:99px;padding:8px 16px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:.85rem;cursor:pointer;display:none">⬅️ 返回</button>
 <div class="skybg"></div>
 <div class="cloud" style="top:12%;animation-duration:28s;animation-delay:0s">☁️</div>
 <div class="cloud" style="top:25%;animation-duration:35s;animation-delay:-12s;font-size:2rem;opacity:.08">☁️</div>
@@ -292,69 +293,68 @@ function _b64buf(b){
 function startBGM(){
   if(_bgmPlaying)return;
   _bgmPlaying=true;
-  _bgmCtx=new(window.AudioContext||window.webkitAudioContext)();
-  _bgmCtx.resume().then(()=>{
-    if(_bgmDecoded){_bgmLoop();return;}
-    _bgmCtx.decodeAudioData(_b64buf(BGM_B64),
-      buf=>{_bgmDecoded=buf;_bgmLoop();},
-      e=>console.log('BGM err',e));
+  try{
+    _bgmCtx=new(window.AudioContext||window.webkitAudioContext)();
+    _bgmCtx.resume().then(()=>{
+      _kikiStart=_bgmCtx.currentTime+0.1;
+      _kikiLoop();
+    });
+  }catch(e){_bgmPlaying=false;}
+}
+const _KIKI_MEL=[
+  76,74,72,74,76,77,76,74,72,0,72,74,76,77,79,0,
+  79,77,76,74,76,79,81,0,79,77,76,74,72,0,74,0,
+  77,76,74,72,74,77,79,0,77,76,74,72,74,0,72,0,
+  74,76,77,79,77,76,74,0,72,74,76,0,72,0,0,0
+];
+const _KIKI_BASS=[
+  64,0,64,0,64,0,64,0,62,0,62,0,62,0,62,0,
+  60,0,60,0,60,0,60,0,59,0,59,0,57,0,57,0,
+  65,0,65,0,65,0,65,0,64,0,64,0,62,0,62,0,
+  60,0,60,0,59,0,59,0,60,0,60,0,60,0,60,0
+];
+const _KIKI_T=0.15;
+let _kikiStart=0,_kikiTimer=null;
+function _midiHz(n){return 440*Math.pow(2,(n-69)/12);}
+function _kikiSchedule(ctx,t0){
+  const dur=_KIKI_MEL.length*_KIKI_T;
+  _KIKI_MEL.forEach((n,i)=>{
+    if(!n)return;
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type='triangle';o.frequency.value=_midiHz(n);
+    g.gain.setValueAtTime(0,t0+i*_KIKI_T);
+    g.gain.linearRampToValueAtTime(0.12,t0+i*_KIKI_T+0.02);
+    g.gain.linearRampToValueAtTime(0,t0+i*_KIKI_T+_KIKI_T*0.8);
+    o.connect(g);g.connect(ctx.destination);
+    o.start(t0+i*_KIKI_T);o.stop(t0+i*_KIKI_T+_KIKI_T);
   });
+  _KIKI_BASS.forEach((n,i)=>{
+    if(!n)return;
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type='sine';o.frequency.value=_midiHz(n);
+    g.gain.setValueAtTime(0,t0+i*_KIKI_T);
+    g.gain.linearRampToValueAtTime(0.07,t0+i*_KIKI_T+0.02);
+    g.gain.linearRampToValueAtTime(0,t0+i*_KIKI_T+_KIKI_T*0.9);
+    o.connect(g);g.connect(ctx.destination);
+    o.start(t0+i*_KIKI_T);o.stop(t0+i*_KIKI_T+_KIKI_T);
+  });
+  return dur;
 }
-
-function _bgmLoop(){
-  if(!_bgmPlaying||!_bgmCtx||!_bgmDecoded)return;
-  _bgmSrc=_bgmCtx.createBufferSource();
-  _bgmSrc.buffer=_bgmDecoded;
-  _bgmSrc.connect(_bgmCtx.destination);
-  _bgmSrc.onended=()=>{if(_bgmPlaying)_bgmLoop();};
-  _bgmSrc.start(0);
+function _kikiLoop(){
+  if(!_bgmPlaying)return;
+  const dur=_kikiSchedule(_bgmCtx,_kikiStart);
+  _kikiStart+=dur;
+  _bgmLoopTimer=setTimeout(_kikiLoop,(dur-0.15)*1000);
 }
+// _bgmLoop replaced by _kikiLoop
 
 function stopBGM(){
   _bgmPlaying=false;
-  if(_bgmSrc){try{_bgmSrc.stop();}catch(e){} _bgmSrc=null;}
-  if(_bgmCtx){try{_bgmCtx.close();}catch(e){} _bgmCtx=null;}
-  _bgmDecoded=null;
+  clearTimeout(_bgmLoopTimer);
+  clearTimeout(_kikiTimer);
+  if(_bgmCtx){try{_bgmCtx.close();}catch(e){}; _bgmCtx=null; _bgmDecoded=null;}
 }
 
-// Read equation aloud using Web Audio tones (same device constraint)
-function readEquation(){
-  unlockAudio();
-  // Play tones representing the numbers
-  const a=AC(), now=a.currentTime;
-  // A tone, pause, B tone, pause, answer tone
-  playNote(440+eqA*20, .3,'sine',.2, 0);
-  playNote(300,.15,'sine',.1, .4);  // "plus" sound
-  playNote(440+eqB*20, .3,'sine',.2, .6);
-  playNote(300,.15,'sine',.1, 1.0);  // "equals" sound
-  playNote(440+eqAns*20,.4,'sine',.22, 1.2); // answer
-}
-
-// ══ CANVAS ══
-const canvas=document.getElementById('gc');
-const ctx=canvas.getContext('2d');
-const DW=70,DH=60;
-function resize(){
-  const w=canvas.parentElement.clientWidth;
-  canvas.width=w; canvas.height=Math.min(380,Math.round(w*.85));
-}
-resize();
-window.addEventListener('resize',()=>{resize();if(!gameActive)idleDraw();});
-
-// ══ GAME STATE ══
-let gameActive=false,gameRaf=null,idleRafId=null;
-let score=0,lives=3,gameLevel=1,frame=0,spawnInt=90,fallSpd=1.4,streakCount=0;
-let dinoX=0,prevDX=0;
-let mouthA=0,mouthDir=1,chomping=false,chompT=0;
-let letters=[],parts=[];
-
-function resetGame(){
-  score=0;lives=3;gameLevel=1;frame=0;spawnInt=90;fallSpd=1.4;streakCount=0;
-  dinoX=canvas.width/2;prevDX=dinoX;
-  mouthA=0;mouthDir=1;chomping=false;chompT=0;
-  letters=[];parts=[];
-  newEquation();
-}
 
 function newEquation(){
   const lv = LEVELS.find(l=>l.id===curLvId)||LEVELS[0];
@@ -410,12 +410,16 @@ function idleDraw(){ctx.clearRect(0,0,canvas.width,canvas.height);drawBG();drawD
 function startGame(){
   stopIdle();
   if(gameRaf){cancelAnimationFrame(gameRaf);gameRaf=null;}
+  unlockAudio();
   resetGame();
   gameActive=true;
   document.getElementById('gOver').style.display='none';
   updateHUD();
   startBGM();
   gameLoop();
+  try{parent.postMessage('gameStarted','*');}catch(e){}
+  document.getElementById('backBtn').style.display='block';
+  try{const el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}catch(e){}
 }
 
 function updateHUD(){
@@ -732,6 +736,14 @@ renderLevels();
 newEquation();
 resize();
 startIdle();
+function goBack(){
+  try{stopBGM();}catch(e){}
+  try{if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();}catch(e){}
+  try{parent.postMessage('gameEnded','*');}catch(e){}
+  try{parent.switchTab('habits',null);}catch(e){}
+  document.getElementById('backBtn').style.display='none';
+}
+
 </script>
 </body>
 </html>
