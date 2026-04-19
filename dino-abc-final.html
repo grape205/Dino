@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>🦖 恐龍字母大冒險</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded MT Bold,Arial,sans-serif;overflow-x:hidden}
+.wrap{max-width:500px;margin:0 auto;padding:0 0 20px}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 6px;gap:8px}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-d{font-size:2.2rem;animation:bob 2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.logo-t{font-size:1rem;color:#81c784;line-height:1.2}
+.logo-s{font-size:.65rem;color:#4caf50;opacity:.7}
+.star-pill{display:flex;align-items:center;gap:6px;background:rgba(255,179,0,.15);border:1.5px solid rgba(255,179,0,.4);border-radius:99px;padding:5px 12px}
+.spstar{font-size:1.3rem}
+.spl{font-size:.6rem;color:#ffb300;opacity:.8}
+.spn{font-size:1.2rem;color:#ffb300;font-weight:800}
+.timer-pill{font-size:.85rem;color:#81c784;background:rgba(0,0,0,.35);border:1.5px solid rgba(92,184,92,.2);border-radius:99px;padding:4px 12px;white-space:nowrap}
+.nav{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:0 8px 8px}
+.nb{background:rgba(0,0,0,.35);border:2px solid rgba(92,184,92,.2);border-radius:14px;padding:7px 2px;color:#81c784;font-family:'Fredoka One',Arial,sans-serif;font-size:.65rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .2s}
+.nb.active{background:rgba(92,184,92,.25);border-color:#4caf50;color:#fff}
+.ni{font-size:1.3rem}
+.panel{display:none}
+.panel.show{display:block}
+#panel-game{padding:0 11px 8px}
+.tbox{display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.4);border:2px solid rgba(92,184,92,.2);border-radius:18px;padding:10px 14px;margin-bottom:8px}
+.tbox-left{flex:1}
+.tl{font-size:.7rem;color:#81c784;margin-bottom:2px}
+.tletter{font-size:3.5rem;color:#fff;line-height:1}
+.tword{font-size:1rem;color:#a5d6a7}
+.tzh{font-size:.8rem;color:#4caf50;opacity:.8}
+.temoji{font-size:3.5rem}
+#soundBar{display:flex;gap:8px;margin-bottom:8px}
+#soundBar button{flex:1;background:rgba(0,0,0,.4);border:2px solid rgba(92,184,92,.25);border-radius:14px;padding:8px 4px;color:#81c784;font-family:'Fredoka One',Arial,sans-serif;font-size:.72rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+#soundBar span:first-child{font-size:1.5rem;flex-shrink:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.sc{background:rgba(0,0,0,.35);border:1.5px solid rgba(92,184,92,.15);border-radius:12px;padding:6px 4px;text-align:center}
+.sv{font-size:1.1rem;color:#fff;font-weight:800}
+.sv.g{color:#4caf50}
+.sv.a{color:#ffb300}
+.sv.r{color:#ef5350;font-size:.9rem}
+.sl{font-size:.6rem;color:#81c784;opacity:.7}
+.grow-bar-wrap{background:rgba(0,0,0,.35);border:1px solid rgba(92,184,92,.18);border-radius:10px;padding:5px 10px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+#growLabel{font-size:.72rem;color:#81c784;white-space:nowrap}
+.grow-track{flex:1;height:7px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden}
+#growBar{height:100%;background:linear-gradient(90deg,#4caf50,#ffb300);border-radius:99px;width:0%;transition:width .4s ease}
+#growNext{font-size:.62rem;font-weight:800;color:rgba(92,184,92,.5);white-space:nowrap}
+.game-wrap{position:relative;margin-bottom:8px}
+.arena{position:relative;background:rgba(0,0,0,.5);border:2px solid rgba(92,184,92,.15);border-radius:18px;overflow:hidden;height:280px;touch-action:none}
+.dino-wrap{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;z-index:10}
+.dino-wrap canvas{display:block}
+.basket{font-size:1.8rem;margin-top:-6px}
+.faller{position:absolute;top:-50px;font-size:1.6rem;font-weight:800;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.8);background:rgba(0,0,0,.5);border:2px solid rgba(92,184,92,.3);border-radius:10px;padding:4px 10px;user-select:none}
+.faller.correct{background:rgba(76,175,80,.5);border-color:#4caf50}
+.faller.wrong{background:rgba(239,83,80,.5);border-color:#ef5350}
+.go-screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.82);border-radius:18px;z-index:30;pointer-events:none}
+.go-d{font-size:3.5rem;animation:bob 1.5s ease-in-out infinite}
+.go-t{font-size:1.4rem;color:#fff;text-align:center;margin:8px 0}
+.go-s{font-size:.85rem;color:#81c784;text-align:center;margin-bottom:14px}
+.go-btn{background:linear-gradient(135deg,#4caf50,#2e7d32);border:none;border-radius:99px;padding:14px 36px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:1.1rem;cursor:pointer;pointer-events:auto;position:relative;z-index:40}
+#panel-habits{padding:0 11px 8px}
+.hsec{font-family:'Fredoka One',Arial,sans-serif;font-size:.92rem;color:#4caf50;padding:4px 2px 8px;display:flex;align-items:center;gap:8px}
+.hpill{background:rgba(76,175,80,.2);border-radius:99px;padding:2px 10px;font-size:.72rem;color:#81c784}
+.hgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.hcard{background:rgba(0,0,0,.42);border:2px solid rgba(92,184,92,.18);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.hcard.done{border-color:#4caf50;background:rgba(76,175,80,.15)}
+.hcard.done2{border-color:#ef5350;background:rgba(239,83,80,.12)}
+.hcard-e{font-size:2rem;margin-bottom:4px}
+.hcard-t{font-size:.82rem;color:#a5d6a7}
+.hcard-c{font-size:.7rem;color:#4caf50;margin-top:3px}
+.hcard-del{position:absolute;top:4px;right:7px;font-size:.7rem;color:rgba(255,100,100,.6);cursor:pointer;padding:2px}
+.hadd-row{display:flex;gap:8px;margin-top:10px;padding:0 2px}
+.hadd-emoji{width:48px;background:rgba(0,0,0,.4);border:2px solid rgba(92,184,92,.25);border-radius:12px;padding:8px;color:#fff;font-size:1.3rem;text-align:center}
+.hadd-name{flex:1;background:rgba(0,0,0,.4);border:2px solid rgba(92,184,92,.25);border-radius:12px;padding:8px 12px;color:#fff;font-size:.9rem}
+.hadd-btn{background:linear-gradient(135deg,#4caf50,#2e7d32);border:none;border-radius:12px;padding:8px 14px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:1rem;cursor:pointer}
+#panel-rewards{padding:0 11px 8px}
+.rsec{font-family:'Fredoka One',Arial,sans-serif;font-size:.92rem;color:#4caf50;padding:4px 2px 8px}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.rcard{background:rgba(0,0,0,.42);border:2px solid rgba(255,179,0,.18);border-radius:18px;padding:13px 10px;text-align:center;cursor:pointer;transition:all .2s}
+.rcard.locked{opacity:.32;cursor:not-allowed}
+.rcard.picked{border-color:#ffb300;background:rgba(255,179,0,.12)}
+.rcard-e{font-size:2rem;margin-bottom:4px}
+.rcard-t{font-size:.82rem;color:#ffcc02}
+.rcard-c{font-size:.7rem;color:#ffb300;margin-top:3px}
+.rdmbtn{display:block;width:100%;margin-top:12px;background:linear-gradient(135deg,#ffb300,#e65100);border:none;border-radius:99px;padding:12px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:1rem;cursor:pointer}
+#panel-math,#panel-zhuyin{padding:0}
+.game-frame{width:100%;height:calc(100vh - 130px);border:none;border-radius:12px;display:block}
+.frame-loading{text-align:center;padding:60px 20px;color:#81c784;font-size:1.2rem}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:none;align-items:center;justify-content:center;pointer-events:none}
+.ov.open{display:flex;pointer-events:auto}
+.ov-box{background:linear-gradient(160deg,#1a2f1a,#0d1f0d);border:2px solid rgba(92,184,92,.3);border-radius:24px;padding:28px 24px;max-width:300px;width:88%;text-align:center}
+.ov-title{font-size:1.3rem;color:#fff;margin-bottom:8px}
+.ov-sub{font-size:.85rem;color:#81c784;margin-bottom:20px;line-height:1.6}
+.ov-btns{display:flex;gap:10px}
+.btn-yes{flex:1;background:linear-gradient(135deg,#4caf50,#2e7d32);border:none;border-radius:99px;padding:12px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:1rem;cursor:pointer}
+.btn-no{flex:1;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:99px;padding:12px;color:#aaa;font-family:'Fredoka One',Arial,sans-serif;font-size:1rem;cursor:pointer}
+.btn-danger{flex:1;background:linear-gradient(135deg,#ef5350,#b71c1c);border:none;border-radius:99px;padding:12px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:1rem;cursor:pointer}
+.rest-ov{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:600;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;pointer-events:none}
+.rest-ov.open{display:flex;pointer-events:auto}
+.rest-count{font-size:4rem;color:#ffb300;margin:16px 0}
+.rest-bar-wrap{width:80%;max-width:300px;height:12px;background:rgba(255,255,255,.15);border-radius:99px;overflow:hidden;margin-bottom:24px}
+.rest-bar{height:100%;background:linear-gradient(90deg,#4caf50,#ffb300);border-radius:99px;transition:width 1s linear}
+.rest-btn{background:linear-gradient(135deg,#4caf50,#2e7d32);border:none;border-radius:99px;padding:12px 32px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:1.1rem;cursor:pointer;display:none}
+.egg-ov{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:550;display:none;align-items:center;justify-content:center;pointer-events:none}
+.egg-ov.open{display:flex;pointer-events:auto}
+.egg-box{background:linear-gradient(160deg,#1a2f1a,#0d1f0d);border:2px solid rgba(92,184,92,.3);border-radius:24px;padding:24px 20px;max-width:320px;width:90%;text-align:center}
+.egg{width:80px;height:95px;background:radial-gradient(ellipse at 35% 35%,#fff9c4,#f9a825);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;position:relative;cursor:pointer;margin:16px auto}
+.egg:active{transform:scale(.94)}
+.spot{position:absolute;background:rgba(0,0,0,.12);border-radius:50%}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:10px 22px;border-radius:99px;font-size:.9rem;z-index:700;transition:opacity .4s;pointer-events:none}
+.toast.hide{opacity:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="logo">
+      <span class="logo-d">🦖</span>
+      <div>
+        <div class="logo-t">恐龍字母大冒險！</div>
+        <div class="logo-s">ABC Dino World 🌴</div>
+      </div>
+    </div>
+    <div class="star-pill">
+      <span class="spstar">⭐</span>
+      <div><div class="spl">星星</div><div class="spn" id="starNum">0</div></div>
+    </div>
+    <div class="timer-pill">⏱️ <span id="timeLeft">30:00</span></div>
+  </div>
+
+  <div class="nav">
+    <button class="nb active" onclick="switchTab('game',this)"><span class="ni">🎮</span>字母遊戲</button>
+    <button class="nb" onclick="switchTab('habits',this)"><span class="ni">🦕</span>習慣任務</button>
+    <button class="nb" onclick="switchTab('rewards',this)"><span class="ni">🏆</span>換獎勵</button>
+    <button class="nb" onclick="switchTab('math',this)"><span class="ni">🔢</span>加法遊戲</button>
+    <button class="nb" onclick="switchTab('zhuyin',this)"><span class="ni">🔤</span>注音遊戲</button>
+  </div>
+
+  <div class="panel show" id="panel-game">
+    <div class="tbox">
+      <div class="tbox-left">
+        <div class="tl">👆 接住這個字母！</div>
+        <div class="tletter" id="tLetter">A</div>
+        <div class="tword" id="tWord">Apple</div>
+        <div class="tzh" id="tZh">蘋果</div>
+      </div>
+      <div><div class="temoji" id="tEmoji">🍎</div></div>
+    </div>
+    <div id="soundBar">
+      <button onclick="tapSayLetter()"><span>🔊</span><span>念字母<br><b id="barLetter">A</b></span></button>
+      <button onclick="tapSayWord()"><span>🔊</span><span>念單字<br><b id="barWord">Apple</b></span></button>
+    </div>
+    <div class="stats">
+      <div class="sc"><div class="sv g" id="sScore">0</div><div class="sl">✅ 得分</div></div>
+      <div class="sc"><div class="sv a" id="sLevel">1</div><div class="sl">⚡ 等級</div></div>
+      <div class="sc"><div class="sv r" id="sLives">❤️❤️❤️</div><div class="sl">生命</div></div>
+    </div>
+    <div class="grow-bar-wrap">
+      <span id="growLabel">🥚 恐龍蛋</span>
+      <div class="grow-track"><div id="growBar"></div></div>
+      <span id="growNext">+5分長大</span>
+    </div>
+    <div class="game-wrap">
+      <div class="arena" id="arena">
+        <div class="dino-wrap" id="dinoWrap">
+          <canvas id="dinoCanvas" width="80" height="80"></canvas>
+          <div class="basket">🧺</div>
+        </div>
+      </div>
+      <div class="go-screen" id="goScreen">
+        <div class="go-d">🦖</div>
+        <div class="go-t">恐龍字母<br>大冒險！</div>
+        <div class="go-s">接住正確的字母！<br>接錯了要扣血哦 🌿</div>
+        <button class="go-btn" id="startBtn">🎮 開始遊戲！</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-habits">
+    <div class="hsec">🦕 習慣任務 <span class="hpill" id="doneCount">0 完成</span></div>
+    <div class="hgrid" id="hGrid"></div>
+    <div class="hadd-row">
+      <input id="newEmoji" class="hadd-emoji" type="text" maxlength="2" placeholder="😊">
+      <input id="newName" class="hadd-name" type="text" maxlength="10" placeholder="新習慣...">
+      <button class="hadd-btn" onclick="addHabit()">➕</button>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-rewards">
+    <div class="rsec">🏆 換獎勵！你有 <span id="rStars" style="color:#ffb300">0</span> 顆⭐</div>
+    <div class="rgrid" id="rGrid"></div>
+    <button class="rdmbtn" onclick="confirmRedeem()">🎉 換這個獎勵！</button>
+  </div>
+
+  <div class="panel" id="panel-math">
+    <div class="frame-loading" id="mathLoading">⏳ 載入中...</div>
+    <iframe class="game-frame" id="mathFrame" src="" style="display:none"
+      onload="document.getElementById('mathLoading').style.display='none';this.style.display='block';"></iframe>
+  </div>
+
+  <div class="panel" id="panel-zhuyin">
+    <div class="frame-loading" id="zhuyinLoading">⏳ 載入中...</div>
+    <iframe class="game-frame" id="zhuyinFrame" src="" style="display:none"
+      onload="document.getElementById('zhuyinLoading').style.display='none';this.style.display='block';"></iframe>
+  </div>
+</div>
+
+<div class="ov" id="leaveOv">
+  <div class="ov-box">
+    <div class="ov-title">🎮 離開遊戲？</div>
+    <div class="ov-sub">遊戲進行中！<br>確定要離開並停止音樂嗎？</div>
+    <div class="ov-btns">
+      <button class="btn-no" onclick="cancelLeave()">⬅️ 繼續玩</button>
+      <button class="btn-danger" onclick="doLeave()">✅ 離開</button>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="habitOv">
+  <div class="ov-box">
+    <div class="ov-title" id="habitOvTitle">完成習慣？</div>
+    <div class="ov-sub" id="habitOvSub">確認記錄！</div>
+    <div class="ov-btns">
+      <button class="btn-no" onclick="cancelHabit()">❌ 取消</button>
+      <button class="btn-yes" onclick="doHabit()">✅ 完成！</button>
+    </div>
+  </div>
+</div>
+
+<div class="rest-ov" id="restOv">
+  <div style="font-size:2rem;color:#fff;margin-bottom:12px">👀 休息一下！</div>
+  <div style="font-size:1rem;color:#81c784;margin-bottom:8px">你已經玩了 30 分鐘！</div>
+  <div style="font-size:.85rem;color:#81c784;margin-bottom:16px">保護眼睛，休息 10 分鐘再玩 🌿</div>
+  <div class="rest-count" id="restCount">10:00</div>
+  <div class="rest-bar-wrap"><div class="rest-bar" id="restBar" style="width:100%"></div></div>
+  <button class="rest-btn" id="restBtn" onclick="endRest()">🎮 繼續玩！</button>
+</div>
+
+<div class="egg-ov" id="eggOv">
+  <div class="egg-box">
+    <div style="font-size:1.3rem;color:#fff;margin-bottom:8px">🎊 100分！太厲害了！</div>
+    <div style="font-size:.82rem;color:#81c784;margin-bottom:8px;line-height:1.5">一顆神秘恐龍蛋出現了！<br>點蛋蛋讓小恐龍出來！🦕</div>
+    <div style="font-size:1.6rem;opacity:0;transition:opacity .4s" id="peekDino">🦕</div>
+    <div class="egg" id="theEgg">
+      <div class="spot" style="width:14px;height:10px;top:26%;left:28%;transform:rotate(-20deg)"></div>
+      <div class="spot" style="width:10px;height:8px;top:52%;left:60%;transform:rotate(15deg)"></div>
+    </div>
+    <div id="eggProgress" style="display:flex;gap:4px;justify-content:center;margin:8px 0;flex-wrap:wrap"></div>
+    <div id="tapHint" style="font-size:.8rem;color:#81c784">👆 點蛋蛋！</div>
+    <div id="eggBonus" style="color:#ffb300;font-size:1rem;margin:6px 0;display:none">🎉 獲得 +50 顆星星！⭐</div>
+    <button id="eggCont" style="display:none;margin-top:10px;background:linear-gradient(135deg,#4caf50,#2e7d32);border:none;border-radius:99px;padding:10px 28px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:1rem;cursor:pointer" onclick="closeEgg()">🦖 繼續大冒險！</button>
+  </div>
+</div>
+
+<div class="toast hide" id="toast"></div>
+
+<script>
+const ABC=[
+  {l:'A',e:'🍎',w:'Apple',zh:'蘋果'},{l:'B',e:'🐝',w:'Bee',zh:'蜜蜂'},
+  {l:'C',e:'🐱',w:'Cat',zh:'貓咪'},{l:'D',e:'🐶',w:'Dog',zh:'狗狗'},
+  {l:'E',e:'🐘',w:'Elephant',zh:'大象'},{l:'F',e:'🐸',w:'Frog',zh:'青蛙'},
+  {l:'G',e:'🍇',w:'Grape',zh:'葡萄'},{l:'H',e:'🐹',w:'Hamster',zh:'倉鼠'},
+  {l:'I',e:'🍦',w:'Ice Cream',zh:'冰淇淋'},{l:'J',e:'🦘',w:'Jumping',zh:'跳跳'},
+  {l:'K',e:'🪁',w:'Kite',zh:'風箏'},{l:'L',e:'🦁',w:'Lion',zh:'獅子'},
+  {l:'M',e:'🐒',w:'Monkey',zh:'猴子'},{l:'N',e:'🌙',w:'Night',zh:'夜晚'},
+  {l:'O',e:'🐙',w:'Octopus',zh:'章魚'},{l:'P',e:'🐼',w:'Panda',zh:'熊貓'},
+  {l:'Q',e:'👸',w:'Queen',zh:'女王'},{l:'R',e:'🌈',w:'Rainbow',zh:'彩虹'},
+  {l:'S',e:'⭐',w:'Star',zh:'星星'},{l:'T',e:'🐯',w:'Tiger',zh:'老虎'},
+  {l:'U',e:'☂️',w:'Umbrella',zh:'雨傘'},{l:'V',e:'🎻',w:'Violin',zh:'小提琴'},
+  {l:'W',e:'🐳',w:'Whale',zh:'鯨魚'},{l:'X',e:'🎸',w:'Xylophone',zh:'木琴'},
+  {l:'Y',e:'🧶',w:'Yarn',zh:'毛線球'},{l:'Z',e:'🦓',w:'Zebra',zh:'斑馬'},
+];
+const DEFAULT_HABITS=[
+  {e:'🦷',t:'刷牙'},{e:'📚',t:'閱讀'},{e:'🥦',t:'吃蔬菜'},
+  {e:'🛁',t:'洗澡'},{e:'😴',t:'早睡'},{e:'🏃',t:'運動'},
+];
+const REWARDS=[
+  {e:'🍭',t:'糖果一顆',c:20},{e:'📱',t:'玩手機30分',c:50},
+  {e:'🎬',t:'看卡通一集',c:40},{e:'🧸',t:'買新玩具',c:150},
+  {e:'🍕',t:'吃披薩',c:80},{e:'🎮',t:'玩遊戲1小時',c:60},
+];
+const GROW=[
+  {label:'🥚 恐龍蛋',next:5},{label:'🐣 破殼了',next:15},
+  {label:'🦕 小恐龍',next:30},{label:'🦖 大恐龍',next:60},
+  {label:'👑 恐龍王',next:999},
+];
+
+const todayKey='dino_'+new Date().toISOString().slice(0,10);
+let stars=parseInt(localStorage.getItem('stars')||'0');
+let HABITS=JSON.parse(localStorage.getItem('habits')||JSON.stringify(DEFAULT_HABITS));
+let habitLog=JSON.parse(localStorage.getItem('hlog_'+todayKey)||'{}');
+let score=0,lives=3,level=1,gameActive=false;
+let fallers=[],fallerTimer=null,dinoX=160;
+let drag=false,dragStartX=0,dinoStartX=0;
+let growScore=0,growIdx=0;
+let eggTaps=0,eggOpen=false;
+let selectedReward=null,currentTarget=null,idleRafId=null;
+const PLAY_LIMIT=30*60,REST_DURATION=10*60;
+let dailyTimer=null,restTimer=null,restRemain=REST_DURATION,isResting=false;
+let bgmPlaying=false,bgmCtx=null,bgmLoopTimer=null,bgmLoopStart=0;
+let pendingTab=null,pendingBtn=null,currentTab="game";
+
+function saveStars(){localStorage.setItem('stars',stars);}
+function saveHabits(){localStorage.setItem('hlog_'+todayKey,JSON.stringify(habitLog));}
+function saveHabitsList(){localStorage.setItem('habits',JSON.stringify(HABITS));}
+function updateStarUI(){document.getElementById('starNum').textContent=stars;}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.remove('hide');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.add('hide'),2800);
+}
+
+// TAB
+function switchTab(name,btn){
+  if(name===currentTab)return;
+  const mathLoaded=document.getElementById('mathFrame').getAttribute('data-loaded');
+  const zhuyinLoaded=document.getElementById('zhuyinFrame').getAttribute('data-loaded');
+  const iframeActive=(currentTab==='math'&&mathLoaded)||(currentTab==='zhuyin'&&zhuyinLoaded);
+  if(gameActive||iframeActive){
+    pendingTab=name;pendingBtn=btn;
+    document.getElementById('leaveOv').classList.add('open');
+    return;
+  }
+  doSwitchTab(name,btn);
+}
+function cancelLeave(){
+  document.getElementById('leaveOv').classList.remove('open');
+  pendingTab=null;pendingBtn=null;
+}
+function doLeave(){
+  document.getElementById('leaveOv').classList.remove('open');
+  if(gameActive)endGame();
+  stopBGM();
+  if(currentTab==='math'){
+    const fr=document.getElementById('mathFrame');
+    fr.src='';fr.removeAttribute('data-loaded');
+    document.getElementById('mathLoading').style.display='block';fr.style.display='none';
+  }
+  if(currentTab==='zhuyin'){
+    const fr=document.getElementById('zhuyinFrame');
+    fr.src='';fr.removeAttribute('data-loaded');
+    document.getElementById('zhuyinLoading').style.display='block';fr.style.display='none';
+  }
+  const name=pendingTab,btn=pendingBtn;
+  pendingTab=null;pendingBtn=null;
+  doSwitchTab(name,btn);
+}
+function doSwitchTab(name,btn){
+  currentTab=name;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('show');
+  if(btn)btn.classList.add('active');
+  if(name==='habits')renderHabits();
+  if(name==='rewards')renderRewards();
+  if(name==='math'){
+    const fr=document.getElementById('mathFrame');
+    if(!fr.getAttribute('data-loaded')){fr.setAttribute('data-loaded','1');fr.src='ptero-math.html';}
+  }
+  if(name==='zhuyin'){
+    const fr=document.getElementById('zhuyinFrame');
+    if(!fr.getAttribute('data-loaded')){fr.setAttribute('data-loaded','1');fr.src='dino-zhuyin.html';}
+  }
+}
+
+// BGM
+// 宮崎駿風 - 輕快五聲音階旋律
+const MELODY=[
+  72,0,74,72,69,0,72,0,
+  74,0,76,74,72,0,74,0,
+  76,77,76,74,72,71,69,0,
+  67,69,71,72,71,69,67,0
+];
+const BASS=[
+  60,0,64,0,60,0,64,0,
+  62,0,65,0,62,0,65,0,
+  60,0,64,0,60,0,64,0,
+  55,0,59,0,55,0,59,0
+];
+const TEMPO=0.18;
+function midiHz(n){return 440*Math.pow(2,(n-69)/12);}
+function scheduleBGM(ctx,t0){
+  const dur=MELODY.length*TEMPO;
+  MELODY.forEach((n,i)=>{
+    if(!n)return;
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type='sine';o.frequency.value=midiHz(n);
+    g.gain.setValueAtTime(0,t0+i*TEMPO);
+    g.gain.linearRampToValueAtTime(0.15,t0+i*TEMPO+0.02);
+    g.gain.linearRampToValueAtTime(0,t0+i*TEMPO+TEMPO*0.85);
+    o.connect(g);g.connect(ctx.destination);
+    o.start(t0+i*TEMPO);o.stop(t0+i*TEMPO+TEMPO);
+  });
+  BASS.forEach((n,i)=>{
+    if(!n)return;
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type='sine';o.frequency.value=midiHz(n);
+    g.gain.setValueAtTime(0,t0+i*TEMPO);
+    g.gain.linearRampToValueAtTime(0.08,t0+i*TEMPO+0.02);
+    g.gain.linearRampToValueAtTime(0,t0+i*TEMPO+TEMPO*0.9);
+    o.connect(g);g.connect(ctx.destination);
+    o.start(t0+i*TEMPO);o.stop(t0+i*TEMPO+TEMPO);
+  });
+  return dur;
+}
+function startBGM(){
+  if(bgmPlaying)return;
+  try{
+    bgmPlaying=true;
+    bgmCtx=new(window.AudioContext||window.webkitAudioContext)();
+    bgmCtx.resume().then(()=>{
+      bgmLoopStart=bgmCtx.currentTime+0.1;
+      function loop(){
+        if(!bgmPlaying)return;
+        const dur=scheduleBGM(bgmCtx,bgmLoopStart);
+        bgmLoopStart+=dur;
+        bgmLoopTimer=setTimeout(loop,(dur-0.15)*1000);
+      }
+      loop();
+    });
+  }catch(e){bgmPlaying=false;}
+}
+function stopBGM(){
+  bgmPlaying=false;
+  clearTimeout(bgmLoopTimer);
+  if(bgmCtx){try{bgmCtx.close();}catch(e){}bgmCtx=null;}
+}
+
+// SPEECH
+function say(text,lang){
+  if(!window.speechSynthesis)return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=lang||'en-US';u.rate=0.85;u.pitch=1.1;
+  speechSynthesis.speak(u);
+}
+function tapSayLetter(){if(currentTarget){say(currentTarget.l,'en-US');setTimeout(()=>say(currentTarget.w,'en-US'),600);}}
+function tapSayWord(){if(currentTarget)say(currentTarget.w,'en-US');}
+
+// IDLE
+function drawDino(ctx2d,t){
+  ctx2d.clearRect(0,0,80,80);
+  ctx2d.font='54px serif';ctx2d.textAlign='center';
+  ctx2d.fillText('🦖',40,56+Math.sin(t*0.05)*4);
+}
+function startIdle(){
+  stopIdle();
+  const cv=document.getElementById('dinoCanvas');if(!cv)return;
+  const ctx2d=cv.getContext('2d');let t=0;
+  function tick(){if(gameActive){idleRafId=null;return;}idleRafId=requestAnimationFrame(tick);drawDino(ctx2d,t++);}
+  tick();
+}
+function stopIdle(){if(idleRafId){cancelAnimationFrame(idleRafId);idleRafId=null;}}
+
+// GAME
+function pickTarget(){
+  currentTarget=ABC[Math.floor(Math.random()*ABC.length)];
+  document.getElementById('tLetter').textContent=currentTarget.l;
+  document.getElementById('tWord').textContent=currentTarget.w;
+  document.getElementById('tZh').textContent=currentTarget.zh;
+  document.getElementById('tEmoji').textContent=currentTarget.e;
+  document.getElementById('barLetter').textContent=currentTarget.l;
+  document.getElementById('barWord').textContent=currentTarget.w;
+}
+function updateLivesUI(){document.getElementById('sLives').textContent='❤️'.repeat(lives);}
+function spawnFaller(){
+  if(!gameActive)return;
+  const arena=document.getElementById('arena');
+  const W=arena.clientWidth;
+  const isCorrect=Math.random()<0.4;
+  let letter;
+  if(isCorrect){letter=currentTarget.l;}
+  else{let r;do{r=ABC[Math.floor(Math.random()*ABC.length)].l;}while(r===currentTarget.l);letter=r;}
+  const el=document.createElement('div');
+  el.className='faller';el.textContent=letter;
+  el.style.left=Math.random()*(W-60)+10+'px';
+  el.dataset.correct=isCorrect?'1':'0';
+  arena.appendChild(el);
+  fallers.push({el,y:-50,speed:1.2+level*0.3+Math.random()*0.8});
+}
+function gameLoop(){
+  if(!gameActive)return;
+  const arena=document.getElementById('arena');
+  const aH=arena.clientHeight;
+  const dRect=document.getElementById('dinoWrap').getBoundingClientRect();
+  fallers.forEach((f,i)=>{
+    f.y+=f.speed;f.el.style.top=f.y+'px';
+    const fR=f.el.getBoundingClientRect();
+    const caught=fR.bottom>=dRect.top&&fR.top<=dRect.bottom&&fR.right>=dRect.left&&fR.left<=dRect.right;
+    if(f.y>aH||caught){
+      if(caught){
+        if(f.el.dataset.correct==='1'){
+          score++;document.getElementById('sScore').textContent=score;checkGrow();
+          f.el.classList.add('correct');
+          if(score%10===0&&score>0){level++;document.getElementById('sLevel').textContent=level;showToast('⚡ 升級了！Level '+level);}
+          if(score===100)showEgg();
+          pickTarget();
+        }else{
+          lives--;updateLivesUI();f.el.classList.add('wrong');
+          if(lives<=0){f.el.remove();fallers.splice(i,1);endGame();return;}
+        }
+      }
+      f.el.remove();fallers.splice(i,1);
+    }
+  });
+  requestAnimationFrame(gameLoop);
+}
+function startGame(){
+  if(gameActive)return;
+  gameActive=true;
+  startDailyTimer();
+  score=0;lives=3;level=1;fallers=[];growScore=0;growIdx=0;
+  document.getElementById('sScore').textContent=0;
+  document.getElementById('sLevel').textContent=1;
+  document.getElementById('growBar').style.width='0%';
+  document.getElementById('growLabel').textContent=GROW[0].label;
+  document.getElementById('growNext').textContent='+'+GROW[0].next+'分長大';
+  updateLivesUI();
+  document.getElementById('goScreen').style.display='none';
+  stopIdle();pickTarget();startBGM();
+  fallerTimer=setInterval(spawnFaller,1800);
+  gameLoop();
+}
+function endGame(){
+  gameActive=false;clearInterval(fallerTimer);
+  clearInterval(dailyTimer);
+  fallers.forEach(f=>f.el.remove());fallers=[];
+  stopBGM();
+  document.getElementById('goScreen').style.display='flex';
+  const earned=Math.floor(score/5);
+  if(earned>0){stars+=earned;saveStars();updateStarUI();showToast('🎉 遊戲結束！+'+earned+'⭐');}
+  else showToast('🎮 遊戲結束！得分：'+score);
+  startIdle();
+}
+function checkGrow(){
+  growScore++;
+  const g=GROW[growIdx];
+  document.getElementById('growBar').style.width=Math.min(growScore/g.next,1)*100+'%';
+  if(growScore>=g.next&&growIdx<GROW.length-1){
+    growScore=0;growIdx++;
+    document.getElementById('growLabel').textContent=GROW[growIdx].label;
+    document.getElementById('growNext').textContent='+'+GROW[growIdx].next+'分長大';
+    showToast('🦕 '+GROW[growIdx].label+'！');
+  }
+}
+
+// EGG
+function showEgg(){
+  eggTaps=0;eggOpen=true;
+  document.getElementById('eggProgress').innerHTML='';
+  document.getElementById('eggBonus').style.display='none';
+  document.getElementById('eggCont').style.display='none';
+  document.getElementById('tapHint').style.display='block';
+  document.getElementById('peekDino').style.opacity='0';
+  document.getElementById('eggOv').classList.add('open');
+}
+document.getElementById('theEgg').addEventListener('click',function(){
+  if(!eggOpen)return;
+  eggTaps++;document.getElementById('eggProgress').innerHTML+='⭐';
+  if(eggTaps>=10){
+    document.getElementById('peekDino').style.opacity='1';
+    document.getElementById('tapHint').style.display='none';
+    document.getElementById('eggBonus').style.display='block';
+    document.getElementById('eggCont').style.display='inline-block';
+    stars+=50;saveStars();updateStarUI();eggOpen=false;
+  }
+});
+function closeEgg(){document.getElementById('eggOv').classList.remove('open');}
+
+// DRAG - touchstart/move on arena for dino movement
+document.getElementById('arena').addEventListener('touchstart',function(e){
+  drag=true;dragStartX=e.touches[0].clientX;dinoStartX=dinoX;
+  e.preventDefault();
+},{passive:false});
+document.getElementById('arena').addEventListener('touchmove',function(e){
+  if(!drag)return;
+  const W=document.getElementById('arena').clientWidth;
+  dinoX=Math.max(30,Math.min(W-30,dinoStartX+(e.touches[0].clientX-dragStartX)));
+  document.getElementById('dinoWrap').style.left=dinoX+'px';
+  document.getElementById('dinoWrap').style.transform='translateX(-50%)';
+  e.preventDefault();
+},{passive:false});
+document.getElementById('arena').addEventListener('touchend',function(){drag=false;});
+document.getElementById('arena').addEventListener('mousedown',function(e){drag=true;dragStartX=e.clientX;dinoStartX=dinoX;});
+document.getElementById('arena').addEventListener('mousemove',function(e){
+  if(!drag)return;
+  const W=document.getElementById('arena').clientWidth;
+  dinoX=Math.max(30,Math.min(W-30,dinoStartX+(e.clientX-dragStartX)));
+  document.getElementById('dinoWrap').style.left=dinoX+'px';
+  document.getElementById('dinoWrap').style.transform='translateX(-50%)';
+});
+document.getElementById('arena').addEventListener('mouseup',function(){drag=false;});
+
+// START BUTTON - separate listener, not inside arena
+document.getElementById('startBtn').addEventListener('touchend',function(e){
+  e.preventDefault();e.stopPropagation();startGame();
+},{passive:false});
+document.getElementById('startBtn').addEventListener('click',function(e){
+  e.stopPropagation();startGame();
+});
+
+// HABITS
+let pendingHabit=-1;
+function renderHabits(){
+  const grid=document.getElementById('hGrid');
+  let done=0;
+  grid.innerHTML=HABITS.map((h,i)=>{
+    const cnt=habitLog[i]||0;if(cnt>0)done++;
+    const cls='hcard'+(cnt>=2?' done2':cnt===1?' done':'');
+    const badge=cnt>=2?'✅✅':cnt===1?'✅':'';
+    return '<div class="'+cls+'" onclick="askHabit('+i+')">'
+      +'<div class="hcard-del" onclick="event.stopPropagation();deleteHabit('+i+')">✕</div>'
+      +'<div class="hcard-e">'+h.e+'</div><div class="hcard-t">'+h.t+'</div>'
+      +'<div class="hcard-c">'+badge+'</div></div>';
+  }).join('');
+  document.getElementById('doneCount').textContent=done+' 完成';
+}
+function askHabit(i){
+  const cnt=habitLog[i]||0;
+  if(cnt>=2){showToast('已完成兩次囉！');return;}
+  pendingHabit=i;
+  const h=HABITS[i];
+  document.getElementById('habitOvTitle').textContent=h.e+' '+h.t+' 完成了嗎？';
+  document.getElementById('habitOvSub').textContent=cnt===0?'第一次完成 +5⭐':'再做一次 +5⭐！好棒！';
+  document.getElementById('habitOv').classList.add('open');
+}
+function cancelHabit(){document.getElementById('habitOv').classList.remove('open');pendingHabit=-1;}
+function doHabit(){
+  document.getElementById('habitOv').classList.remove('open');
+  if(pendingHabit<0)return;
+  const i=pendingHabit;pendingHabit=-1;
+  habitLog[i]=(habitLog[i]||0)+1;saveHabits();
+  stars+=5;saveStars();updateStarUI();
+  showToast('🦕 '+HABITS[i].e+' +5⭐！繼續加油！');renderHabits();
+}
+function addHabit(){
+  const e=document.getElementById('newEmoji').value.trim()||'⭐';
+  const t=document.getElementById('newName').value.trim();
+  if(!t){showToast('請輸入習慣名稱！');return;}
+  HABITS.push({e,t});saveHabitsList();
+  document.getElementById('newEmoji').value='';document.getElementById('newName').value='';
+  showToast('✅ 新增：'+e+' '+t);renderHabits();
+}
+function deleteHabit(i){
+  HABITS.splice(i,1);saveHabitsList();
+  const newLog={};
+  Object.keys(habitLog).forEach(k=>{
+    const ki=parseInt(k);
+    if(ki<i)newLog[k]=habitLog[k];else if(ki>i)newLog[ki-1]=habitLog[k];
+  });
+  habitLog=newLog;saveHabits();renderHabits();
+}
+
+// REWARDS
+function renderRewards(){
+  document.getElementById('rStars').textContent=stars;
+  document.getElementById('rGrid').innerHTML=REWARDS.map((r,i)=>{
+    const locked=stars<r.c;
+    const cls='rcard'+(locked?' locked':selectedReward===i?' picked':'');
+    return '<div class="'+cls+'" onclick="pickReward('+i+')">'
+      +'<div class="rcard-e">'+r.e+'</div><div class="rcard-t">'+r.t+'</div>'
+      +'<div class="rcard-c">'+r.c+'⭐</div></div>';
+  }).join('');
+}
+function pickReward(i){
+  if(stars<REWARDS[i].c){showToast('星星不夠哦！');return;}
+  selectedReward=i;renderRewards();
+}
+function confirmRedeem(){
+  if(selectedReward===null){showToast('請先選一個獎勵！');return;}
+  const r=REWARDS[selectedReward];
+  if(stars<r.c){showToast('星星不夠！');return;}
+  stars-=r.c;saveStars();showToast('🎉 換到了 '+r.e+' '+r.t+'！');
+  selectedReward=null;renderRewards();
+}
+
+// TIMER
+function getRemainingSeconds(){
+  return Math.max(0,PLAY_LIMIT-parseInt(localStorage.getItem('used_'+todayKey)||'0'));
+}
+function updateTimerDisplay(sec){
+  const m=Math.floor(sec/60),s=sec%60;
+  document.getElementById('timeLeft').textContent=m+':'+(s<10?'0':'')+s;
+}
+function startDailyTimer(){
+  clearInterval(dailyTimer);
+  dailyTimer=setInterval(()=>{
+    if(isResting)return;
+    const used=parseInt(localStorage.getItem('used_'+todayKey)||'0')+1;
+    localStorage.setItem('used_'+todayKey,used);
+    const rem=Math.max(0,PLAY_LIMIT-used);
+    updateTimerDisplay(rem);
+    if(rem<=0){clearInterval(dailyTimer);if(gameActive)endGame();startRest();}
+  },1000);
+}
+function startRest(){
+  isResting=true;restRemain=REST_DURATION;
+  document.getElementById('restOv').classList.add('open');
+  document.getElementById('restBtn').style.display='none';
+  updateRestDisplay();
+  restTimer=setInterval(()=>{
+    restRemain--;updateRestDisplay();
+    if(restRemain<=0){clearInterval(restTimer);document.getElementById('restBtn').style.display='inline-block';}
+  },1000);
+}
+function updateRestDisplay(){
+  const m=Math.floor(restRemain/60),s=restRemain%60;
+  document.getElementById('restCount').textContent=m+':'+(s<10?'0':'')+s;
+  document.getElementById('restBar').style.width=(restRemain/REST_DURATION*100)+'%';
+}
+function endRest(){
+  isResting=false;clearInterval(restTimer);
+  document.getElementById('restOv').classList.remove('open');
+  localStorage.setItem('used_'+todayKey,'0');
+  updateTimerDisplay(PLAY_LIMIT);startDailyTimer();
+  showToast('🎮 休息好了！繼續加油！');
+}
+
+// INIT
+updateStarUI();
+updateTimerDisplay(getRemainingSeconds());
+startIdle();
+pickTarget();
+</script>
+</body>
+</html>
