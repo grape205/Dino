@@ -325,6 +325,38 @@ function getCorrect(){
   if(t==='tone') return current.tone;
 }
 
+
+function playCorrect(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [523,659,784].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0,ctx.currentTime+i*0.1);
+      g.gain.linearRampToValueAtTime(0.3,ctx.currentTime+i*0.1+0.02);
+      g.gain.linearRampToValueAtTime(0,ctx.currentTime+i*0.1+0.12);
+      o.connect(g);g.connect(ctx.destination);
+      o.start(ctx.currentTime+i*0.1);
+      o.stop(ctx.currentTime+i*0.1+0.15);
+    });
+    setTimeout(()=>ctx.close(),600);
+  }catch(e){}
+}
+function playWrong(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [220,196].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='sawtooth';o.frequency.value=f;
+      g.gain.setValueAtTime(0.25,ctx.currentTime+i*0.15);
+      g.gain.linearRampToValueAtTime(0,ctx.currentTime+i*0.15+0.18);
+      o.connect(g);g.connect(ctx.destination);
+      o.start(ctx.currentTime+i*0.15);
+      o.stop(ctx.currentTime+i*0.15+0.2);
+    });
+    setTimeout(()=>ctx.close(),600);
+  }catch(e){}
+}
 function handleAnswer(btn,chosen){
   if(answering)return;
   answering=true;
@@ -334,7 +366,7 @@ function handleAnswer(btn,chosen){
   const lv=LEVELS[levelIdx];
   totalQ++;
   if(chosen===correct){
-    btn.classList.add('correct');btn.querySelector('.fi').textContent='✅';
+    playCorrect();btn.classList.add('correct');btn.querySelector('.fi').textContent='✅';
     score+=lv.pts;totalCorrect++;
     document.getElementById('scoreNum').textContent=score;
     document.getElementById('feedbackMsg').textContent=praise();

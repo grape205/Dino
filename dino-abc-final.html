@@ -511,6 +511,7 @@ function gameLoop(){
 function startGame(){
   if(gameActive)return;
   gameActive=true;
+  startDailyTimer();
   score=0;lives=3;level=1;fallers=[];growScore=0;growIdx=0;
   document.getElementById('sScore').textContent=0;
   document.getElementById('sLevel').textContent=1;
@@ -525,6 +526,7 @@ function startGame(){
 }
 function endGame(){
   gameActive=false;clearInterval(fallerTimer);
+  clearInterval(dailyTimer);
   fallers.forEach(f=>f.el.remove());fallers=[];
   stopBGM();
   document.getElementById('goScreen').style.display='flex';
@@ -720,7 +722,6 @@ function endRest(){
 // INIT
 updateStarUI();
 updateTimerDisplay(getRemainingSeconds());
-startDailyTimer();
 startIdle();
 pickTarget();
 </script>
