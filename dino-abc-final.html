@@ -301,7 +301,7 @@ let selectedReward=null,currentTarget=null,idleRafId=null;
 const PLAY_LIMIT=30*60,REST_DURATION=10*60;
 let dailyTimer=null,restTimer=null,restRemain=REST_DURATION,isResting=false;
 let bgmPlaying=false,bgmCtx=null,bgmLoopTimer=null,bgmLoopStart=0;
-let pendingTab=null,pendingBtn=null;
+let pendingTab=null,pendingBtn=null,currentTab="game";
 
 function saveStars(){localStorage.setItem('stars',stars);}
 function saveHabits(){localStorage.setItem('hlog_'+todayKey,JSON.stringify(habitLog));}
@@ -315,7 +315,9 @@ function showToast(msg){
 
 // TAB
 function switchTab(name,btn){
-  if(gameActive){
+  if(name===currentTab)return;
+  const iframeActive=(currentTab==='math'||currentTab==='zhuyin');
+  if(gameActive||iframeActive){
     pendingTab=name;pendingBtn=btn;
     document.getElementById('leaveOv').classList.add('open');
     return;
@@ -330,11 +332,22 @@ function doLeave(){
   document.getElementById('leaveOv').classList.remove('open');
   if(gameActive)endGame();
   stopBGM();
+  if(currentTab==='math'){
+    const fr=document.getElementById('mathFrame');
+    fr.src='';fr.removeAttribute('data-loaded');
+    document.getElementById('mathLoading').style.display='block';fr.style.display='none';
+  }
+  if(currentTab==='zhuyin'){
+    const fr=document.getElementById('zhuyinFrame');
+    fr.src='';fr.removeAttribute('data-loaded');
+    document.getElementById('zhuyinLoading').style.display='block';fr.style.display='none';
+  }
   const name=pendingTab,btn=pendingBtn;
   pendingTab=null;pendingBtn=null;
   doSwitchTab(name,btn);
 }
 function doSwitchTab(name,btn){
+  currentTab=name;
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('show');
