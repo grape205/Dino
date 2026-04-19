@@ -316,7 +316,9 @@ function showToast(msg){
 // TAB
 function switchTab(name,btn){
   if(name===currentTab)return;
-  const iframeActive=(currentTab==='math'||currentTab==='zhuyin');
+  const mathLoaded=document.getElementById('mathFrame').getAttribute('data-loaded');
+  const zhuyinLoaded=document.getElementById('zhuyinFrame').getAttribute('data-loaded');
+  const iframeActive=(currentTab==='math'&&mathLoaded)||(currentTab==='zhuyin'&&zhuyinLoaded);
   if(gameActive||iframeActive){
     pendingTab=name;pendingBtn=btn;
     document.getElementById('leaveOv').classList.add('open');
@@ -365,16 +367,27 @@ function doSwitchTab(name,btn){
 }
 
 // BGM
-const MELODY=[60,62,64,65,67,65,64,62,60,60,62,64,67,65,64,62,60,0,64,65,67,69,67,65,64,62,60,0];
-const BASS=[48,0,48,0,48,0,48,0,48,0,48,0,48,0,48,0,48,0,48,0,48,0,48,0,48,0,48,0,48,0];
-const TEMPO=0.22;
+// 宮崎駿風 - 輕快五聲音階旋律
+const MELODY=[
+  72,0,74,72,69,0,72,0,
+  74,0,76,74,72,0,74,0,
+  76,77,76,74,72,71,69,0,
+  67,69,71,72,71,69,67,0
+];
+const BASS=[
+  60,0,64,0,60,0,64,0,
+  62,0,65,0,62,0,65,0,
+  60,0,64,0,60,0,64,0,
+  55,0,59,0,55,0,59,0
+];
+const TEMPO=0.18;
 function midiHz(n){return 440*Math.pow(2,(n-69)/12);}
 function scheduleBGM(ctx,t0){
   const dur=MELODY.length*TEMPO;
   MELODY.forEach((n,i)=>{
     if(!n)return;
     const o=ctx.createOscillator(),g=ctx.createGain();
-    o.type='triangle';o.frequency.value=midiHz(n);
+    o.type='sine';o.frequency.value=midiHz(n);
     g.gain.setValueAtTime(0,t0+i*TEMPO);
     g.gain.linearRampToValueAtTime(0.15,t0+i*TEMPO+0.02);
     g.gain.linearRampToValueAtTime(0,t0+i*TEMPO+TEMPO*0.85);
