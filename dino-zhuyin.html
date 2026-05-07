@@ -189,6 +189,7 @@ body{font-family:'Fredoka One','Noto Sans TC',sans-serif;background:#1B5E20;min-
 
 <script>
 const qBank=[
+  // ── 原有20題 ──
   {emoji:'🍎',name:'蘋果',zhuyin:'ㄆㄧㄥˊ',initial:'ㄆ',syllable:'ㄆㄧㄥˊ',tone:'ˊ',toneWord:'ㄆㄧㄥ',wrongI:['ㄅ','ㄇ','ㄈ','ㄉ','ㄊ'],wrongS:['ㄅㄧㄥˊ','ㄇㄧㄥˊ','ㄉㄧㄥˊ','ㄆㄤˊ'],wrongT:['ˉ','ˇ','ˋ']},
   {emoji:'🍌',name:'香蕉',zhuyin:'ㄒㄧㄤ',initial:'ㄒ',syllable:'ㄒㄧㄤ',tone:'ˉ',toneWord:'ㄒㄧㄤ',wrongI:['ㄐ','ㄑ','ㄓ','ㄔ','ㄕ'],wrongS:['ㄐㄧㄤ','ㄑㄧㄤ','ㄒㄧㄣ','ㄒㄧㄡ'],wrongT:['ˊ','ˇ','ˋ']},
   {emoji:'🐶',name:'狗',zhuyin:'ㄍㄡˇ',initial:'ㄍ',syllable:'ㄍㄡˇ',tone:'ˇ',toneWord:'ㄍㄡ',wrongI:['ㄎ','ㄏ','ㄐ','ㄑ','ㄒ'],wrongS:['ㄎㄡˇ','ㄏㄡˇ','ㄍㄨˇ','ㄍㄟˇ'],wrongT:['ˉ','ˊ','ˋ']},
@@ -209,6 +210,46 @@ const qBank=[
   {emoji:'🐼',name:'熊貓',zhuyin:'ㄒㄩㄥˊ',initial:'ㄒ',syllable:'ㄒㄩㄥˊ',tone:'ˊ',toneWord:'ㄒㄩㄥ',wrongI:['ㄐ','ㄑ','ㄓ','ㄔ','ㄕ'],wrongS:['ㄐㄩㄥˊ','ㄑㄩㄥˊ','ㄒㄧㄥˊ','ㄒㄩㄣˊ'],wrongT:['ˉ','ˇ','ˋ']},
   {emoji:'🌺',name:'玫瑰',zhuyin:'ㄇㄟˊ',initial:'ㄇ',syllable:'ㄇㄟˊ',tone:'ˊ',toneWord:'ㄇㄟ',wrongI:['ㄅ','ㄆ','ㄈ','ㄉ','ㄊ'],wrongS:['ㄅㄟˊ','ㄆㄟˊ','ㄇㄠˊ','ㄇㄣˊ'],wrongT:['ˉ','ˇ','ˋ']},
   {emoji:'⭐',name:'星星',zhuyin:'ㄒㄧㄥ',initial:'ㄒ',syllable:'ㄒㄧㄥ',tone:'ˉ',toneWord:'ㄒㄧㄥ',wrongI:['ㄐ','ㄑ','ㄓ','ㄔ','ㄕ'],wrongS:['ㄐㄧㄥ','ㄑㄧㄥ','ㄒㄧㄣ','ㄒㄧㄡ'],wrongT:['ˊ','ˇ','ˋ']},
+  // ── 新增40題（動物）──
+  {emoji:'🐘',name:'大象',zhuyin:'ㄒㄧㄤˋ',initial:'ㄒ',syllable:'ㄒㄧㄤˋ',tone:'ˋ',toneWord:'ㄒㄧㄤ',wrongI:['ㄐ','ㄑ','ㄓ','ㄔ','ㄕ'],wrongS:['ㄐㄧㄤˋ','ㄑㄧㄤˋ','ㄒㄧㄥˋ','ㄒㄧㄝˋ'],wrongT:['ˉ','ˊ','ˇ']},
+  {emoji:'🦒',name:'長頸鹿',zhuyin:'ㄔㄤˊ',initial:'ㄔ',syllable:'ㄔㄤˊ',tone:'ˊ',toneWord:'ㄔㄤ',wrongI:['ㄓ','ㄕ','ㄖ','ㄗ','ㄘ'],wrongS:['ㄓㄤˊ','ㄕㄤˊ','ㄔㄥˊ','ㄔㄢˊ'],wrongT:['ˉ','ˇ','ˋ']},
+  {emoji:'🐧',name:'企鵝',zhuyin:'ㄑㄧˋ',initial:'ㄑ',syllable:'ㄑㄧˋ',tone:'ˋ',toneWord:'ㄑㄧ',wrongI:['ㄐ','ㄒ','ㄗ','ㄘ','ㄙ'],wrongS:['ㄐㄧˋ','ㄒㄧˋ','ㄑㄩˋ','ㄑㄟˋ'],wrongT:['ˉ','ˊ','ˇ']},
+  {emoji:'🦊',name:'狐狸',zhuyin:'ㄏㄨˊ',initial:'ㄏ',syllable:'ㄏㄨˊ',tone:'ˊ',toneWord:'ㄏㄨ',wrongI:['ㄍ','ㄎ','ㄈ','ㄉ','ㄊ'],wrongS:['ㄍㄨˊ','ㄎㄨˊ','ㄏㄡˊ','ㄏㄟˊ'],wrongT:['ˉ','ˇ','ˋ']},
+  {emoji:'🐢',name:'烏龜',zhuyin:'ㄨ',initial:'ㄨ',syllable:'ㄨ',tone:'ˉ',toneWord:'ㄨ',wrongI:['ㄧ','ㄩ','ㄚ','ㄛ','ㄜ'],wrongS:['ㄧ','ㄩ','ㄡ','ㄢ'],wrongT:['ˊ','ˇ','ˋ']},
+  {emoji:'🐦',name:'小鳥',zhuyin:'ㄋㄧㄠˇ',initial:'ㄋ',syllable:'ㄋㄧㄠˇ',tone:'ˇ',toneWord:'ㄋㄧㄠ',wrongI:['ㄌ','ㄅ','ㄆ','ㄇ','ㄈ'],wrongS:['ㄌㄧㄠˇ','ㄇㄧㄠˇ','ㄋㄧㄡˇ','ㄋㄧㄝˇ'],wrongT:['ˉ','ˊ','ˋ']},
+  {emoji:'🐬',name:'海豚',zhuyin:'ㄏㄞˇ',initial:'ㄏ',syllable:'ㄏㄞˇ',tone:'ˇ',toneWord:'ㄏㄞ',wrongI:['ㄍ','ㄎ','ㄈ','ㄉ','ㄊ'],wrongS:['ㄍㄞˇ','ㄎㄞˇ','ㄏㄠˇ','ㄏㄟˇ'],wrongT:['ˉ','ˊ','ˋ']},
+  {emoji:'🦓',name:'斑馬',zhuyin:'ㄅㄢ',initial:'ㄅ',syllable:'ㄅㄢ',tone:'ˉ',toneWord:'ㄅㄢ',wrongI:['ㄆ','ㄇ','ㄈ','ㄉ','ㄊ'],wrongS:['ㄆㄢ','ㄇㄢ','ㄅㄣ','ㄅㄤ'],wrongT:['ˊ','ˇ','ˋ']},
+  {emoji:'🐻',name:'熊',zhuyin:'ㄒㄩㄥˊ',initial:'ㄒ',syllable:'ㄒㄩㄥˊ',tone:'ˊ',toneWord:'ㄒㄩㄥ',wrongI:['ㄐ','ㄑ','ㄓ','ㄔ','ㄕ'],wrongS:['ㄐㄩㄥˊ','ㄑㄩㄥˊ','ㄒㄧㄥˊ','ㄒㄩㄣˊ'],wrongT:['ˉ','ˇ','ˋ']},
+  {emoji:'🐰',name:'兔子',zhuyin:'ㄊㄨˋ',initial:'ㄊ',syllable:'ㄊㄨˋ',tone:'ˋ',toneWord:'ㄊㄨ',wrongI:['ㄉ','ㄋ','ㄌ','ㄅ','ㄆ'],wrongS:['ㄉㄨˋ','ㄋㄨˋ','ㄊㄡˋ','ㄊㄢˋ'],wrongT:['ˉ','ˊ','ˇ']},
+  // ── 新增（食物）──
+  {emoji:'🍜',name:'麵條',zhuyin:'ㄇㄧㄢˋ',initial:'ㄇ',syllable:'ㄇㄧㄢˋ',tone:'ˋ',toneWord:'ㄇㄧㄢ',wrongI:['ㄅ','ㄆ','ㄈ','ㄉ','ㄊ'],wrongS:['ㄅㄧㄢˋ','ㄆㄧㄢˋ','ㄇㄧㄥˋ','ㄇㄧㄠˋ'],wrongT:['ˉ','ˊ','ˇ']},
+  {emoji:'🍚',name:'白飯',zhuyin:'ㄈㄢˋ',initial:'ㄈ',syllable:'ㄈㄢˋ',tone:'ˋ',toneWord:'ㄈㄢ',wrongI:['ㄅ','ㄆ','ㄇ','ㄉ','ㄊ'],wrongS:['ㄅㄢˋ','ㄆㄢˋ','ㄈㄟˋ','ㄈㄣˋ'],wrongT:['ˉ','ˊ','ˇ']},
+  {emoji:'🥛',name:'牛奶',zhuyin:'ㄋㄧㄡˊ',initial:'ㄋ',syllable:'ㄋㄧㄡˊ',tone:'ˊ',toneWord:'ㄋㄧㄡ',wrongI:['ㄌ','ㄅ','ㄆ','ㄇ','ㄈ'],wrongS:['ㄌㄧㄡˊ','ㄇㄧㄡˊ','ㄋㄧㄢˊ','ㄋㄧㄝˊ'],wrongT:['ˉ','ˇ','ˋ']},
+  {emoji:'🍰',name:'甜點',zhuyin:'ㄊㄧㄢˊ',initial:'ㄊ',syllable:'ㄊㄧㄢˊ',tone:'ˊ',toneWord:'ㄊㄧㄢ',wrongI:['ㄉ','ㄋ','ㄌ','ㄅ','ㄆ'],wrongS:['ㄉㄧㄢˊ','ㄋㄧㄢˊ','ㄊㄧㄥˊ','ㄊㄧㄝˊ'],wrongT:['ˉ','ˇ','ˋ']},
+  {emoji:'🍇',name:'葡萄',zhuyin:'ㄆㄨˊ',initial:'ㄆ',syllable:'ㄆㄨˊ',tone:'ˊ',toneWord:'ㄆㄨ',wrongI:['ㄅ','ㄇ','ㄈ','ㄉ','ㄊ'],wrongS:['ㄅㄨˊ','ㄇㄨˊ','ㄆㄛˊ','ㄆㄢˊ'],wrongT:['ˉ','ˇ','ˋ']},
+  {emoji:'🍓',name:'草莓',zhuyin:'ㄘㄠˇ',initial:'ㄘ',syllable:'ㄘㄠˇ',tone:'ˇ',toneWord:'ㄘㄠ',wrongI:['ㄗ','ㄙ','ㄓ','ㄔ','ㄕ'],wrongS:['ㄗㄠˇ','ㄙㄠˇ','ㄘㄟˇ','ㄘㄡˇ'],wrongT:['ˉ','ˊ','ˋ']},
+  {emoji:'🍊',name:'橘子',zhuyin:'ㄐㄩˊ',initial:'ㄐ',syllable:'ㄐㄩˊ',tone:'ˊ',toneWord:'ㄐㄩ',wrongI:['ㄑ','ㄒ','ㄓ','ㄔ','ㄕ'],wrongS:['ㄑㄩˊ','ㄒㄩˊ','ㄐㄩˇ','ㄐㄩㄝˊ'],wrongT:['ˉ','ˇ','ˋ']},
+  {emoji:'🍑',name:'桃子',zhuyin:'ㄊㄠˊ',initial:'ㄊ',syllable:'ㄊㄠˊ',tone:'ˊ',toneWord:'ㄊㄠ',wrongI:['ㄉ','ㄋ','ㄌ','ㄅ','ㄆ'],wrongS:['ㄉㄠˊ','ㄋㄠˊ','ㄊㄡˊ','ㄊㄨˊ'],wrongT:['ˉ','ˇ','ˋ']},
+  // ── 新增（自然/生活）──
+  {emoji:'☀️',name:'太陽',zhuyin:'ㄊㄞˋ',initial:'ㄊ',syllable:'ㄊㄞˋ',tone:'ˋ',toneWord:'ㄊㄞ',wrongI:['ㄉ','ㄋ','ㄌ','ㄅ','ㄆ'],wrongS:['ㄉㄞˋ','ㄋㄞˋ','ㄊㄠˋ','ㄊㄢˋ'],wrongT:['ˉ','ˊ','ˇ']},
+  {emoji:'🌊',name:'海浪',zhuyin:'ㄏㄞˇ',initial:'ㄏ',syllable:'ㄏㄞˇ',tone:'ˇ',toneWord:'ㄏㄞ',wrongI:['ㄍ','ㄎ','ㄈ','ㄉ','ㄊ'],wrongS:['ㄍㄞˇ','ㄎㄞˇ','ㄏㄠˇ','ㄏㄟˇ'],wrongT:['ˉ','ˊ','ˋ']},
+  {emoji:'🌿',name:'葉子',zhuyin:'ㄧㄝˋ',initial:'ㄧ',syllable:'ㄧㄝˋ',tone:'ˋ',toneWord:'ㄧㄝ',wrongI:['ㄨ','ㄩ','ㄚ','ㄛ','ㄜ'],wrongS:['ㄩㄝˋ','ㄨㄟˋ','ㄧㄝˊ','ㄧㄣˋ'],wrongT:['ˉ','ˊ','ˇ']},
+  {emoji:'🏔️',name:'山',zhuyin:'ㄕㄢ',initial:'ㄕ',syllable:'ㄕㄢ',tone:'ˉ',toneWord:'ㄕㄢ',wrongI:['ㄓ','ㄔ','ㄖ','ㄗ','ㄘ'],wrongS:['ㄓㄢ','ㄔㄢ','ㄕㄣ','ㄕㄤ'],wrongT:['ˊ','ˇ','ˋ']},
+  {emoji:'🌧️',name:'下雨',zhuyin:'ㄒㄧㄚˋ',initial:'ㄒ',syllable:'ㄒㄧㄚˋ',tone:'ˋ',toneWord:'ㄒㄧㄚ',wrongI:['ㄐ','ㄑ','ㄓ','ㄔ','ㄕ'],wrongS:['ㄐㄧㄚˋ','ㄑㄧㄚˋ','ㄒㄧㄠˋ','ㄒㄧㄝˋ'],wrongT:['ˉ','ˊ','ˇ']},
+  {emoji:'❄️',name:'雪',zhuyin:'ㄒㄩㄝˇ',initial:'ㄒ',syllable:'ㄒㄩㄝˇ',tone:'ˇ',toneWord:'ㄒㄩㄝ',wrongI:['ㄐ','ㄑ','ㄓ','ㄔ','ㄕ'],wrongS:['ㄐㄩㄝˇ','ㄑㄩㄝˇ','ㄒㄩㄝˋ','ㄒㄩㄝˊ'],wrongT:['ˉ','ˊ','ˋ']},
+  {emoji:'🌈',name:'天空',zhuyin:'ㄊㄧㄢ',initial:'ㄊ',syllable:'ㄊㄧㄢ',tone:'ˉ',toneWord:'ㄊㄧㄢ',wrongI:['ㄉ','ㄋ','ㄌ','ㄅ','ㄆ'],wrongS:['ㄉㄧㄢ','ㄋㄧㄢ','ㄊㄧㄥ','ㄊㄧㄝ'],wrongT:['ˊ','ˇ','ˋ']},
+  // ── 新增（玩具/學校）──
+  {emoji:'📚',name:'書',zhuyin:'ㄕㄨ',initial:'ㄕ',syllable:'ㄕㄨ',tone:'ˉ',toneWord:'ㄕㄨ',wrongI:['ㄓ','ㄔ','ㄖ','ㄗ','ㄘ'],wrongS:['ㄓㄨ','ㄔㄨ','ㄕㄣ','ㄕㄤ'],wrongT:['ˊ','ˇ','ˋ']},
+  {emoji:'✏️',name:'鉛筆',zhuyin:'ㄑㄧㄢ',initial:'ㄑ',syllable:'ㄑㄧㄢ',tone:'ˉ',toneWord:'ㄑㄧㄢ',wrongI:['ㄐ','ㄒ','ㄗ','ㄘ','ㄙ'],wrongS:['ㄐㄧㄢ','ㄒㄧㄢ','ㄑㄧㄣ','ㄑㄧㄥ'],wrongT:['ˊ','ˇ','ˋ']},
+  {emoji:'🎒',name:'書包',zhuyin:'ㄅㄠ',initial:'ㄅ',syllable:'ㄅㄠ',tone:'ˉ',toneWord:'ㄅㄠ',wrongI:['ㄆ','ㄇ','ㄈ','ㄉ','ㄊ'],wrongS:['ㄆㄠ','ㄇㄠ','ㄅㄛ','ㄅㄢ'],wrongT:['ˊ','ˇ','ˋ']},
+  {emoji:'🎨',name:'畫畫',zhuyin:'ㄏㄨㄚˋ',initial:'ㄏ',syllable:'ㄏㄨㄚˋ',tone:'ˋ',toneWord:'ㄏㄨㄚ',wrongI:['ㄍ','ㄎ','ㄐ','ㄑ','ㄒ'],wrongS:['ㄍㄨㄚˋ','ㄎㄨㄚˋ','ㄏㄨㄛˋ','ㄏㄨㄟˋ'],wrongT:['ˉ','ˊ','ˇ']},
+  {emoji:'🎵',name:'音樂',zhuyin:'ㄧㄣ',initial:'ㄧ',syllable:'ㄧㄣ',tone:'ˉ',toneWord:'ㄧㄣ',wrongI:['ㄨ','ㄩ','ㄚ','ㄛ','ㄜ'],wrongS:['ㄧㄥ','ㄧㄢ','ㄧㄤ','ㄧㄡ'],wrongT:['ˊ','ˇ','ˋ']},
+  {emoji:'⚽',name:'球',zhuyin:'ㄑㄧㄡˊ',initial:'ㄑ',syllable:'ㄑㄧㄡˊ',tone:'ˊ',toneWord:'ㄑㄧㄡ',wrongI:['ㄐ','ㄒ','ㄗ','ㄘ','ㄙ'],wrongS:['ㄐㄧㄡˊ','ㄒㄧㄡˊ','ㄑㄧㄣˊ','ㄑㄧㄤˊ'],wrongT:['ˉ','ˇ','ˋ']},
+  {emoji:'🏠',name:'房子',zhuyin:'ㄈㄤˊ',initial:'ㄈ',syllable:'ㄈㄤˊ',tone:'ˊ',toneWord:'ㄈㄤ',wrongI:['ㄅ','ㄆ','ㄇ','ㄉ','ㄊ'],wrongS:['ㄅㄤˊ','ㄆㄤˊ','ㄈㄥˊ','ㄈㄢˊ'],wrongT:['ˉ','ˇ','ˋ']},
+  {emoji:'🚀',name:'火箭',zhuyin:'ㄏㄨㄛˇ',initial:'ㄏ',syllable:'ㄏㄨㄛˇ',tone:'ˇ',toneWord:'ㄏㄨㄛ',wrongI:['ㄍ','ㄎ','ㄈ','ㄉ','ㄊ'],wrongS:['ㄍㄨㄛˇ','ㄎㄨㄛˇ','ㄏㄨㄛˋ','ㄏㄨㄛˊ'],wrongT:['ˉ','ˊ','ˋ']},
+  {emoji:'🎠',name:'旋轉木馬',zhuyin:'ㄇㄨˋ',initial:'ㄇ',syllable:'ㄇㄨˋ',tone:'ˋ',toneWord:'ㄇㄨ',wrongI:['ㄅ','ㄆ','ㄈ','ㄉ','ㄊ'],wrongS:['ㄅㄨˋ','ㄆㄨˋ','ㄇㄛˋ','ㄇㄢˋ'],wrongT:['ˉ','ˊ','ˇ']},
+  {emoji:'🌻',name:'向日葵',zhuyin:'ㄒㄧㄤˋ',initial:'ㄒ',syllable:'ㄒㄧㄤˋ',tone:'ˋ',toneWord:'ㄒㄧㄤ',wrongI:['ㄐ','ㄑ','ㄓ','ㄔ','ㄕ'],wrongS:['ㄐㄧㄤˋ','ㄑㄧㄤˋ','ㄒㄧㄥˋ','ㄒㄧㄝˋ'],wrongT:['ˉ','ˊ','ˇ']},
+  {emoji:'🌵',name:'仙人掌',zhuyin:'ㄓㄤˇ',initial:'ㄓ',syllable:'ㄓㄤˇ',tone:'ˇ',toneWord:'ㄓㄤ',wrongI:['ㄔ','ㄕ','ㄖ','ㄗ','ㄘ'],wrongS:['ㄔㄤˇ','ㄕㄤˇ','ㄓㄥˇ','ㄓㄢˇ'],wrongT:['ˉ','ˊ','ˋ']},
 ];
 
 // Levels config
