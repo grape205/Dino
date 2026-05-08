@@ -229,6 +229,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
         <span class="spstar">⭐</span>
         <div><div class="spl">星星</div><div class="spn" id="starNum">0</div></div>
       </div>
+      <button onclick="showLeaderboard()" style="background:linear-gradient(135deg,#b45309,#f59e0b);border:none;border-radius:99px;padding:5px 12px;color:#fff;font-family:'Fredoka One',cursive;font-size:.78rem;cursor:pointer;display:flex;align-items:center;gap:4px">🏆 排行榜</button>
       <div class="timer-pill">⏱️ <span id="timeLeft">30:00</span></div>
     </div>
   </div>
@@ -349,16 +350,29 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
 
   <!-- 加法遊戲 -->
   <div class="panel" id="panel-math">
-    <div class="frame-loading" id="mathLoading">⏳ 載入中...</div>
-    <iframe class="game-frame" id="mathFrame" src="" style="display:none"
-      onload="document.getElementById('mathLoading').style.display='none';this.style.display='block';"></iframe>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;gap:16px">
+      <div style="font-size:4rem;animation:bob 2s ease-in-out infinite">🦕</div>
+      <div style="font-size:1.6rem;color:#a78bfa;text-align:center;line-height:1.3">翼龍加法<br>大冒險！</div>
+      <div style="font-size:.85rem;color:#c4b5fd;text-align:center">接住正確的答案！</div>
+      <a href="ptero-math.html"
+        style="display:block;width:100%;max-width:280px;background:linear-gradient(135deg,#4c1d95,#7c3aed);border:none;border-radius:99px;padding:18px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:1.2rem;text-align:center;text-decoration:none;box-shadow:0 6px 24px rgba(124,58,237,.5)">
+        🎮 開始加法遊戲！
+      </a>
+      <div style="font-size:.72rem;color:rgba(196,181,253,.5)">點上方按鈕開啟遊戲</div>
+    </div>
   </div>
 
   <!-- 注音遊戲 -->
   <div class="panel" id="panel-zhuyin">
-    <div class="frame-loading" id="zhuyinLoading">⏳ 載入中...</div>
-    <iframe class="game-frame" id="zhuyinFrame" src="" style="display:none"
-      onload="document.getElementById('zhuyinLoading').style.display='none';this.style.display='block';"></iframe>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;gap:16px">
+      <div style="font-size:4rem;animation:bob 2s ease-in-out infinite">🌿</div>
+      <div style="font-size:1.6rem;color:#ffb300;text-align:center;line-height:1.3">注音大冒險！</div>
+      <div style="font-size:.85rem;color:#a5d6a7;text-align:center">叢林注音挑戰！</div>
+      <a href="dino-zhuyin.html"
+        style="display:block;width:100%;max-width:280px;background:linear-gradient(135deg,#e65100,#ff9800);border:none;border-radius:99px;padding:18px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:1.2rem;text-align:center;text-decoration:none;box-shadow:0 6px 24px rgba(255,152,0,.4)">
+        🔤 開始注音遊戲！
+      </a>
+    </div>
   </div>
 
   <!-- 📖 英文單字書 -->
@@ -570,19 +584,32 @@ function showLogin(){if(currentUser){showToast('已登入：'+(currentUser.user_
 
 // ══ ABC DATA ══
 const ABC=[
-  {l:'A',e:'🍎',w:'Apple',zh:'蘋果'},{l:'B',e:'🐝',w:'Bee',zh:'蜜蜂'},
-  {l:'C',e:'🐱',w:'Cat',zh:'貓咪'},{l:'D',e:'🐶',w:'Dog',zh:'狗狗'},
-  {l:'E',e:'🐘',w:'Elephant',zh:'大象'},{l:'F',e:'🐸',w:'Frog',zh:'青蛙'},
-  {l:'G',e:'🍇',w:'Grape',zh:'葡萄'},{l:'H',e:'🐹',w:'Hamster',zh:'倉鼠'},
-  {l:'I',e:'🍦',w:'Ice Cream',zh:'冰淇淋'},{l:'J',e:'🦘',w:'Jumping',zh:'跳跳'},
-  {l:'K',e:'🪁',w:'Kite',zh:'風箏'},{l:'L',e:'🦁',w:'Lion',zh:'獅子'},
-  {l:'M',e:'🐒',w:'Monkey',zh:'猴子'},{l:'N',e:'🌙',w:'Night',zh:'夜晚'},
-  {l:'O',e:'🐙',w:'Octopus',zh:'章魚'},{l:'P',e:'🐼',w:'Panda',zh:'熊貓'},
-  {l:'Q',e:'👸',w:'Queen',zh:'女王'},{l:'R',e:'🌈',w:'Rainbow',zh:'彩虹'},
-  {l:'S',e:'⭐',w:'Star',zh:'星星'},{l:'T',e:'🐯',w:'Tiger',zh:'老虎'},
-  {l:'U',e:'☂️',w:'Umbrella',zh:'雨傘'},{l:'V',e:'🎻',w:'Violin',zh:'小提琴'},
-  {l:'W',e:'🐳',w:'Whale',zh:'鯨魚'},{l:'X',e:'🎸',w:'Xylophone',zh:'木琴'},
-  {l:'Y',e:'🧶',w:'Yarn',zh:'毛線球'},{l:'Z',e:'🦓',w:'Zebra',zh:'斑馬'},
+  {l:'A',e:'🍎',w:'Apple',zh:'蘋果'},{l:'A',e:'🐜',w:'Ant',zh:'螞蟻'},{l:'A',e:'🥑',w:'Avocado',zh:'酪梨'},{l:'A',e:'✈️',w:'Airplane',zh:'飛機'},
+  {l:'B',e:'🐝',w:'Bee',zh:'蜜蜂'},{l:'B',e:'🍌',w:'Banana',zh:'香蕉'},{l:'B',e:'🐻',w:'Bear',zh:'熊'},{l:'B',e:'🦋',w:'Butterfly',zh:'蝴蝶'},{l:'B',e:'⚽',w:'Ball',zh:'球'},
+  {l:'C',e:'🐱',w:'Cat',zh:'貓咪'},{l:'C',e:'🥕',w:'Carrot',zh:'紅蘿蔔'},{l:'C',e:'🐛',w:'Caterpillar',zh:'毛毛蟲'},{l:'C',e:'🍰',w:'Cake',zh:'蛋糕'},{l:'C',e:'🚗',w:'Car',zh:'汽車'},
+  {l:'D',e:'🐶',w:'Dog',zh:'狗狗'},{l:'D',e:'🦆',w:'Duck',zh:'鴨子'},{l:'D',e:'🐲',w:'Dragon',zh:'龍'},{l:'D',e:'🥁',w:'Drum',zh:'鼓'},
+  {l:'E',e:'🐘',w:'Elephant',zh:'大象'},{l:'E',e:'🥚',w:'Egg',zh:'雞蛋'},{l:'E',e:'🦅',w:'Eagle',zh:'老鷹'},
+  {l:'F',e:'🐸',w:'Frog',zh:'青蛙'},{l:'F',e:'🐟',w:'Fish',zh:'魚'},{l:'F',e:'🦊',w:'Fox',zh:'狐狸'},{l:'F',e:'🌸',w:'Flower',zh:'花'},
+  {l:'G',e:'🍇',w:'Grape',zh:'葡萄'},{l:'G',e:'🦒',w:'Giraffe',zh:'長頸鹿'},{l:'G',e:'🐐',w:'Goat',zh:'山羊'},{l:'G',e:'🌿',w:'Grass',zh:'草'},
+  {l:'H',e:'🐹',w:'Hamster',zh:'倉鼠'},{l:'H',e:'🐴',w:'Horse',zh:'馬'},{l:'H',e:'🏠',w:'House',zh:'房子'},{l:'H',e:'🎩',w:'Hat',zh:'帽子'},
+  {l:'I',e:'🍦',w:'Ice Cream',zh:'冰淇淋'},{l:'I',e:'🏝️',w:'Island',zh:'島嶼'},
+  {l:'J',e:'🪁',w:'Jet',zh:'飛機'},{l:'J',e:'🕹️',w:'Joystick',zh:'搖桿'},{l:'J',e:'🦘',w:'Jumper',zh:'跳跳'},
+  {l:'K',e:'🪁',w:'Kite',zh:'風箏'},{l:'K',e:'🦘',w:'Kangaroo',zh:'袋鼠'},{l:'K',e:'🔑',w:'Key',zh:'鑰匙'},
+  {l:'L',e:'🦁',w:'Lion',zh:'獅子'},{l:'L',e:'🦎',w:'Lizard',zh:'蜥蜴'},{l:'L',e:'🍋',w:'Lemon',zh:'檸檬'},
+  {l:'M',e:'🐒',w:'Monkey',zh:'猴子'},{l:'M',e:'🌙',w:'Moon',zh:'月亮'},{l:'M',e:'🍄',w:'Mushroom',zh:'蘑菇'},{l:'M',e:'🐭',w:'Mouse',zh:'老鼠'},
+  {l:'N',e:'🌙',w:'Night',zh:'夜晚'},{l:'N',e:'🪺',w:'Nest',zh:'鳥巢'},{l:'N',e:'🍜',w:'Noodles',zh:'麵條'},
+  {l:'O',e:'🐙',w:'Octopus',zh:'章魚'},{l:'O',e:'🦦',w:'Otter',zh:'水獺'},{l:'O',e:'🍊',w:'Orange',zh:'橘子'},
+  {l:'P',e:'🐼',w:'Panda',zh:'熊貓'},{l:'P',e:'🐧',w:'Penguin',zh:'企鵝'},{l:'P',e:'🍑',w:'Peach',zh:'桃子'},{l:'P',e:'🐷',w:'Pig',zh:'豬'},
+  {l:'Q',e:'👸',w:'Queen',zh:'女王'},{l:'Q',e:'❓',w:'Question',zh:'問題'},
+  {l:'R',e:'🌈',w:'Rainbow',zh:'彩虹'},{l:'R',e:'🐇',w:'Rabbit',zh:'兔子'},{l:'R',e:'🚀',w:'Rocket',zh:'火箭'},{l:'R',e:'🌹',w:'Rose',zh:'玫瑰'},
+  {l:'S',e:'⭐',w:'Star',zh:'星星'},{l:'S',e:'🐍',w:'Snake',zh:'蛇'},{l:'S',e:'🍓',w:'Strawberry',zh:'草莓'},{l:'S',e:'☀️',w:'Sun',zh:'太陽'},{l:'S',e:'🐑',w:'Sheep',zh:'羊'},
+  {l:'T',e:'🐯',w:'Tiger',zh:'老虎'},{l:'T',e:'🐢',w:'Turtle',zh:'烏龜'},{l:'T',e:'🌳',w:'Tree',zh:'樹'},{l:'T',e:'🚂',w:'Train',zh:'火車'},
+  {l:'U',e:'☂️',w:'Umbrella',zh:'雨傘'},{l:'U',e:'🦄',w:'Unicorn',zh:'獨角獸'},
+  {l:'V',e:'🎻',w:'Violin',zh:'小提琴'},{l:'V',e:'🌋',w:'Volcano',zh:'火山'},
+  {l:'W',e:'🐳',w:'Whale',zh:'鯨魚'},{l:'W',e:'🌊',w:'Wave',zh:'海浪'},{l:'W',e:'🍉',w:'Watermelon',zh:'西瓜'},{l:'W',e:'🐺',w:'Wolf',zh:'狼'},
+  {l:'X',e:'🎸',w:'Xylophone',zh:'木琴'},
+  {l:'Y',e:'🧶',w:'Yarn',zh:'毛線球'},{l:'Y',e:'🟡',w:'Yellow',zh:'黃色'},
+  {l:'Z',e:'🦓',w:'Zebra',zh:'斑馬'},{l:'Z',e:'⚡',w:'Zap',zh:'閃電'},
 ];
 const DEFAULT_HABITS=[{e:'🦷',t:'刷牙'},{e:'📚',t:'閱讀'},{e:'🥦',t:'吃蔬菜'},{e:'🛁',t:'洗澡'},{e:'😴',t:'早睡'},{e:'🏃',t:'運動'}];
 const REWARDS=[{e:'🍭',t:'糖果一顆',c:20},{e:'📱',t:'玩手機30分',c:50},{e:'🎬',t:'看卡通一集',c:40},{e:'🧸',t:'買新玩具',c:150},{e:'🍕',t:'吃披薩',c:80},{e:'🎮',t:'玩遊戲1小時',c:60}];
@@ -674,7 +701,7 @@ function stopIdle(){if(idleRafId){cancelAnimationFrame(idleRafId);idleRafId=null
 // ══ GAME ══
 function pickTarget(){
   let pick;
-  do{pick=ABC[Math.floor(Math.random()*ABC.length)];}while(currentTarget&&pick.l===currentTarget.l);
+  do{pick=ABC[Math.floor(Math.random()*ABC.length)];}while(currentTarget&&pick.w===currentTarget.w);
   currentTarget=pick;
   document.getElementById('tLetter').textContent=currentTarget.l;
   document.getElementById('tWord').textContent=currentTarget.w;
@@ -721,6 +748,7 @@ function startGame(){
   updateLivesUI();document.getElementById('goScreen').style.display='none';
   stopIdle();pickTarget();startBGM();startDailyTimer();
   fallerTimer=setInterval(spawnFaller,1800);gameLoop();
+  goFullscreen();
 }
 function endGame(){
   gameActive=false;clearInterval(fallerTimer);clearInterval(dailyTimer);
@@ -921,7 +949,7 @@ function openVocabEditor(){
   document.getElementById('vImgFile').value='';
   setTimeout(initVDraw,50);
 }
-function closeVocabEditor(){document.getElementById('vocabEditor').classList.remove('open');}
+function _oldCloseVocabEditor_removed(){}
 
 function onVImgChange(input){
   if(!input.files||!input.files[0])return;
@@ -944,17 +972,33 @@ async function saveVocab(){
   const emoji=document.getElementById('vEmoji').value.trim();
   const imgEl=document.getElementById('vImgPreview');
   const photo=(imgEl.style.display!=='none'&&imgEl.src&&imgEl.src!==location.href)?imgEl.src:'';
-  // 手繪
   const vc=document.getElementById('vDrawCanvas');
   const vd=vCtx?vCtx.getImageData(0,0,vc.width,vc.height):null;
   const hasDrawing=vd&&Array.from(vd.data).some((v,i)=>i%4===3&&v>10&&(vd.data[i-3]>30||vd.data[i-2]>30||vd.data[i-1]>30));
   const drawing=hasDrawing?vc.toDataURL('image/jpeg',0.6):'';
-  const entry={id:Date.now(),word,zh,phonetic,emoji,photo,drawing};
-  VOCAB.unshift(entry);saveVocabLocal();
-  if(currentUser){
-    try{await sb.from('vocab_words').insert({user_id:currentUser.id,word,zh_meaning:zh,phonetic,emoji,photo,drawing,created_at:new Date().toISOString()});}catch(e){}
+
+  const editIdx=window._editingVocabIdx;
+  if(editIdx!=null&&editIdx>=0&&editIdx<VOCAB.length){
+    // 編輯模式：更新原本那筆
+    const old=VOCAB[editIdx];
+    VOCAB[editIdx]={...old,word,zh,phonetic:phonetic||old.phonetic,emoji,photo:photo||old.photo,drawing:drawing||old.drawing};
+    saveVocabLocal();
+    window._editingVocabIdx=null;
+    closeVocabEditor();renderVocabList();showToast('✅ 「'+word+'」已更新！');
+  } else {
+    // 新增模式
+    const entry={id:Date.now(),word,zh,phonetic,emoji,photo,drawing};
+    VOCAB.unshift(entry);saveVocabLocal();
+    if(currentUser){
+      try{await sb.from('vocab_words').insert({user_id:currentUser.id,word,zh_meaning:zh,phonetic,emoji,photo,drawing,created_at:new Date().toISOString()});}catch(e){}
+    }
+    closeVocabEditor();renderVocabList();showToast('📖 「'+word+'」儲存成功！');
   }
-  closeVocabEditor();renderVocabList();showToast('📖 「'+word+'」儲存成功！');
+}
+
+function closeVocabEditor(){
+  document.getElementById('vocabEditor').classList.remove('open');
+  window._editingVocabIdx=null;
 }
 
 function renderVocabList(){
@@ -965,7 +1009,10 @@ function renderVocabList(){
     if(v.photo)imgHtml=`<img src="${v.photo}" style="width:54px;height:54px;border-radius:10px;object-fit:cover">`;
     else if(v.drawing&&v.drawing.length>10)imgHtml=`<img src="${v.drawing}" style="width:54px;height:54px;border-radius:10px;object-fit:contain;background:#1a1a2e">`;
     else imgHtml=`<span style="font-size:2.2rem">${v.emoji||'📖'}</span>`;
-    return `<div class="vocab-card" onclick="openVcModal(${i})">
+    return `<div class="vocab-card" id="vc-${i}"
+      onclick="openVcModal(${i})"
+      ontouchstart="vcLongStart(${i})" ontouchend="vcLongEnd()" ontouchcancel="vcLongEnd()"
+      onmousedown="vcLongStart(${i})" onmouseup="vcLongEnd()" onmouseleave="vcLongEnd()">
       <div class="vc-img">${imgHtml}</div>
       <div class="vc-body">
         <div class="vc-word">${v.word}</div>
@@ -973,11 +1020,43 @@ function renderVocabList(){
         <div class="vc-zh">${v.zh}</div>
       </div>
       <div class="vc-btns">
-        <button class="vc-speak-btn" onclick="event.stopPropagation();say('${v.word}','en-US')">🔊 發音</button>
-        <button class="vc-del-btn" onclick="event.stopPropagation();deleteVocab(${i})">🗑️</button>
+        <button class="vc-speak-btn" onclick="event.stopPropagation();say('${v.word}','en-US')">🔊</button>
+      </div>
+      <div class="vc-actions" id="vca-${i}" style="display:none;position:absolute;inset:0;border-radius:18px;background:rgba(0,0,0,.82);display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:5">
+        <div style="font-size:.8rem;color:#a78bfa;margin-bottom:2px">「${v.word}」</div>
+        <div style="display:flex;gap:10px">
+          <button onclick="event.stopPropagation();editVocab(${i})" style="background:#1565c0;border:none;border-radius:99px;padding:8px 20px;color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;cursor:pointer">✏️ 編輯</button>
+          <button onclick="event.stopPropagation();deleteVocab(${i})" style="background:#c62828;border:none;border-radius:99px;padding:8px 20px;color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;cursor:pointer">🗑️ 刪除</button>
+        </div>
+        <button onclick="event.stopPropagation();hideVcActions(${i})" style="background:rgba(255,255,255,.1);border:none;border-radius:99px;padding:5px 16px;color:#aaa;font-size:.75rem;cursor:pointer">取消</button>
       </div>
     </div>`;
   }).join('');
+}
+let _vcLongTimer=null;
+function vcLongStart(i){
+  _vcLongTimer=setTimeout(()=>{
+    _vcLongTimer=null;
+    // 隱藏其他
+    document.querySelectorAll('.vc-actions').forEach(el=>el.style.display='none');
+    const el=document.getElementById('vca-'+i);
+    if(el)el.style.display='flex';
+  },500);
+}
+function vcLongEnd(){if(_vcLongTimer){clearTimeout(_vcLongTimer);_vcLongTimer=null;}}
+function hideVcActions(i){const el=document.getElementById('vca-'+i);if(el)el.style.display='none';}
+
+function editVocab(i){
+  const v=VOCAB[i];
+  // 填入編輯器
+  document.getElementById('vWord').value=v.word||'';
+  document.getElementById('vZh').value=v.zh||'';
+  document.getElementById('vEmoji').value=v.emoji||'';
+  document.getElementById('vSearchResults').style.display='none';
+  // 標記編輯 index
+  window._editingVocabIdx=i;
+  openVocabEditor();
+  showToast('✏️ 編輯模式：修改後按儲存');
 }
 
 function openVcModal(i){
@@ -1049,71 +1128,196 @@ function toggleVVoice(){
 // ── 搜尋英文單字（用 Claude API）──
 // 中文→英文對照表（幼兒常用）
 const ZH_EN_MAP={
-  '大象':['Elephant','🐘'],'貓咪':['Cat','🐱'],'貓':['Cat','🐱'],'狗狗':['Dog','🐶'],'狗':['Dog','🐶'],
-  '魚':['Fish','🐟'],'鳥':['Bird','🐦'],'兔子':['Rabbit','🐰'],'熊貓':['Panda','🐼'],
-  '老虎':['Tiger','🐯'],'獅子':['Lion','🦁'],'猴子':['Monkey','🐒'],'青蛙':['Frog','🐸'],
-  '蝴蝶':['Butterfly','🦋'],'蜜蜂':['Bee','🐝'],'企鵝':['Penguin','🐧'],'長頸鹿':['Giraffe','🦒'],
-  '斑馬':['Zebra','🦓'],'獅子':['Lion','🦁'],'熊':['Bear','🐻'],'烏龜':['Turtle','🐢'],
-  '蘋果':['Apple','🍎'],'香蕉':['Banana','🍌'],'橘子':['Orange','🍊'],'葡萄':['Grape','🍇'],
-  '草莓':['Strawberry','🍓'],'西瓜':['Watermelon','🍉'],'桃子':['Peach','🍑'],'梨子':['Pear','🍐'],
-  '太陽':['Sun','☀️'],'月亮':['Moon','🌙'],'星星':['Star','⭐'],'雲':['Cloud','☁️'],
-  '雨':['Rain','🌧️'],'雪':['Snow','❄️'],'花':['Flower','🌸'],'樹':['Tree','🌳'],
-  '書':['Book','📚'],'鉛筆':['Pencil','✏️'],'球':['Ball','⚽'],'車':['Car','🚗'],
-  '飛機':['Airplane','✈️'],'房子':['House','🏠'],'蛋糕':['Cake','🎂'],'牛奶':['Milk','🥛'],
-  '爸爸':['Dad','👨'],'媽媽':['Mom','👩'],'爺爺':['Grandpa','👴'],'奶奶':['Grandma','👵'],
-  '紅色':['Red','🔴'],'藍色':['Blue','🔵'],'綠色':['Green','🟢'],'黃色':['Yellow','🟡'],
-  '白色':['White','⬜'],'黑色':['Black','⬛'],'粉紅色':['Pink','🩷'],
+  // 動物
+  '大象':['Elephant','🐘','/ˈɛlɪfənt/'],
+  '貓':['Cat','🐱','/kæt/'],'貓咪':['Cat','🐱','/kæt/'],
+  '狗':['Dog','🐶','/dɒɡ/'],'狗狗':['Dog','🐶','/dɒɡ/'],
+  '魚':['Fish','🐟','/fɪʃ/'],
+  '鳥':['Bird','🐦','/bɜːrd/'],'小鳥':['Bird','🐦','/bɜːrd/'],
+  '兔子':['Rabbit','🐰','/ˈræbɪt/'],'兔':['Rabbit','🐰','/ˈræbɪt/'],
+  '熊貓':['Panda','🐼','/ˈpændə/'],
+  '老虎':['Tiger','🐯','/ˈtaɪɡər/'],'虎':['Tiger','🐯','/ˈtaɪɡər/'],
+  '獅子':['Lion','🦁','/ˈlaɪən/'],'獅':['Lion','🦁','/ˈlaɪən/'],
+  '猴子':['Monkey','🐒','/ˈmʌŋki/'],'猴':['Monkey','🐒','/ˈmʌŋki/'],
+  '青蛙':['Frog','🐸','/frɒɡ/'],'蛙':['Frog','🐸','/frɒɡ/'],
+  '蝴蝶':['Butterfly','🦋','/ˈbʌtəflaɪ/'],
+  '蜜蜂':['Bee','🐝','/biː/'],'蜂':['Bee','🐝','/biː/'],
+  '企鵝':['Penguin','🐧','/ˈpɛŋɡwɪn/'],
+  '長頸鹿':['Giraffe','🦒','/dʒɪˈrɑːf/'],
+  '斑馬':['Zebra','🦓','/ˈziːbrə/'],
+  '熊':['Bear','🐻','/bɛər/'],
+  '烏龜':['Turtle','🐢','/ˈtɜːrtl/'],'龜':['Turtle','🐢','/ˈtɜːrtl/'],
+  '狐狸':['Fox','🦊','/fɒks/'],
+  '鴨子':['Duck','🦆','/dʌk/'],'鴨':['Duck','🦆','/dʌk/'],
+  '雞':['Chicken','🐔','/ˈtʃɪkɪn/'],
+  '豬':['Pig','🐷','/pɪɡ/'],'豬豬':['Pig','🐷','/pɪɡ/'],
+  '牛':['Cow','🐄','/kaʊ/'],
+  '羊':['Sheep','🐑','/ʃiːp/'],
+  '馬':['Horse','🐴','/hɔːrs/'],
+  '恐龍':['Dinosaur','🦕','/ˈdaɪnəsɔːr/'],
+  '章魚':['Octopus','🐙','/ˈɒktəpəs/'],
+  '螃蟹':['Crab','🦀','/kræb/'],
+  '蝸牛':['Snail','🐌','/sneɪl/'],
+  '蜻蜓':['Dragonfly','🪲','/ˈdræɡənflaɪ/'],
+  '蚊子':['Mosquito','🦟','/məˈskiːtoʊ/'],
+  // 水果
+  '蘋果':['Apple','🍎','/ˈæpəl/'],
+  '香蕉':['Banana','🍌','/bəˈnɑːnə/'],
+  '橘子':['Orange','🍊','/ˈɒrɪndʒ/'],'橙子':['Orange','🍊','/ˈɒrɪndʒ/'],
+  '葡萄':['Grape','🍇','/ɡreɪp/'],
+  '草莓':['Strawberry','🍓','/ˈstrɔːberi/'],
+  '西瓜':['Watermelon','🍉','/ˈwɔːtərmelən/'],
+  '桃子':['Peach','🍑','/piːtʃ/'],'桃':['Peach','🍑','/piːtʃ/'],
+  '梨子':['Pear','🍐','/pɛər/'],'梨':['Pear','🍐','/pɛər/'],
+  '芒果':['Mango','🥭','/ˈmæŋɡoʊ/'],
+  '鳳梨':['Pineapple','🍍','/ˈpaɪnæpəl/'],
+  '奇異果':['Kiwi','🥝','/ˈkiːwiː/'],
+  '藍莓':['Blueberry','🫐','/ˈbluːberi/'],
+  '檸檬':['Lemon','🍋','/ˈlɛmən/'],
+  '椰子':['Coconut','🥥','/ˈkoʊkənʌt/'],
+  // 食物
+  '蛋糕':['Cake','🎂','/keɪk/'],
+  '牛奶':['Milk','🥛','/mɪlk/'],
+  '麵包':['Bread','🍞','/brɛd/'],
+  '餅乾':['Cookie','🍪','/ˈkʊki/'],
+  '糖果':['Candy','🍭','/ˈkændi/'],
+  '冰淇淋':['Ice Cream','🍦','/ˈaɪs kriːm/'],
+  '飯':['Rice','🍚','/raɪs/'],'白飯':['Rice','🍚','/raɪs/'],
+  '麵條':['Noodles','🍜','/ˈnuːdlz/'],'麵':['Noodles','🍜','/ˈnuːdlz/'],
+  '湯':['Soup','🍲','/suːp/'],
+  '蛋':['Egg','🥚','/ɛɡ/'],'雞蛋':['Egg','🥚','/ɛɡ/'],
+  '果汁':['Juice','🧃','/dʒuːs/'],
+  '水':['Water','💧','/ˈwɔːtər/'],
+  '披薩':['Pizza','🍕','/ˈpiːtsə/'],
+  '漢堡':['Burger','🍔','/ˈbɜːrɡər/'],
+  '薯條':['Fries','🍟','/fraɪz/'],
+  // 自然
+  '太陽':['Sun','☀️','/sʌn/'],
+  '月亮':['Moon','🌙','/muːn/'],'月':['Moon','🌙','/muːn/'],
+  '星星':['Star','⭐','/stɑːr/'],'星':['Star','⭐','/stɑːr/'],
+  '雲':['Cloud','☁️','/klaʊd/'],'雲朵':['Cloud','☁️','/klaʊd/'],
+  '雨':['Rain','🌧️','/reɪn/'],
+  '雪':['Snow','❄️','/snoʊ/'],
+  '彩虹':['Rainbow','🌈','/ˈreɪnboʊ/'],
+  '花':['Flower','🌸','/ˈflaʊər/'],
+  '樹':['Tree','🌳','/triː/'],
+  '草':['Grass','🌿','/ɡrɑːs/'],
+  '山':['Mountain','🏔️','/ˈmaʊntɪn/'],
+  '海':['Sea','🌊','/siː/'],'大海':['Sea','🌊','/siː/'],
+  '河':['River','🏞️','/ˈrɪvər/'],
+  '火':['Fire','🔥','/ˈfaɪər/'],
+  // 顏色
+  '紅色':['Red','🔴','/rɛd/'],'紅':['Red','🔴','/rɛd/'],
+  '藍色':['Blue','🔵','/bluː/'],'藍':['Blue','🔵','/bluː/'],
+  '綠色':['Green','🟢','/ɡriːn/'],'綠':['Green','🟢','/ɡriːn/'],
+  '黃色':['Yellow','🟡','/ˈjɛloʊ/'],'黃':['Yellow','🟡','/ˈjɛloʊ/'],
+  '白色':['White','⬜','/waɪt/'],'白':['White','⬜','/waɪt/'],
+  '黑色':['Black','⬛','/blæk/'],'黑':['Black','⬛','/blæk/'],
+  '粉紅色':['Pink','🩷','/pɪŋk/'],'粉紅':['Pink','🩷','/pɪŋk/'],
+  '紫色':['Purple','🟣','/ˈpɜːrpl/'],'紫':['Purple','🟣','/ˈpɜːrpl/'],
+  '橙色':['Orange','🟠','/ˈɒrɪndʒ/'],'橙':['Orange','🟠','/ˈɒrɪndʒ/'],
+  // 生活
+  '書':['Book','📚','/bʊk/'],
+  '鉛筆':['Pencil','✏️','/ˈpɛnsɪl/'],
+  '書包':['Backpack','🎒','/ˈbækpæk/'],
+  '球':['Ball','⚽','/bɔːl/'],
+  '車':['Car','🚗','/kɑːr/'],'汽車':['Car','🚗','/kɑːr/'],
+  '飛機':['Airplane','✈️','/ˈɛrpleɪn/'],
+  '船':['Boat','⛵','/boʊt/'],
+  '腳踏車':['Bicycle','🚲','/ˈbaɪsɪkl/'],'自行車':['Bicycle','🚲','/ˈbaɪsɪkl/'],
+  '房子':['House','🏠','/haʊs/'],
+  '學校':['School','🏫','/skuːl/'],
+  '醫院':['Hospital','🏥','/ˈhɒspɪtl/'],
+  '公園':['Park','🏡','/pɑːrk/'],
+  '電話':['Phone','📱','/foʊn/'],
+  '電腦':['Computer','💻','/kəmˈpjuːtər/'],
+  '電視':['TV','📺','/ˌtiːˈviː/'],
+  // 家人
+  '爸爸':['Dad','👨','/dæd/'],'爸':['Dad','👨','/dæd/'],
+  '媽媽':['Mom','👩','/mɒm/'],'媽':['Mom','👩','/mɒm/'],
+  '爺爺':['Grandpa','👴','/ˈɡrænpɑː/'],
+  '奶奶':['Grandma','👵','/ˈɡrænmɑː/'],
+  '哥哥':['Brother','👦','/ˈbrʌðər/'],'弟弟':['Brother','👦','/ˈbrʌðər/'],
+  '姐姐':['Sister','👧','/ˈsɪstər/'],'妹妹':['Sister','👧','/ˈsɪstər/'],
+  '朋友':['Friend','🤝','/frɛnd/'],
+  '老師':['Teacher','👩‍🏫','/ˈtiːtʃər/'],
+  '醫生':['Doctor','👨‍⚕️','/ˈdɒktər/'],
+  // 身體
+  '眼睛':['Eye','👁️','/aɪ/'],'眼':['Eye','👁️','/aɪ/'],
+  '鼻子':['Nose','👃','/noʊz/'],'鼻':['Nose','👃','/noʊz/'],
+  '嘴巴':['Mouth','👄','/maʊθ/'],'嘴':['Mouth','👄','/maʊθ/'],
+  '耳朵':['Ear','👂','/ɪər/'],'耳':['Ear','👂','/ɪər/'],
+  '手':['Hand','✋','/hænd/'],'手手':['Hand','✋','/hænd/'],
+  '腳':['Foot','🦶','/fʊt/'],
+  '頭':['Head','🗣️','/hɛd/'],
+  '心':['Heart','❤️','/hɑːrt/'],'愛心':['Heart','❤️','/hɑːrt/'],
+  // 家具
+  '椅子':['Chair','🪑','/tʃɛər/'],'椅':['Chair','🪑','/tʃɛər/'],
+  '桌子':['Table','🪞','/ˈteɪbl/'],'桌':['Table','🪞','/ˈteɪbl/'],
+  '床':['Bed','🛏️','/bɛd/'],'床鋪':['Bed','🛏️','/bɛd/'],
+  '門':['Door','🚪','/dɔːr/'],
+  '窗戶':['Window','🪟','/ˈwɪndoʊ/'],'窗':['Window','🪟','/ˈwɪndoʊ/'],
+  '燈':['Lamp','💡','/læmp/'],'電燈':['Lamp','💡','/læmp/'],
+  '鏡子':['Mirror','🪞','/ˈmɪrər/'],
+  '書桌':['Desk','🖥️','/dɛsk/'],
+  // 衣物
+  '衣服':['Clothes','👕','/kloʊðz/'],
+  '帽子':['Hat','🎩','/hæt/'],'帽':['Hat','🎩','/hæt/'],
+  '鞋子':['Shoes','👟','/ʃuːz/'],'鞋':['Shoes','👟','/ʃuːz/'],
+  '褲子':['Pants','👖','/pænts/'],'褲':['Pants','👖','/pænts/'],
+  '裙子':['Skirt','👗','/skɜːrt/'],
+  '眼鏡':['Glasses','👓','/ˈɡlɑːsɪz/'],
+  // 玩具
+  '玩具':['Toy','🧸','/tɔɪ/'],
+  '積木':['Blocks','🧱','/blɒks/'],
+  '洋娃娃':['Doll','🪆','/dɒl/'],'娃娃':['Doll','🪆','/dɒl/'],
+  '風箏':['Kite','🪁','/kaɪt/'],
+  // 其他
+  '傘':['Umbrella','☂️','/ʌmˈbrɛlə/'],'雨傘':['Umbrella','☂️','/ʌmˈbrɛlə/'],
+  '蠟燭':['Candle','🕯️','/ˈkændl/'],
+  '鑰匙':['Key','🔑','/kiː/'],
 };
 
-async function searchEnglish(){
+function searchEnglish(){
   const zh=document.getElementById('vZh').value.trim();
   if(!zh){showToast('請先輸入或說出中文意思！');return;}
   const resultBox=document.getElementById('vSearchResults');
   const resultList=document.getElementById('vResultList');
   resultBox.style.display='block';
-  resultList.innerHTML='<div style="color:#42a5f5;font-size:.8rem;padding:8px">⏳ 搜尋中...</div>';
+  // 純本地查詢，不用任何API
   let candidates=[];
-  // 1. 查本地對照表
-  for(const [key,[word,emoji]] of Object.entries(ZH_EN_MAP)){
-    if(zh.includes(key)||key.includes(zh)){
-      candidates.push({word,emoji,desc:key});
+  for(const [key,[word,emoji,phonetic]] of Object.entries(ZH_EN_MAP)){
+    if(zh===key||zh.includes(key)||key.includes(zh)){
+      candidates.push({word,emoji,phonetic:phonetic||'',desc:key});
     }
   }
-  // 2. 用 MyMemory 翻譯 API
-  try{
-    const res=await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(zh)+'&langpair=zh|en');
-    const data=await res.json();
-    const translated=(data.responseData?.translatedText||'').trim();
-    if(translated&&translated.length>0&&translated.length<40){
-      const eng=translated.charAt(0).toUpperCase()+translated.slice(1);
-      if(!candidates.find(c=>c.word.toLowerCase()===eng.toLowerCase())){
-        candidates.unshift({word:eng,emoji:'📖',desc:zh});
+  if(candidates.length===0){
+    // 模糊搜尋：找包含任一字的
+    for(const [key,[word,emoji,phonetic]] of Object.entries(ZH_EN_MAP)){
+      for(const ch of zh){
+        if(ch.length>0&&key.includes(ch)&&!candidates.find(c=>c.word===word)){
+          candidates.push({word,emoji,phonetic:phonetic||'',desc:key});
+        }
       }
     }
-  }catch(e){}
+  }
   if(candidates.length===0){
-    resultList.innerHTML='<div style="text-align:center;color:#ffb300;padding:12px;font-size:.82rem">找不到「'+zh+'」<br><span style="color:#81c784;font-size:.75rem">請直接在下方輸入英文</span></div>';
+    resultList.innerHTML='<div style="text-align:center;padding:14px"><div style="font-size:2rem">🤔</div><div style="color:#ffb300;font-size:.85rem;margin-top:6px">找不到「'+zh+'」</div><div style="color:#81c784;font-size:.72rem;margin-top:4px">請直接在下方輸入英文單字</div></div>';
     return;
   }
   candidates=candidates.slice(0,3);
-  // 3. 查音標
-  for(const c of candidates){
-    try{
-      const r=await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(c.word));
-      if(r.ok){const d=await r.json();c.phonetic=d[0]?.phonetic||d[0]?.phonetics?.find(p=>p.text)?.text||'';}
-    }catch(e){c.phonetic='';}
-  }
-  resultList.innerHTML=candidates.map((w,idx)=>{
-    const ws=w.word.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    const ps=(w.phonetic||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    const es=(w.emoji||'').replace(/'/g,"\\'");
-    return '<div onclick="selectWord(\''+ws+'\',\''+ps+'\',\''+es+'\')" style="background:rgba(66,165,245,.08);border:2px solid rgba(66,165,245,.2);border-radius:14px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:4px">'
-      +'<span style="font-size:2.2rem">'+(w.emoji||'📖')+'</span>'
-      +'<div style="flex:1"><div style="font-size:1.2rem;color:#fff;font-family:\'Fredoka One\',Arial,sans-serif">'+w.word+'</div>'
-      +(w.phonetic?'<div style="font-size:.72rem;color:#ffb300">'+w.phonetic+'</div>':'')
-      +'<div style="font-size:.8rem;color:#81c784">'+(w.desc||zh)+'</div></div>'
-      +'<button onclick="event.stopPropagation();say(\''+ws+'\',\'en-US\')" style="background:rgba(76,175,80,.2);border:1.5px solid rgba(76,175,80,.3);border-radius:99px;padding:6px 12px;color:#81c784;font-family:\'Fredoka One\',Arial,sans-serif;font-size:.72rem;cursor:pointer;flex-shrink:0">🔊</button>'
-      +'</div>';
+  resultList.innerHTML=candidates.map(w=>{
+    const ws=w.word.replace(/'/g,"\\'");
+    const ps=w.phonetic.replace(/'/g,"\\'");
+    return '<div onclick="selectWord(\''+ws+'\',\''+ps+'\',\''+w.emoji+'\')" style="background:rgba(66,165,245,.1);border:2px solid rgba(66,165,245,.25);border-radius:14px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:6px;active:border-color:#42a5f5">'
+      +'<span style="font-size:2.4rem">'+w.emoji+'</span>'
+      +'<div style="flex:1">'
+        +'<div style="font-size:1.3rem;color:#fff;font-family:\'Fredoka One\',Arial,sans-serif">'+w.word+'</div>'
+        +(w.phonetic?'<div style="font-size:.72rem;color:#ffb300">'+w.phonetic+'</div>':'')
+        +'<div style="font-size:.8rem;color:#81c784">'+w.desc+'</div>'
+      +'</div>'
+      +'<button onclick="event.stopPropagation();say(\''+ws+'\',\'en-US\')" style="background:rgba(76,175,80,.2);border:1.5px solid rgba(76,175,80,.3);border-radius:99px;padding:7px 13px;color:#81c784;font-family:\'Fredoka One\',Arial,sans-serif;font-size:.75rem;cursor:pointer">🔊</button>'
+    +'</div>';
   }).join('');
 }
 

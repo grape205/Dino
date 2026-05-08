@@ -121,7 +121,7 @@ body{font-family:'Fredoka One','Noto Sans TC',sans-serif;background:#1B5E20;min-
 </style>
 </head>
 <body>
-<button onclick="goBackZhuyin()" style="position:fixed;top:12px;left:12px;z-index:999;background:rgba(0,0,0,.6);border:1.5px solid rgba(255,255,255,.3);border-radius:99px;padding:8px 16px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:.85rem;cursor:pointer">⬅️ 返回</button>
+<a href="dino-abc-final.html" style="position:fixed;top:12px;left:12px;z-index:999;background:rgba(0,0,0,.6);border:1.5px solid rgba(255,255,255,.3);border-radius:99px;padding:8px 16px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:.85rem;cursor:pointer;text-decoration:none;display:inline-block">⬅️ 返回</a>
 <div class="jungle-bg"></div>
 <div class="jungle-floor"></div>
 <div class="leaf-layer">
@@ -580,7 +580,16 @@ startGame();
   <div class="intro-dino">🦕</div>
   <div class="intro-title">恐龍注音大冒險</div>
   <div class="intro-sub">四個關卡，從首字母到聲調<br>準備好了嗎？</div>
-  <button class="intro-btn" onclick="beginGame()">🎮 開始遊戲！</button>
+  <button class="intro-btn" id="zhuyinStartBtn">🎮 開始遊戲！</button>
 </div>
+<script>
+(function(){
+  const btn=document.getElementById('zhuyinStartBtn');
+  let busy=false;
+  function doBegin(e){if(e)e.preventDefault();if(busy)return;busy=true;setTimeout(()=>busy=false,1500);beginGame();}
+  btn.addEventListener('touchend',doBegin,{passive:false});
+  btn.addEventListener('click',doBegin);
+})();
+</script>
 </body>
 </html>
