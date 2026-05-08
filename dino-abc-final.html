@@ -615,8 +615,8 @@ let iframeGameActive=false;
 window.addEventListener('message',e=>{if(e.data==='gameStarted')iframeGameActive=true;if(e.data==='gameEnded')iframeGameActive=false;});
 function switchTab(name,btn){
   if(name===currentTab)return;
-  // 只有遊戲真正在進行中才問
-  if(gameActive||(iframeGameActive&&(currentTab==='math'||currentTab==='zhuyin'))){
+  // 只有字母遊戲真正在跑才問
+  if(gameActive){
     pendingTab=name;pendingBtn=btn;
     document.getElementById('leaveOv').classList.add('open');
     return;
@@ -1047,6 +1047,24 @@ function toggleVVoice(){
 }
 
 // ── 搜尋英文單字（用 Claude API）──
+// 中文→英文對照表（幼兒常用）
+const ZH_EN_MAP={
+  '大象':['Elephant','🐘'],'貓咪':['Cat','🐱'],'貓':['Cat','🐱'],'狗狗':['Dog','🐶'],'狗':['Dog','🐶'],
+  '魚':['Fish','🐟'],'鳥':['Bird','🐦'],'兔子':['Rabbit','🐰'],'熊貓':['Panda','🐼'],
+  '老虎':['Tiger','🐯'],'獅子':['Lion','🦁'],'猴子':['Monkey','🐒'],'青蛙':['Frog','🐸'],
+  '蝴蝶':['Butterfly','🦋'],'蜜蜂':['Bee','🐝'],'企鵝':['Penguin','🐧'],'長頸鹿':['Giraffe','🦒'],
+  '斑馬':['Zebra','🦓'],'獅子':['Lion','🦁'],'熊':['Bear','🐻'],'烏龜':['Turtle','🐢'],
+  '蘋果':['Apple','🍎'],'香蕉':['Banana','🍌'],'橘子':['Orange','🍊'],'葡萄':['Grape','🍇'],
+  '草莓':['Strawberry','🍓'],'西瓜':['Watermelon','🍉'],'桃子':['Peach','🍑'],'梨子':['Pear','🍐'],
+  '太陽':['Sun','☀️'],'月亮':['Moon','🌙'],'星星':['Star','⭐'],'雲':['Cloud','☁️'],
+  '雨':['Rain','🌧️'],'雪':['Snow','❄️'],'花':['Flower','🌸'],'樹':['Tree','🌳'],
+  '書':['Book','📚'],'鉛筆':['Pencil','✏️'],'球':['Ball','⚽'],'車':['Car','🚗'],
+  '飛機':['Airplane','✈️'],'房子':['House','🏠'],'蛋糕':['Cake','🎂'],'牛奶':['Milk','🥛'],
+  '爸爸':['Dad','👨'],'媽媽':['Mom','👩'],'爺爺':['Grandpa','👴'],'奶奶':['Grandma','👵'],
+  '紅色':['Red','🔴'],'藍色':['Blue','🔵'],'綠色':['Green','🟢'],'黃色':['Yellow','🟡'],
+  '白色':['White','⬜'],'黑色':['Black','⬛'],'粉紅色':['Pink','🩷'],
+};
+
 async function searchEnglish(){
   const zh=document.getElementById('vZh').value.trim();
   if(!zh){showToast('請先輸入或說出中文意思！');return;}
@@ -1054,39 +1072,49 @@ async function searchEnglish(){
   const resultList=document.getElementById('vResultList');
   resultBox.style.display='block';
   resultList.innerHTML='<div style="color:#42a5f5;font-size:.8rem;padding:8px">⏳ 搜尋中...</div>';
-  try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:300,
-        messages:[{role:'user',content:`幫我找3個對應「${zh}」的英文單字，適合幼兒學習。
-只回傳JSON格式，不要其他文字：
-[{"word":"Apple","phonetic":"/ˈæp.əl/","emoji":"🍎","desc":"蘋果"},{"word":"..."}]`}]
-      })
-    });
-    const data=await resp.json();
-    const txt=data.content[0].text.trim();
-    const clean=txt.replace(/```json|```/g,'').trim();
-    const words=JSON.parse(clean);
-    resultList.innerHTML=words.map(w=>`
-      <div onclick="selectWord('${w.word}','${(w.phonetic||'').replace(/'/g,"\\'")}','${w.emoji||''}')"
-        style="background:rgba(66,165,245,.08);border:2px solid rgba(66,165,245,.2);border-radius:14px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .15s"
-        onmouseenter="this.style.borderColor='#42a5f5'" onmouseleave="this.style.borderColor='rgba(66,165,245,.2)'">
-        <span style="font-size:2.2rem">${w.emoji||'📖'}</span>
-        <div style="flex:1">
-          <div style="font-size:1.2rem;color:#fff;font-family:'Fredoka One',Arial,sans-serif">${w.word}</div>
-          <div style="font-size:.72rem;color:#ffb300">${w.phonetic||''}</div>
-          <div style="font-size:.8rem;color:#81c784">${w.desc||zh}</div>
-        </div>
-        <button onclick="event.stopPropagation();say('${w.word}','en-US')" style="background:rgba(76,175,80,.2);border:1.5px solid rgba(76,175,80,.3);border-radius:99px;padding:5px 10px;color:#81c784;font-family:'Fredoka One',Arial,sans-serif;font-size:.7rem;cursor:pointer">🔊</button>
-      </div>
-    `).join('');
-  }catch(e){
-    // fallback：用字典 API
-    resultList.innerHTML='<div style="color:#ef5350;font-size:.75rem;padding:6px">搜尋失敗，請直接輸入英文單字</div>';
+  let candidates=[];
+  // 1. 查本地對照表
+  for(const [key,[word,emoji]] of Object.entries(ZH_EN_MAP)){
+    if(zh.includes(key)||key.includes(zh)){
+      candidates.push({word,emoji,desc:key});
+    }
   }
+  // 2. 用 MyMemory 翻譯 API
+  try{
+    const res=await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(zh)+'&langpair=zh|en');
+    const data=await res.json();
+    const translated=(data.responseData?.translatedText||'').trim();
+    if(translated&&translated.length>0&&translated.length<40){
+      const eng=translated.charAt(0).toUpperCase()+translated.slice(1);
+      if(!candidates.find(c=>c.word.toLowerCase()===eng.toLowerCase())){
+        candidates.unshift({word:eng,emoji:'📖',desc:zh});
+      }
+    }
+  }catch(e){}
+  if(candidates.length===0){
+    resultList.innerHTML='<div style="text-align:center;color:#ffb300;padding:12px;font-size:.82rem">找不到「'+zh+'」<br><span style="color:#81c784;font-size:.75rem">請直接在下方輸入英文</span></div>';
+    return;
+  }
+  candidates=candidates.slice(0,3);
+  // 3. 查音標
+  for(const c of candidates){
+    try{
+      const r=await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(c.word));
+      if(r.ok){const d=await r.json();c.phonetic=d[0]?.phonetic||d[0]?.phonetics?.find(p=>p.text)?.text||'';}
+    }catch(e){c.phonetic='';}
+  }
+  resultList.innerHTML=candidates.map((w,idx)=>{
+    const ws=w.word.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const ps=(w.phonetic||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const es=(w.emoji||'').replace(/'/g,"\\'");
+    return '<div onclick="selectWord(\''+ws+'\',\''+ps+'\',\''+es+'\')" style="background:rgba(66,165,245,.08);border:2px solid rgba(66,165,245,.2);border-radius:14px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:4px">'
+      +'<span style="font-size:2.2rem">'+(w.emoji||'📖')+'</span>'
+      +'<div style="flex:1"><div style="font-size:1.2rem;color:#fff;font-family:\'Fredoka One\',Arial,sans-serif">'+w.word+'</div>'
+      +(w.phonetic?'<div style="font-size:.72rem;color:#ffb300">'+w.phonetic+'</div>':'')
+      +'<div style="font-size:.8rem;color:#81c784">'+(w.desc||zh)+'</div></div>'
+      +'<button onclick="event.stopPropagation();say(\''+ws+'\',\'en-US\')" style="background:rgba(76,175,80,.2);border:1.5px solid rgba(76,175,80,.3);border-radius:99px;padding:6px 12px;color:#81c784;font-family:\'Fredoka One\',Arial,sans-serif;font-size:.72rem;cursor:pointer;flex-shrink:0">🔊</button>'
+      +'</div>';
+  }).join('');
 }
 
 function selectWord(word,phonetic,emoji){

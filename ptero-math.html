@@ -206,13 +206,14 @@ body{font-family:'Nunito',sans-serif;background:#0a0a1a;min-height:100vh;overflo
     <canvas id="gc"></canvas>
     <div class="agnd"></div>
     <div class="lvbanner" id="lvBanner">⚡ 升級！</div>
-    <div class="gover" id="gOver">
+    <div class="gover" id="gOver"
+      ontouchstart="event.preventDefault();if(!window._sbtnCd){window._sbtnCd=1;startGame();setTimeout(()=>window._sbtnCd=0,1000);}"
+      onclick="if(!window._sbtnCd){window._sbtnCd=1;startGame();setTimeout(()=>window._sbtnCd=0,1000);}">
       <div class="go-d">🦕</div>
       <div class="go-t">翼龍加法<br>大冒險！</div>
       <div class="go-s" id="gMsg">接住正確的答案！<br>接錯了要扣血哦 🌙</div>
-      <button class="go-btn" id="mathStartBtn"
-        ontouchstart="event.preventDefault();startGame();"
-        onclick="startGame()">🎮 開始！</button>
+      <button class="go-btn" id="mathStartBtn" style="pointer-events:none">🎮 開始！</button>
+      <div style="font-size:.72rem;color:rgba(196,181,253,.6);margin-top:-4px">👆 點畫面開始</div>
     </div>
   </div>
   <div class="drag-hint">👈 左右滑動翼龍接答案 👉</div>
