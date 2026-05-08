@@ -139,7 +139,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
 .rest-bar-wrap{width:80%;max-width:300px;height:12px;background:rgba(255,255,255,.15);border-radius:99px;overflow:hidden;margin-bottom:24px}
 .rest-bar{height:100%;background:linear-gradient(90deg,#4caf50,#ffb300);border-radius:99px;transition:width 1s linear}
 .rest-btn{background:linear-gradient(135deg,#4caf50,#2e7d32);border:none;border-radius:99px;padding:12px 32px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:1.1rem;cursor:pointer;display:none}
-.lb-ov{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:500;display:none;align-items:center;justify-content:center;pointer-events:none}
+.lb-ov{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:850;display:none;align-items:center;justify-content:center;pointer-events:none}
 .lb-ov.open{display:flex;pointer-events:auto}
 .lb-box{background:linear-gradient(160deg,#1a2f1a,#0d1f0d);border:2px solid rgba(255,179,0,.3);border-radius:24px;padding:24px 20px;max-width:340px;width:92%;max-height:80vh;overflow-y:auto}
 .lb-title{font-size:1.3rem;color:#ffb300;text-align:center;margin-bottom:14px}
@@ -370,18 +370,40 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
     <!-- 新增表單 -->
     <div class="vocab-editor" id="vocabEditor">
       <div class="vocab-editor-title">✏️ 新增英文單字</div>
-      <input class="vinput" id="vWord" type="text" placeholder="English Word（例：Elephant）">
-      <input class="vinput" id="vZh" type="text" placeholder="中文意思（例：大象）">
-      <div style="font-size:.75rem;color:#42a5f5;margin-bottom:6px">🖼️ 圖片（選其一，或都不選）</div>
-      <div class="vocab-img-row">
-        <input class="vinput" id="vEmoji" type="text" maxlength="4" placeholder="Emoji 🐘" style="width:80px;text-align:center;font-size:1.4rem;flex:none">
-        <label class="vocab-img-label">
-          📷 上傳圖片
-          <input type="file" id="vImgFile" accept="image/*" style="display:none" onchange="onVImgChange(this)">
-        </label>
+
+      <!-- 語音輸入中文 -->
+      <div style="font-size:.78rem;color:#42a5f5;margin-bottom:5px">① 說中文 → 搜尋英文</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:stretch">
+        <input class="vinput" id="vZh" type="text" placeholder="中文意思（例：大象）" style="flex:1;margin:0">
+        <button id="vVoiceBtn" onclick="toggleVVoice()" style="background:rgba(66,165,245,.15);border:1.5px solid rgba(66,165,245,.4);border-radius:12px;padding:0 14px;color:#42a5f5;font-family:'Fredoka One',Arial,sans-serif;font-size:.85rem;cursor:pointer;white-space:nowrap;flex-shrink:0">🎤</button>
       </div>
+      <button onclick="searchEnglish()" style="width:100%;background:linear-gradient(135deg,#1565c0,#42a5f5);border:none;border-radius:12px;padding:11px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:.92rem;cursor:pointer;margin-bottom:10px">🔍 幫我找英文單字！</button>
+
+      <!-- 搜尋結果選擇 -->
+      <div id="vSearchResults" style="display:none;margin-bottom:10px">
+        <div style="font-size:.75rem;color:#42a5f5;margin-bottom:8px">② 選一個英文單字：</div>
+        <div id="vResultList" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+
+      <!-- 直接輸入英文 -->
+      <div style="font-size:.78rem;color:#42a5f5;margin-bottom:5px">或直接輸入英文</div>
+      <input class="vinput" id="vWord" type="text" placeholder="English Word（例：Elephant）">
+
+      <!-- Emoji -->
+      <input class="vinput" id="vEmoji" type="text" maxlength="4" placeholder="Emoji 🐘（可選）" style="text-align:center;font-size:1.4rem">
+
+      <!-- 上傳圖片 -->
+      <label class="vocab-img-label" style="margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(0,0,0,.3);border:1.5px solid rgba(66,165,245,.2);border-radius:12px;padding:10px;color:#81c784;font-size:.8rem;cursor:pointer">
+        📷 上傳圖片（可選）
+        <input type="file" id="vImgFile" accept="image/*" style="display:none" onchange="onVImgChange(this)">
+      </label>
       <img id="vImgPreview" style="display:none;width:100%;max-height:110px;object-fit:contain;border-radius:10px;margin-bottom:8px;background:#1a1a2e">
-      <div style="font-size:.75rem;color:#42a5f5;margin-bottom:5px">✏️ 手繪圖（可選）</div>
+
+      <!-- 手繪 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+        <span style="font-size:.78rem;color:#42a5f5">✏️ 手繪圖（可選）</span>
+        <button onclick="openVDrawFull()" style="background:rgba(66,165,245,.12);border:1.5px solid rgba(66,165,245,.3);border-radius:8px;padding:4px 12px;color:#42a5f5;font-family:'Fredoka One',Arial,sans-serif;font-size:.7rem;cursor:pointer">⛶ 放大畫</button>
+      </div>
       <canvas class="vocab-draw-canvas" id="vDrawCanvas" width="600" height="200"></canvas>
       <div class="vocab-draw-tools">
         <div class="color-dot sel" style="background:#fff" onclick="setVColor(this,'#fff')"></div>
@@ -493,6 +515,23 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
   </div>
   <canvas class="draw-full-canvas" id="fullCanvas"></canvas>
   <button class="draw-full-done" onclick="closeDrawFull()">✅ 完成畫畫</button>
+</div>
+
+<!-- 單字書畫畫放大 -->
+<div class="draw-full-ov" id="vDrawFullOv" style="z-index:900">
+  <div style="font-size:.85rem;color:#42a5f5;padding-top:4px">✏️ 手繪單字圖</div>
+  <div class="draw-full-tools">
+    <div class="color-dot sel" style="background:#fff;width:28px;height:28px" onclick="setVFullColor(this,'#fff')"></div>
+    <div class="color-dot" style="background:#ff8fab;width:28px;height:28px" onclick="setVFullColor(this,'#ff8fab')"></div>
+    <div class="color-dot" style="background:#ffb300;width:28px;height:28px" onclick="setVFullColor(this,'#ffb300')"></div>
+    <div class="color-dot" style="background:#4caf50;width:28px;height:28px" onclick="setVFullColor(this,'#4caf50')"></div>
+    <div class="color-dot" style="background:#42a5f5;width:28px;height:28px" onclick="setVFullColor(this,'#42a5f5')"></div>
+    <div class="color-dot" style="background:#ef5350;width:28px;height:28px" onclick="setVFullColor(this,'#ef5350')"></div>
+    <input type="range" style="width:90px;accent-color:#42a5f5" min="2" max="30" value="8" id="vFullSizeInput">
+    <button onclick="clearVFullCanvas()" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:5px 10px;color:#aaa;font-family:'Fredoka One',Arial,sans-serif;font-size:.72rem;cursor:pointer">🗑️清除</button>
+  </div>
+  <canvas id="vFullCanvas" style="border-radius:14px;touch-action:none;cursor:crosshair;background:#1a1a2e;border:2px solid rgba(66,165,245,.3)"></canvas>
+  <button onclick="closeVDrawFull()" style="background:linear-gradient(135deg,#42a5f5,#1565c0);border:none;border-radius:99px;padding:12px 36px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:1rem;cursor:pointer;margin-bottom:6px">✅ 完成畫畫</button>
 </div>
 
 <div class="toast hide" id="toast"></div>
@@ -681,6 +720,7 @@ function startGame(){
 function endGame(){
   gameActive=false;clearInterval(fallerTimer);clearInterval(dailyTimer);
   fallers.forEach(f=>f.el.remove());fallers=[];stopBGM();
+  sndDead(); // 超級瑪麗死亡音效
   document.getElementById('goScreen').style.display='flex';
   const earned=Math.floor(score/5);
   if(earned>0){stars+=earned;saveStars();updateStarUI();}
@@ -698,7 +738,10 @@ function checkGrow(){growScore++;const g=GROW[growIdx];document.getElementById('
 // ══ LEADERBOARD ══
 const MEDALS=['🥇','🥈','🥉'];
 async function showLeaderboard(){
-  document.getElementById('lbOv').classList.add('open');
+  const ov=document.getElementById('lbOv');
+  ov.classList.add('open');
+  currentLbGame='abc';
+  document.querySelectorAll('.lb-tab').forEach((b,i)=>{b.classList.toggle('active',i===0);});
   loadLbData('abc');
 }
 function switchLbTab(game,btn){
@@ -948,6 +991,134 @@ function openVcModal(i){
 function closeVcModal(){document.getElementById('vcModal').classList.remove('open');vcCurrentWord=null;}
 function speakCurrent(){if(vcCurrentWord)say(vcCurrentWord.word,'en-US');}
 function deleteVocab(i){const w=VOCAB[i].word;VOCAB.splice(i,1);saveVocabLocal();renderVocabList();showToast('🗑️ 刪除「'+w+'」');}
+
+// ── 提示圖點擊發音 ──
+document.getElementById('tEmoji').style.cursor='pointer';
+document.getElementById('tEmoji').addEventListener('click',()=>{if(currentTarget){say(currentTarget.l,'en-US');setTimeout(()=>say(currentTarget.w,'en-US'),700);}});
+document.getElementById('tEmoji').addEventListener('touchend',e=>{e.preventDefault();if(currentTarget){say(currentTarget.l,'en-US');setTimeout(()=>say(currentTarget.w,'en-US'),700);}});
+
+// ── 死亡音效 Super Mario ──
+function sndDead(){
+  try{
+    const c=new(window.AudioContext||window.webkitAudioContext)();
+    const seq=[
+      [493.88,0,.12],[523.25,.14,.1],[0,.25,0],
+      [392,.28,.1],[0,.39,0],
+      [329.63,.42,.1],[0,.53,0],
+      [261.63,.56,.18]
+    ];
+    seq.forEach(([f,t,d])=>{
+      if(!f)return;
+      const o=c.createOscillator(),g=c.createGain();
+      o.type='square';o.frequency.value=f;
+      g.gain.setValueAtTime(0.18,c.currentTime+t);
+      g.gain.linearRampToValueAtTime(0,c.currentTime+t+d);
+      o.connect(g);g.connect(c.destination);
+      o.start(c.currentTime+t);o.stop(c.currentTime+t+d+.05);
+    });
+    setTimeout(()=>c.close(),1500);
+  }catch(e){}
+}
+
+// ── 語音輸入單字書 ──
+let vVoiceRecog=null;
+function toggleVVoice(){
+  const btn=document.getElementById('vVoiceBtn');
+  if(vVoiceRecog){vVoiceRecog.stop();vVoiceRecog=null;btn.textContent='🎤';btn.style.background='rgba(66,165,245,.15)';return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){showToast('此裝置不支援語音輸入');return;}
+  vVoiceRecog=new SR();
+  vVoiceRecog.lang='zh-TW';vVoiceRecog.continuous=false;vVoiceRecog.interimResults=false;
+  vVoiceRecog.onresult=e=>{
+    const txt=e.results[0][0].transcript.trim();
+    document.getElementById('vZh').value=txt;
+    showToast('🎤 聽到：'+txt);
+    searchEnglish();
+  };
+  vVoiceRecog.onend=()=>{vVoiceRecog=null;btn.textContent='🎤';btn.style.background='rgba(66,165,245,.15)';};
+  vVoiceRecog.onerror=()=>{vVoiceRecog=null;btn.textContent='🎤';btn.style.background='rgba(66,165,245,.15)';};
+  vVoiceRecog.start();
+  btn.textContent='🔴';btn.style.background='rgba(239,83,80,.3)';
+}
+
+// ── 搜尋英文單字（用 Claude API）──
+async function searchEnglish(){
+  const zh=document.getElementById('vZh').value.trim();
+  if(!zh){showToast('請先輸入或說出中文意思！');return;}
+  const resultBox=document.getElementById('vSearchResults');
+  const resultList=document.getElementById('vResultList');
+  resultBox.style.display='block';
+  resultList.innerHTML='<div style="color:#42a5f5;font-size:.8rem;padding:8px">⏳ 搜尋中...</div>';
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:300,
+        messages:[{role:'user',content:`幫我找3個對應「${zh}」的英文單字，適合幼兒學習。
+只回傳JSON格式，不要其他文字：
+[{"word":"Apple","phonetic":"/ˈæp.əl/","emoji":"🍎","desc":"蘋果"},{"word":"..."}]`}]
+      })
+    });
+    const data=await resp.json();
+    const txt=data.content[0].text.trim();
+    const clean=txt.replace(/```json|```/g,'').trim();
+    const words=JSON.parse(clean);
+    resultList.innerHTML=words.map(w=>`
+      <div onclick="selectWord('${w.word}','${(w.phonetic||'').replace(/'/g,"\\'")}','${w.emoji||''}')"
+        style="background:rgba(66,165,245,.08);border:2px solid rgba(66,165,245,.2);border-radius:14px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .15s"
+        onmouseenter="this.style.borderColor='#42a5f5'" onmouseleave="this.style.borderColor='rgba(66,165,245,.2)'">
+        <span style="font-size:2.2rem">${w.emoji||'📖'}</span>
+        <div style="flex:1">
+          <div style="font-size:1.2rem;color:#fff;font-family:'Fredoka One',Arial,sans-serif">${w.word}</div>
+          <div style="font-size:.72rem;color:#ffb300">${w.phonetic||''}</div>
+          <div style="font-size:.8rem;color:#81c784">${w.desc||zh}</div>
+        </div>
+        <button onclick="event.stopPropagation();say('${w.word}','en-US')" style="background:rgba(76,175,80,.2);border:1.5px solid rgba(76,175,80,.3);border-radius:99px;padding:5px 10px;color:#81c784;font-family:'Fredoka One',Arial,sans-serif;font-size:.7rem;cursor:pointer">🔊</button>
+      </div>
+    `).join('');
+  }catch(e){
+    // fallback：用字典 API
+    resultList.innerHTML='<div style="color:#ef5350;font-size:.75rem;padding:6px">搜尋失敗，請直接輸入英文單字</div>';
+  }
+}
+
+function selectWord(word,phonetic,emoji){
+  document.getElementById('vWord').value=word;
+  if(emoji)document.getElementById('vEmoji').value=emoji;
+  document.querySelectorAll('#vResultList > div').forEach(d=>{d.style.borderColor='rgba(66,165,245,.2)';d.style.background='rgba(66,165,245,.08)';});
+  event.currentTarget.style.borderColor='#42a5f5';event.currentTarget.style.background='rgba(66,165,245,.2)';
+  say(word,'en-US');
+  showToast('✅ 選了：'+word);
+}
+
+// ── 單字書畫畫放大 ──
+let vFullCtx=null,vFullDrawing=false;
+function openVDrawFull(){
+  const ov=document.getElementById('vDrawFullOv');ov.classList.add('open');
+  const fc=document.getElementById('vFullCanvas');
+  const W=Math.min(window.innerWidth-12,600);
+  const H=window.innerHeight-160;
+  fc.width=W*2;fc.height=H*2;fc.style.width=W+'px';fc.style.height=H+'px';
+  vFullCtx=fc.getContext('2d');vFullCtx.scale(2,2);
+  vFullCtx.fillStyle='#1a1a2e';vFullCtx.fillRect(0,0,W,H);
+  const vc=document.getElementById('vDrawCanvas');
+  try{vFullCtx.drawImage(vc,0,0,W,H);}catch(e){}
+  fc.ontouchstart=e=>{vFullDrawing=true;const p=getPos(e,fc);vFullCtx.beginPath();vFullCtx.moveTo(p.x/2,p.y/2);e.preventDefault();};
+  fc.ontouchmove=e=>{if(!vFullDrawing)return;const p=getPos(e,fc);vFullCtx.strokeStyle=vDrawColor;vFullCtx.lineWidth=parseInt(document.getElementById('vFullSizeInput').value);vFullCtx.lineCap='round';vFullCtx.lineTo(p.x/2,p.y/2);vFullCtx.stroke();e.preventDefault();};
+  fc.ontouchend=()=>vFullDrawing=false;
+  fc.onmousedown=e=>{vFullDrawing=true;const p=getPos(e,fc);vFullCtx.beginPath();vFullCtx.moveTo(p.x/2,p.y/2);};
+  fc.onmousemove=e=>{if(!vFullDrawing)return;const p=getPos(e,fc);vFullCtx.strokeStyle=vDrawColor;vFullCtx.lineWidth=parseInt(document.getElementById('vFullSizeInput').value);vFullCtx.lineCap='round';vFullCtx.lineTo(p.x/2,p.y/2);vFullCtx.stroke();};
+  fc.onmouseup=()=>vFullDrawing=false;
+}
+function clearVFullCanvas(){if(vFullCtx){const fc=document.getElementById('vFullCanvas');vFullCtx.fillStyle='#1a1a2e';vFullCtx.fillRect(0,0,fc.width/2,fc.height/2);}}
+function closeVDrawFull(){
+  const fc=document.getElementById('vFullCanvas');
+  if(vCtx&&fc){vCtx.fillStyle='#1a1a2e';vCtx.fillRect(0,0,600,200);try{vCtx.drawImage(fc,0,0,600,200);}catch(e){}}
+  document.getElementById('vDrawFullOv').classList.remove('open');
+}
+function setVFullColor(el,c){vDrawColor=c;document.querySelectorAll('#vDrawFullOv .color-dot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');}
 
 // INIT
 updateStarUI();
