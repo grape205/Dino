@@ -108,9 +108,9 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
 .diary-editor.open{display:block}
 .diary-editor-title{font-size:1rem;color:#ff8fab;margin-bottom:10px;text-align:center}
 .mood-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
-.mood-btn{font-size:1.6rem;background:rgba(0,0,0,.3);border:2px solid rgba(255,255,255,.1);border-radius:10px;padding:5px 8px;cursor:pointer;transition:all .15s;line-height:1.2}
-.mood-btn.sel{border-color:#ff8fab;background:rgba(255,143,171,.2);transform:scale(1.15)}
-.mood-label{font-size:.55rem;color:#ff8fab;display:block;text-align:center;margin-top:2px}
+.mood-btn{font-size:1.6rem;background:#fff;border:2px solid rgba(255,143,171,.3);border-radius:12px;padding:6px 10px;cursor:pointer;transition:all .15s;line-height:1.2;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.mood-btn.sel{border-color:#ff8fab;background:#fff0f5;transform:scale(1.15);box-shadow:0 4px 14px rgba(255,143,171,.4)}
+.mood-label{font-size:.55rem;color:#c9184a;display:block;text-align:center;margin-top:2px}
 .diary-text-area{width:100%;background:rgba(0,0,0,.3);border:1.5px solid rgba(255,143,171,.2);border-radius:12px;padding:10px;color:#fff;font-size:.9rem;min-height:80px;resize:none;font-family:'Fredoka One',Arial,sans-serif;margin-bottom:8px}
 .diary-voice-btn{width:100%;background:rgba(255,143,171,.12);border:1.5px solid rgba(255,143,171,.3);border-radius:12px;padding:10px;color:#ff8fab;font-family:'Fredoka One',Arial,sans-serif;font-size:.88rem;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px}
 .diary-voice-btn.on{background:rgba(255,100,100,.3);animation:pulse 1s infinite}
@@ -201,7 +201,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
 .vc-modal-btns{display:flex;gap:10px}
 
 /* ── DRAW FULLSCREEN ── */
-.draw-full-ov{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:800;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px}
+.draw-full-ov{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:800;display:none;flex-direction:column;align-items:center;justify-content:space-between;gap:6px;padding:8px 6px}
 .draw-full-ov.open{display:flex}
 .draw-full-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;padding:0 8px}
 .draw-full-canvas{border-radius:14px;touch-action:none;cursor:crosshair;background:#1a1a2e;border:2px solid rgba(255,143,171,.3)}
@@ -773,8 +773,8 @@ let fullCtx=null,fullDrawing=false;
 function openDrawFull(){
   const ov=document.getElementById('drawFullOv');ov.classList.add('open');
   const fc=document.getElementById('fullCanvas');
-  const W=Math.min(window.innerWidth-20,600);
-  const H=Math.round(W*0.6);
+  const W=Math.min(window.innerWidth-12,600);
+  const H=window.innerHeight-130; // 幾乎全螢幕高度
   fc.width=W*2;fc.height=H*2;fc.style.width=W+'px';fc.style.height=H+'px';
   fullCtx=fc.getContext('2d');
   fullCtx.scale(2,2);
