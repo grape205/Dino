@@ -210,7 +210,9 @@ body{font-family:'Nunito',sans-serif;background:#0a0a1a;min-height:100vh;overflo
       <div class="go-d">🦕</div>
       <div class="go-t">翼龍加法<br>大冒險！</div>
       <div class="go-s" id="gMsg">接住正確的答案！<br>接錯了要扣血哦 🌙</div>
-      <button class="go-btn" id="mathStartBtn">🎮 開始！</button>
+      <button class="go-btn" id="mathStartBtn"
+        ontouchstart="event.preventDefault();startGame();"
+        onclick="startGame()">🎮 開始！</button>
     </div>
   </div>
   <div class="drag-hint">👈 左右滑動翼龍接答案 👉</div>
@@ -736,23 +738,7 @@ renderLevels();
 newEquation();
 resize();
 startIdle();
-// 修正 iframe touchend 無法觸發問題
-(function(){
-  const btn = document.getElementById('mathStartBtn');
-  if(btn){
-    btn.addEventListener('touchend', function(e){e.preventDefault();e.stopPropagation();startGame();}, {passive:false});
-    btn.addEventListener('click', function(e){e.stopPropagation();startGame();});
-  }
-  const r2 = document.getElementById('gOver');
-  if(r2){
-    const reBtn = r2.querySelector('.go-btn');
-    if(reBtn){
-      reBtn.removeAttribute('onclick');
-      reBtn.addEventListener('touchend', function(e){e.preventDefault();startGame();}, {passive:false});
-      reBtn.addEventListener('click', function(){startGame();});
-    }
-  }
-})();
+// 開始按鈕已在 HTML 直接綁定 ontouchstart
 function goBack(){
   try{stopBGM();}catch(e){}
   try{if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();}catch(e){}

@@ -615,7 +615,12 @@ let iframeGameActive=false;
 window.addEventListener('message',e=>{if(e.data==='gameStarted')iframeGameActive=true;if(e.data==='gameEnded')iframeGameActive=false;});
 function switchTab(name,btn){
   if(name===currentTab)return;
-  if(gameActive||iframeGameActive){pendingTab=name;pendingBtn=btn;document.getElementById('leaveOv').classList.add('open');return;}
+  // 只有遊戲真正在進行中才問
+  if(gameActive||(iframeGameActive&&(currentTab==='math'||currentTab==='zhuyin'))){
+    pendingTab=name;pendingBtn=btn;
+    document.getElementById('leaveOv').classList.add('open');
+    return;
+  }
   doSwitchTab(name,btn);
 }
 function cancelLeave(){document.getElementById('leaveOv').classList.remove('open');pendingTab=null;pendingBtn=null;}

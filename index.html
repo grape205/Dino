@@ -131,20 +131,27 @@ const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
   }
 })();
 
-// 如果已登入，直接跳轉
 async function init(){
-  // 處理 OAuth redirect
-  if(location.hash.includes('access_token')){
+  // 處理 OAuth 回來的 token
+  const hash=location.hash;
+  if(hash&&hash.includes('access_token')){
+    // 等 supabase 處理完 session
+    await new Promise(r=>setTimeout(r,500));
     const {data:{session}}=await sb.auth.getSession();
     if(session){
+      // 清掉 hash 再跳轉
+      history.replaceState(null,'',location.pathname);
       location.replace(MAIN);
       return;
     }
   }
+  // 已有 session 直接跳
   const {data:{session}}=await sb.auth.getSession();
   if(session){
     location.replace(MAIN);
+    return;
   }
+  // 沒登入就顯示登入頁（預設已顯示）
 }
 
 async function loginGoogle(){
@@ -153,7 +160,10 @@ async function loginGoogle(){
   document.getElementById('loading').style.display='block';
   await sb.auth.signInWithOAuth({
     provider:'google',
-    options:{redirectTo:'https://grape205.github.io/Dino/index.html'}
+    options:{
+      redirectTo:'https://grape205.github.io/Dino/index.html',
+      queryParams:{prompt:'select_account'}
+    }
   });
 }
 
