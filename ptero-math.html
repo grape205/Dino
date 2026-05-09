@@ -97,6 +97,7 @@ body{font-family:'Nunito',sans-serif;background:#0a0a1a;min-height:100vh;overflo
 .arena{position:relative;border-radius:17px;overflow:hidden;margin:0 12px;
   border:2.5px solid #4c1d95;
   box-shadow:0 0 40px rgba(124,58,237,.12),inset 0 0 80px rgba(0,0,0,.55)}
+.arena-fs{position:fixed!important;inset:0!important;z-index:800!important;border-radius:0!important;margin:0!important;border:none!important;width:100vw!important;height:100dvh!important}
 #gc{display:block;width:100%;touch-action:none}
 .agnd{height:10px;background:linear-gradient(180deg,#4c1d95,#2e1065);border-top:2px solid #7c3aed}
 
@@ -423,15 +424,16 @@ function startGame(){
   resetGame();
   gameActive=true;
   document.getElementById('gOver').style.display='none';
-  const ga=document.getElementById('goverStartArea');if(ga)ga.innerHTML='';
+  document.getElementById('mathStartBtn').style.display='none';
+  // CSS 全螢幕（不用瀏覽器 API，Android 不會自動退出）
+  document.querySelector('.arena').classList.add('arena-fs');
+  document.querySelector('.wrap').style.display='none';
+  document.body.style.background='#0a0a1a';
+  resize();
   updateHUD();
   startBGM();
   gameLoop();
-  try{parent.postMessage('gameStarted','*');}catch(e){}
-  document.getElementById('backBtn').style.display='block';
-  try{const el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}catch(e){}
 }
-
 function updateHUD(){
   document.getElementById('sScore').textContent=score;
   document.getElementById('sLevel').textContent=gameLevel;
@@ -697,18 +699,17 @@ function doEndGame(){
   stopBGM();
   stars+=score*3;totalScore+=score;saveData();updateStarUI();
   confetti();
+  // 還原版面
+  document.querySelector('.arena').classList.remove('arena-fs');
+  document.querySelector('.wrap').style.display='';
   const ov=document.getElementById('gOver');
   ov.style.display='flex';
   document.getElementById('gMsg').innerHTML=
     `得了 <span style="color:#fbbf24;font-size:1.4em">${score}</span> 分！<br>`+
     `獲得 <span style="color:#fbbf24">${score*3}</span> 顆⭐`;
-  injectStartBtn('🔄 再玩一次！');
-  // 重設 ontouchend 為再玩一次
+  // 顯示再玩按鈕
   const rb=document.getElementById('mathStartBtn');
-  if(rb){
-    rb.ontouchend=function(e){e.preventDefault();rb.style.display='none';startGame();};
-    rb.onclick=function(){rb.style.display='none';startGame();};
-  }
+  if(rb){rb.style.display='block';rb.textContent='🔄 再玩一次！';}
   showToast(`🎮 結束！得${score}分 +${score*3}⭐`);
 }
 
