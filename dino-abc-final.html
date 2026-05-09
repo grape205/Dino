@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🦖 恐龍字母大冒險</title>
+<title>🦖 恐龍字母大冒險 v12</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -709,7 +709,7 @@ function doSwitchTab(name,btn){
   if(name==='rewards')renderRewards();
   if(name==='diary')renderDiary();
   if(name==='vocab')renderVocabList();
-  if(name==='game')goFullscreen();
+  if(name==='game'){} // 全螢幕只在按開始時觸發
   else{try{if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();}catch(e){}}
 }
 if(location.hash==='#vocab'){setTimeout(()=>{const btn=document.querySelector('[onclick*="vocab"]');switchTab('vocab',btn);},300);}

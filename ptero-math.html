@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>🦕 翼龍加法大冒險</title>
+<title>🦕 翼龍加法大冒險 v12</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -101,7 +101,7 @@ body{font-family:'Nunito',sans-serif;background:#0a0a1a;min-height:100vh;overflo
 .agnd{height:10px;background:linear-gradient(180deg,#4c1d95,#2e1065);border-top:2px solid #7c3aed}
 
 /* overlays */
-.gover{position:absolute;inset:0;background:rgba(0,0,0,.82);border-radius:15px;pointer-events:auto;
+.gover{position:absolute;inset:0;background:rgba(0,0,0,.82);border-radius:15px;pointer-events:none;pointer-events:auto;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:10px;z-index:30;backdrop-filter:blur(5px)}
 .go-d{font-size:4.5rem;animation:ptero 1.5s ease-in-out infinite}
@@ -214,8 +214,8 @@ body{font-family:'Nunito',sans-serif;background:#0a0a1a;min-height:100vh;overflo
     </div>
   </div>
   <div class="drag-hint">👈 左右滑動翼龍接答案 👉</div>
-  <!-- 開始按鈕 在 arena 外面 觸控才正常 -->
-  <div id="goverStartArea" style="padding:8px 16px;display:flex;justify-content:center">
+  <!-- 開始按鈕 在 arena 外面 觸控才正常 v12 -->
+  <div id="goverStartArea" style="padding:12px 16px 8px;display:flex;justify-content:center">
     <!-- 按鈕由 JS 插入 -->
   </div>
 <!-- SOUND BTN -->
@@ -752,7 +752,7 @@ function injectStartBtn(label){
   area.innerHTML='';
   const btn=document.createElement('button');
   btn.textContent=label||'🎮 開始遊戲！';
-  btn.style.cssText='background:linear-gradient(135deg,#4c1d95,#7c3aed);border:none;border-radius:99px;padding:16px 36px;color:#fff;font-family:\'Fredoka One\',cursive;font-size:1.2rem;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,.5);min-width:200px';
+  btn.style.cssText='width:calc(100% - 0px);background:linear-gradient(135deg,#4c1d95,#7c3aed);border:none;border-radius:99px;padding:20px;color:#fff;font-family:\'Fredoka One\',cursive;font-size:1.3rem;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,.5);display:block';
   btn.onclick=doMathStart;
   btn.addEventListener('touchend',function(e){e.preventDefault();doMathStart();},{passive:false});
   area.appendChild(btn);
