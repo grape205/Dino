@@ -788,7 +788,6 @@ function startGame(){
   document.getElementById('goScreen').style.display='none';
   stopIdle();pickTarget();startBGM();startDailyTimer();
   fallerTimer=setInterval(spawnFaller,1800);gameLoop();
-  goFullscreen();
 }
 function endGame(){
   gameActive=false;clearInterval(fallerTimer);clearInterval(dailyTimer);
@@ -855,16 +854,7 @@ document.getElementById('arena').addEventListener('touchend',()=>drag=false);
 document.getElementById('arena').addEventListener('mousedown',e=>{drag=true;dragStartX=e.clientX;dinoStartX=dinoX;});
 document.getElementById('arena').addEventListener('mousemove',e=>{if(!drag)return;const W=document.getElementById('arena').clientWidth;dinoX=Math.max(30,Math.min(W-30,dinoStartX+(e.clientX-dragStartX)));document.getElementById('dinoWrap').style.left=dinoX+'px';document.getElementById('dinoWrap').style.transform='translateX(-50%)';});
 document.getElementById('arena').addEventListener('mouseup',()=>drag=false);
-document.getElementById('startBtn').addEventListener('touchend',e=>{
-  e.preventDefault();e.stopPropagation();
-  try{const el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}catch(ex){}
-  startGame();
-},{passive:false});
-document.getElementById('startBtn').addEventListener('click',e=>{
-  e.stopPropagation();
-  try{const el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}catch(ex){}
-  startGame();
-});
+// startBtn 事件由 HTML ontouchstart/ontouchend 處理
 
 // HABITS
 function renderHabits(){const grid=document.getElementById('hGrid');let done=0;grid.innerHTML=HABITS.map((h,i)=>{const cnt=habitLog[i]||0;if(cnt>0)done++;const cls='hcard'+(cnt>=2?' done2':cnt===1?' done':'');const badge=cnt>=2?'✅✅':cnt===1?'✅':'';return '<div class="'+cls+'" onclick="askHabit('+i+')">'+'<div class="hcard-del" onclick="event.stopPropagation();deleteHabit('+i+')">✕</div>'+'<div class="hcard-e">'+h.e+'</div><div class="hcard-t">'+h.t+'</div><div class="hcard-c">'+badge+'</div></div>';}).join('');document.getElementById('doneCount').textContent=done+' 完成';}
