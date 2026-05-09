@@ -217,7 +217,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
       <div><div class="logo-t">恐龍字母大冒險！</div><div class="logo-s">ABC Dino World 🌴</div></div>
     </div>
     <div style="display:flex;gap:6px;align-items:center">
-      <div id="userPill" class="user-pill" onclick="showLogin()" style="display:none">
+      <div id="userPill" class="user-pill" onclick="showUserMenu()" style="display:none">
         <img id="userAvatar" class="user-avatar" src="" alt="">
         <span id="userName" class="user-name">登入</span>
       </div>
@@ -500,6 +500,22 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
   </div>
 </div>
 
+<!-- 用戶選單 (登出) -->
+<div id="userMenuOv" style="display:none;position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)" onclick="document.getElementById('userMenuOv').style.display='none'">
+  <div onclick="event.stopPropagation()" style="position:absolute;top:60px;right:12px;background:#1a1a2e;border:1.5px solid rgba(129,196,132,.3);border-radius:18px;padding:16px;min-width:200px;box-shadow:0 8px 32px rgba(0,0,0,.5)">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1)">
+      <img id="menuAvatar" src="" style="width:40px;height:40px;border-radius:50%;object-fit:cover" onerror="this.style.display='none'">
+      <div>
+        <div id="menuName" style="color:#fff;font-family:'Fredoka One',cursive;font-size:.95rem"></div>
+        <div id="menuEmail" style="color:#aaa;font-size:.65rem;margin-top:1px"></div>
+      </div>
+    </div>
+    <button onclick="doLogout()" style="width:100%;background:linear-gradient(135deg,#b91c1c,#ef4444);border:none;border-radius:99px;padding:11px;color:#fff;font-family:'Fredoka One',cursive;font-size:.9rem;cursor:pointer">
+      🚪 登出
+    </button>
+  </div>
+</div>
+
 <!-- 單字卡 Modal -->
 <div class="vc-modal" id="vcModal">
   <div class="vc-modal-box">
@@ -582,6 +598,23 @@ function clearUser(){currentUser=null;document.getElementById('loginPill').style
 async function loginGoogle(){await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:SITE_URL}});}
 function showLogin(){if(currentUser){showToast('已登入：'+(currentUser.user_metadata?.full_name||currentUser.email));return;}document.getElementById('loginOv').classList.add('open');}
 
+function showUserMenu(){
+  if(!currentUser){showLogin();return;}
+  const ov=document.getElementById('userMenuOv');
+  const avatar=currentUser.user_metadata?.avatar_url||'';
+  document.getElementById('menuAvatar').src=avatar;
+  document.getElementById('menuName').textContent=currentUser.user_metadata?.full_name||'玩家';
+  document.getElementById('menuEmail').textContent=currentUser.email||'';
+  ov.style.display='block';
+}
+
+async function doLogout(){
+  document.getElementById('userMenuOv').style.display='none';
+  try{await sb.auth.signOut();}catch(e){}
+  clearUser();
+  showToast('👋 已登出！');
+}
+
 // ══ ABC DATA ══
 const ABC=[
   {l:'A',e:'🍎',w:'Apple',zh:'蘋果'},{l:'A',e:'🐜',w:'Ant',zh:'螞蟻'},{l:'A',e:'🥑',w:'Avocado',zh:'酪梨'},{l:'A',e:'✈️',w:'Airplane',zh:'飛機'},
@@ -638,11 +671,8 @@ function updateStarUI(){document.getElementById('starNum').textContent=stars;}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.remove('hide');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.add('hide'),2800);}
 
 // TAB
-let iframeGameActive=false;
-window.addEventListener('message',e=>{if(e.data==='gameStarted')iframeGameActive=true;if(e.data==='gameEnded')iframeGameActive=false;});
 function switchTab(name,btn){
   if(name===currentTab)return;
-  // 只有字母遊戲真正在跑才問
   if(gameActive){
     pendingTab=name;pendingBtn=btn;
     document.getElementById('leaveOv').classList.add('open');
@@ -654,8 +684,6 @@ function cancelLeave(){document.getElementById('leaveOv').classList.remove('open
 function doLeave(){
   document.getElementById('leaveOv').classList.remove('open');
   if(gameActive)endGame();stopBGM();
-  if(currentTab==='math'){const fr=document.getElementById('mathFrame');fr.src='';fr.removeAttribute('data-loaded');document.getElementById('mathLoading').style.display='block';fr.style.display='none';}
-  if(currentTab==='zhuyin'){const fr=document.getElementById('zhuyinFrame');fr.src='';fr.removeAttribute('data-loaded');document.getElementById('zhuyinLoading').style.display='block';fr.style.display='none';}
   const n=pendingTab,b=pendingBtn;pendingTab=null;pendingBtn=null;doSwitchTab(n,b);
 }
 function doSwitchTab(name,btn){
@@ -668,16 +696,11 @@ function doSwitchTab(name,btn){
   if(name==='rewards')renderRewards();
   if(name==='diary')renderDiary();
   if(name==='vocab')renderVocabList();
-  if(name==='math'){const fr=document.getElementById('mathFrame');if(!fr.getAttribute('data-loaded')){fr.setAttribute('data-loaded','1');fr.src='ptero-math.html';}}
-  if(name==='zhuyin'){const fr=document.getElementById('zhuyinFrame');if(!fr.getAttribute('data-loaded')){fr.setAttribute('data-loaded','1');fr.src='dino-zhuyin.html';}}
-  if(name==='game'||name==='math'||name==='zhuyin')goFullscreen();
-  else exitFullscreen();
+  if(name==='game')goFullscreen();
+  else{try{if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();}catch(e){}}
 }
-// 首頁跳到 vocab
 if(location.hash==='#vocab'){setTimeout(()=>{const btn=document.querySelector('[onclick*="vocab"]');switchTab('vocab',btn);},300);}
-
 function goFullscreen(){try{const el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}catch(e){}}
-function exitFullscreen(){try{if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();}catch(e){}}
 
 // BGM
 const MELODY=[71,0,69,67,69,71,72,0,71,69,67,0,64,0,67,0,69,0,71,72,74,0,72,71,69,0,67,0,64,0,0,0,72,0,74,76,74,72,71,0,69,0,71,72,74,0,72,0,71,69,67,0,69,0,67,0,64,0,0,0,0,0,0,0];
@@ -940,13 +963,15 @@ function initVDraw(){
 function setVColor(el,c){vDrawColor=c;document.querySelectorAll('.vocab-draw-tools .color-dot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');}
 function clearVDraw(){if(vCtx){vCtx.fillStyle='#1a1a2e';vCtx.fillRect(0,0,600,200);}}
 
-function openVocabEditor(){
+function openVocabEditor(keepValues){
   const ed=document.getElementById('vocabEditor');ed.classList.add('open');
-  document.getElementById('vWord').value='';
-  document.getElementById('vZh').value='';
-  document.getElementById('vEmoji').value='';
-  document.getElementById('vImgPreview').style.display='none';
-  document.getElementById('vImgFile').value='';
+  if(!keepValues){
+    document.getElementById('vWord').value='';
+    document.getElementById('vZh').value='';
+    document.getElementById('vEmoji').value='';
+    document.getElementById('vImgPreview').style.display='none';
+    document.getElementById('vImgFile').value='';
+  }
   setTimeout(initVDraw,50);
 }
 function _oldCloseVocabEditor_removed(){}
@@ -1048,14 +1073,14 @@ function hideVcActions(i){const el=document.getElementById('vca-'+i);if(el)el.st
 
 function editVocab(i){
   const v=VOCAB[i];
-  // 填入編輯器
+  window._editingVocabIdx=i;
+  // 先設值
   document.getElementById('vWord').value=v.word||'';
   document.getElementById('vZh').value=v.zh||'';
   document.getElementById('vEmoji').value=v.emoji||'';
   document.getElementById('vSearchResults').style.display='none';
-  // 標記編輯 index
-  window._editingVocabIdx=i;
-  openVocabEditor();
+  // keepValues=true，不清空
+  openVocabEditor(true);
   showToast('✏️ 編輯模式：修改後按儲存');
 }
 
@@ -1081,26 +1106,41 @@ document.getElementById('tEmoji').style.cursor='pointer';
 document.getElementById('tEmoji').addEventListener('click',()=>{if(currentTarget){say(currentTarget.l,'en-US');setTimeout(()=>say(currentTarget.w,'en-US'),700);}});
 document.getElementById('tEmoji').addEventListener('touchend',e=>{e.preventDefault();if(currentTarget){say(currentTarget.l,'en-US');setTimeout(()=>say(currentTarget.w,'en-US'),700);}});
 
-// ── 死亡音效 Super Mario ──
+// ── 死亡音效 Super Mario Bros (精確版) ──
 function sndDead(){
   try{
     const c=new(window.AudioContext||window.webkitAudioContext)();
-    const seq=[
-      [493.88,0,.12],[523.25,.14,.1],[0,.25,0],
-      [392,.28,.1],[0,.39,0],
-      [329.63,.42,.1],[0,.53,0],
-      [261.63,.56,.18]
+    // 真正的瑪利歐死亡音：B4 下滑 + 五音下降
+    const notes=[
+      // freq, startTime, duration, volume
+      [494,   0.000, 0.08, 0.3],   // B4
+      [392,   0.100, 0.08, 0.3],   // G4
+      [523,   0.200, 0.10, 0.3],   // C5 (短促高音)
+      [0,     0.310, 0.05, 0],
+      [392,   0.360, 0.12, 0.3],   // G4
+      [0,     0.480, 0.04, 0],
+      [330,   0.520, 0.12, 0.28],  // E4
+      [0,     0.640, 0.04, 0],
+      [294,   0.680, 0.12, 0.26],  // D4
+      [277,   0.800, 0.12, 0.24],  // C#4
+      [294,   0.920, 0.08, 0.22],  // D4
+      [0,     1.000, 0.05, 0],
+      [220,   1.050, 0.20, 0.20],  // A3 長音結尾
     ];
-    seq.forEach(([f,t,d])=>{
-      if(!f)return;
-      const o=c.createOscillator(),g=c.createGain();
-      o.type='square';o.frequency.value=f;
-      g.gain.setValueAtTime(0.18,c.currentTime+t);
-      g.gain.linearRampToValueAtTime(0,c.currentTime+t+d);
+    notes.forEach(([freq,t,dur,vol])=>{
+      if(!freq||!vol)return;
+      const o=c.createOscillator();
+      const g=c.createGain();
+      o.type='square';
+      o.frequency.setValueAtTime(freq,c.currentTime+t);
+      g.gain.setValueAtTime(vol,c.currentTime+t);
+      g.gain.setValueAtTime(vol,c.currentTime+t+dur*0.7);
+      g.gain.linearRampToValueAtTime(0,c.currentTime+t+dur);
       o.connect(g);g.connect(c.destination);
-      o.start(c.currentTime+t);o.stop(c.currentTime+t+d+.05);
+      o.start(c.currentTime+t);
+      o.stop(c.currentTime+t+dur+0.02);
     });
-    setTimeout(()=>c.close(),1500);
+    setTimeout(()=>c.close(),2000);
   }catch(e){}
 }
 

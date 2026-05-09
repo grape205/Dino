@@ -214,15 +214,7 @@ body{font-family:'Nunito',sans-serif;background:#0a0a1a;min-height:100vh;overflo
     </div>
   </div>
   <div class="drag-hint">👈 左右滑動翼龍接答案 👉</div>
-  <!-- 獨立開始按鈕，在 arena 外面 -->
-  <div id="startBtnWrap" style="padding:12px 16px;display:block">
-    <button id="mainStartBtn"
-      style="width:100%;background:linear-gradient(135deg,#4c1d95,#7c3aed);border:none;border-radius:99px;padding:18px;color:#fff;font-family:'Fredoka One',cursive;font-size:1.2rem;cursor:pointer;box-shadow:0 6px 24px rgba(124,58,237,.5)">
-      🎮 開始遊戲！
-    </button>
-  </div>
-
-  <!-- SOUND BTN -->
+<!-- SOUND BTN -->
   <div id="soundBar2">
     <button id="btnEq" onclick="readEquation()">
       🔊 念算式
@@ -421,7 +413,7 @@ function startGame(){
   resetGame();
   gameActive=true;
   document.getElementById('gOver').style.display='none';
-  document.getElementById('startBtnWrap').style.display='none';
+  try{document.getElementById('startWrap').style.display='none';}catch(e){}
   updateHUD();
   startBGM();
   gameLoop();
@@ -700,9 +692,11 @@ function doEndGame(){
   document.getElementById('gMsg').innerHTML=
     `得了 <span style="color:#fbbf24;font-size:1.4em">${score}</span> 分！<br>`+
     `獲得 <span style="color:#fbbf24">${score*3}</span> 顆⭐`;
-  const wrap=document.getElementById('startBtnWrap');
-  wrap.style.display='block';
-  document.getElementById('mainStartBtn').textContent='🔄 再玩一次！';
+  try{
+    const sw=document.getElementById('startWrap');
+    sw.style.display='block';
+    document.getElementById('startMainBtn').textContent='🔄 再玩一次！';
+  }catch(e){}
   showToast(`🎮 結束！得${score}分 +${score*3}⭐`);
 }
 
@@ -747,19 +741,6 @@ newEquation();
 resize();
 startIdle();
 
-// 獨立開始按鈕綁定（DOMContentLoaded 確保元素存在）
-document.addEventListener('DOMContentLoaded',function(){
-  const btn=document.getElementById('mainStartBtn');
-  if(!btn)return;
-  let busy=false;
-  function doStart(e){
-    if(e)e.preventDefault();
-    if(busy)return;busy=true;setTimeout(()=>busy=false,1500);
-    startGame();
-  }
-  btn.addEventListener('touchend',doStart,{passive:false});
-  btn.addEventListener('click',doStart);
-});
 function goBack(){
   try{stopBGM();}catch(e){}
   try{if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();}catch(e){}
@@ -768,6 +749,22 @@ function goBack(){
   document.getElementById('backBtn').style.display='none';
 }
 
+</script>
+
+<!-- ★ 開始按鈕 ★ 放在 script 外保證可點 -->
+<div id="startWrap" style="padding:0 16px 16px;position:relative;z-index:20">
+  <button id="startMainBtn"
+    style="width:100%;background:linear-gradient(135deg,#4c1d95,#7c3aed);border:none;border-radius:99px;padding:20px;color:#fff;font-family:'Fredoka One',cursive;font-size:1.25rem;cursor:pointer;box-shadow:0 6px 24px rgba(124,58,237,.5)"
+    onclick="doMathStart()">🎮 開始遊戲！</button>
+</div>
+<script>
+function doMathStart(){
+  if(window._ms)return;window._ms=1;setTimeout(()=>window._ms=0,2000);
+  document.getElementById('startWrap').style.display='none';
+  startGame();
+  try{const el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}catch(e){}
+}
+document.getElementById('startMainBtn').addEventListener('touchend',function(e){e.preventDefault();doMathStart();},{passive:false});
 </script>
 </body>
 </html>
