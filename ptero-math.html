@@ -425,10 +425,6 @@ function startGame(){
   gameActive=true;
   document.getElementById('gOver').style.display='none';
   document.getElementById('mathStartBtn').style.display='none';
-  // CSS 全螢幕（不用瀏覽器 API，Android 不會自動退出）
-  document.querySelector('.arena').classList.add('arena-fs');
-  document.querySelector('.wrap').style.display='none';
-  document.body.style.background='#0a0a1a';
   resize();
   updateHUD();
   startBGM();
@@ -699,9 +695,7 @@ function doEndGame(){
   stopBGM();
   stars+=score*3;totalScore+=score;saveData();updateStarUI();
   confetti();
-  // 還原版面
-  document.querySelector('.arena').classList.remove('arena-fs');
-  document.querySelector('.wrap').style.display='';
+  // 結束遊戲
   const ov=document.getElementById('gOver');
   ov.style.display='flex';
   document.getElementById('gMsg').innerHTML=

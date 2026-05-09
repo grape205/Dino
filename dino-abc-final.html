@@ -788,8 +788,6 @@ function startGame(){
   document.getElementById('growBar').style.width='0%';document.getElementById('growLabel').textContent=GROW[0].label;document.getElementById('growNext').textContent='+'+GROW[0].next+'分長大';
   updateLivesUI();
   document.getElementById('goScreen').style.display='none';
-  // CSS 全螢幕
-  document.getElementById('arena').classList.add('game-fullscreen');
   stopIdle();pickTarget();startBGM();startDailyTimer();
   fallerTimer=setInterval(spawnFaller,1800);gameLoop();
 }
@@ -797,8 +795,6 @@ function endGame(){
   gameActive=false;clearInterval(fallerTimer);clearInterval(dailyTimer);
   fallers.forEach(f=>f.el.remove());fallers=[];stopBGM();
   sndDead();
-  // 還原全螢幕
-  document.getElementById('arena').classList.remove('game-fullscreen');
   // 顯示再玩畫面
   const gs=document.getElementById('goScreen');
   gs.style.display='flex';
