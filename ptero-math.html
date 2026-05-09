@@ -215,12 +215,13 @@ body{font-family:'Nunito',sans-serif;background:#0a0a1a;min-height:100vh;overflo
     </div>
   </div>
   <div class="drag-hint">👈 左右滑動翼龍接答案 👉</div>
-  <!-- 開始按鈕 在 arena 外面 觸控才正常 v12 -->
-  <div id="goverStartArea" style="padding:12px 16px 8px">
+  <!-- 開始按鈕在 arena 外面 -->
+  <div id="goverStartArea" style="padding:8px 16px 12px">
+    <div id="levelHint" style="text-align:center;color:#a78bfa;font-size:.82rem;margin-bottom:8px">👆 先選上方等級，再按開始！</div>
     <button id="mathStartBtn"
       ontouchstart="try{document.documentElement.requestFullscreen?document.documentElement.requestFullscreen():document.documentElement.webkitRequestFullscreen&&document.documentElement.webkitRequestFullscreen();}catch(e){}"
-      ontouchend="event.preventDefault();this.style.display='none';startGame();"
-      onclick="try{document.documentElement.requestFullscreen?document.documentElement.requestFullscreen():document.documentElement.webkitRequestFullscreen&&document.documentElement.webkitRequestFullscreen();}catch(e){}this.style.display='none';startGame();"
+      ontouchend="event.preventDefault();document.getElementById('mathStartBtn').style.display='none';document.getElementById('levelHint').style.display='none';startGame();"
+      onclick="try{document.documentElement.requestFullscreen?document.documentElement.requestFullscreen():document.documentElement.webkitRequestFullscreen&&document.documentElement.webkitRequestFullscreen();}catch(e){}document.getElementById('mathStartBtn').style.display='none';document.getElementById('levelHint').style.display='none';startGame();"
       style="width:100%;background:linear-gradient(135deg,#4c1d95,#7c3aed);border:none;border-radius:99px;padding:20px;color:#fff;font-family:'Fredoka One',cursive;font-size:1.3rem;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,.5)">
       🎮 開始遊戲！
     </button>
@@ -425,8 +426,7 @@ function startGame(){
   gameActive=true;
   document.getElementById('gOver').style.display='none';
   document.getElementById('mathStartBtn').style.display='none';
-  // 全螢幕覆蓋
-  document.querySelector('.wrap').style.cssText='position:fixed;inset:0;z-index:500;overflow-y:auto;max-width:100%';
+  document.getElementById('soundBar2').style.display='none';
   resize();
   updateHUD();
   startBGM();
@@ -697,8 +697,7 @@ function doEndGame(){
   stopBGM();
   stars+=score*3;totalScore+=score;saveData();updateStarUI();
   confetti();
-  // 結束遊戲
-  document.querySelector('.wrap').style.cssText='';
+  document.getElementById('soundBar2').style.display='';
   const ov=document.getElementById('gOver');
   ov.style.display='flex';
   document.getElementById('gMsg').innerHTML=
@@ -707,6 +706,8 @@ function doEndGame(){
   // 顯示再玩按鈕
   const rb=document.getElementById('mathStartBtn');
   if(rb){rb.style.display='block';rb.textContent='🔄 再玩一次！';}
+  const lh=document.getElementById('levelHint');
+  if(lh)lh.style.display='none'; // 再玩不需要提示
   showToast(`🎮 結束！得${score}分 +${score*3}⭐`);
 }
 

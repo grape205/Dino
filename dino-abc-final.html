@@ -788,9 +788,15 @@ function startGame(){
   document.getElementById('growBar').style.width='0%';document.getElementById('growLabel').textContent=GROW[0].label;document.getElementById('growNext').textContent='+'+GROW[0].next+'分長大';
   updateLivesUI();
   document.getElementById('goScreen').style.display='none';
-  // 讓遊戲面板覆蓋全螢幕
+  // 放大遊戲區塊填滿畫面
   const panel=document.getElementById('panel-game');
-  panel.style.cssText='position:fixed;inset:0;z-index:500;overflow-y:auto;background:#0a1f0a;padding:0';
+  panel.style.position='fixed';
+  panel.style.inset='0';
+  panel.style.zIndex='500';
+  panel.style.overflowY='auto';
+  panel.style.background='#0a1f0a';
+  const arena=document.getElementById('arena');
+  arena.style.height=(window.innerHeight-320)+'px';
   stopIdle();pickTarget();startBGM();startDailyTimer();
   fallerTimer=setInterval(spawnFaller,1800);gameLoop();
 }
@@ -799,7 +805,10 @@ function endGame(){
   fallers.forEach(f=>f.el.remove());fallers=[];stopBGM();
   sndDead();
   // 還原版面
-  document.getElementById('panel-game').style.cssText='';
+  const panel=document.getElementById('panel-game');
+  panel.style.position='';panel.style.inset='';panel.style.zIndex='';
+  panel.style.overflowY='';panel.style.background='';
+  document.getElementById('arena').style.height='';
   // 顯示再玩畫面
   const gs=document.getElementById('goScreen');
   gs.style.display='flex';
