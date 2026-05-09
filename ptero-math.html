@@ -752,9 +752,21 @@ function injectStartBtn(label){
   area.innerHTML='';
   const btn=document.createElement('button');
   btn.textContent=label||'🎮 開始遊戲！';
-  btn.style.cssText='width:calc(100% - 0px);background:linear-gradient(135deg,#4c1d95,#7c3aed);border:none;border-radius:99px;padding:20px;color:#fff;font-family:\'Fredoka One\',cursive;font-size:1.3rem;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,.5);display:block';
-  btn.onclick=doMathStart;
-  btn.addEventListener('touchend',function(e){e.preventDefault();doMathStart();},{passive:false});
+  btn.style.cssText='width:100%;background:linear-gradient(135deg,#4c1d95,#7c3aed);border:none;border-radius:99px;padding:20px;color:#fff;font-family:\'Fredoka One\',cursive;font-size:1.3rem;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,.5);display:block';
+  // ontouchstart 全螢幕（Android 需要在 touchstart 裡呼叫）
+  btn.addEventListener('touchstart',function(){
+    try{var el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}catch(e){}
+  },{passive:true});
+  btn.addEventListener('touchend',function(e){
+    e.preventDefault();
+    if(window._ms)return;window._ms=1;setTimeout(()=>window._ms=0,2000);
+    startGame();
+  },{passive:false});
+  btn.addEventListener('click',function(){
+    try{var el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}catch(e){}
+    if(window._ms)return;window._ms=1;setTimeout(()=>window._ms=0,2000);
+    startGame();
+  });
   area.appendChild(btn);
 }
 injectStartBtn('🎮 開始遊戲！');
