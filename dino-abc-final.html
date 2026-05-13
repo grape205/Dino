@@ -790,6 +790,18 @@ function startGame(){
   document.getElementById('growBar').style.width='0%';document.getElementById('growLabel').textContent=GROW[0].label;document.getElementById('growNext').textContent='+'+GROW[0].next+'分長大';
   updateLivesUI();
   document.getElementById('goScreen').style.display='none';
+  // 懸浮返回按鈕
+  let _backBtn=document.getElementById('_gameBackBtn');
+  if(!_backBtn){
+    _backBtn=document.createElement('button');
+    _backBtn.id='_gameBackBtn';
+    _backBtn.textContent='⬅️ 返回';
+    _backBtn.style.cssText='position:fixed;top:10px;left:10px;z-index:9999;background:rgba(0,0,0,.6);border:1.5px solid rgba(92,184,92,.4);border-radius:99px;padding:7px 14px;color:#81c784;font-family:'Fredoka One',Arial,sans-serif;font-size:.82rem;cursor:pointer';
+    _backBtn.ontouchend=function(e){e.preventDefault();endGame();switchTab('habits',document.querySelector('.nb'));};
+    _backBtn.onclick=function(){endGame();switchTab('habits',document.querySelector('.nb'));};
+    document.body.appendChild(_backBtn);
+  }
+  _backBtn.style.display='block';
   // 放大遊戲區塊填滿畫面
   const panel=document.getElementById('panel-game');
   panel.style.position='fixed';
@@ -811,6 +823,9 @@ function endGame(){
   panel.style.position='';panel.style.inset='';panel.style.zIndex='';
   panel.style.overflowY='';panel.style.background='';
   document.getElementById('arena').style.height='';
+  // 隱藏懸浮返回按鈕
+  const _bb=document.getElementById('_gameBackBtn');
+  if(_bb)_bb.style.display='none';
   // 顯示再玩畫面
   const gs=document.getElementById('goScreen');
   gs.style.display='flex';

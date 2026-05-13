@@ -54,8 +54,8 @@ body{font-family:'Nunito',sans-serif;background:#0a0a1a;min-height:100vh;overflo
 .level-wrap{padding:0 12px 10px}
 .level-title{font-family:'Fredoka One',cursive;font-size:.9rem;color:#a78bfa;margin-bottom:8px}
 .level-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.lv-btn{padding:10px 4px;border:2px solid rgba(167,139,250,.25);border-radius:13px;
-  background:rgba(0,0,0,.35);font-family:'Fredoka One',cursive;font-size:.78rem;
+.lv-btn{padding:7px 2px;border:2px solid rgba(167,139,250,.25);border-radius:10px;
+  background:rgba(0,0,0,.35);font-family:'Fredoka One',cursive;font-size:.68rem;
   color:#7c3aed;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);
   text-align:center;backdrop-filter:blur(4px)}
 .lv-btn.unlocked{border-color:rgba(167,139,250,.5);color:#a78bfa}
@@ -95,18 +95,18 @@ body{font-family:'Nunito',sans-serif;background:#0a0a1a;min-height:100vh;overflo
 
 /* arena */
 .arena{position:relative;border-radius:17px;overflow:hidden;margin:0 12px;
-  border:2.5px solid #4c1d95;
+  border:2.5px solid #4c1d95;min-height:360px;
   box-shadow:0 0 40px rgba(124,58,237,.12),inset 0 0 80px rgba(0,0,0,.55)}
 .arena-fs{position:fixed!important;inset:0!important;z-index:800!important;border-radius:0!important;margin:0!important;border:none!important;width:100vw!important;height:100dvh!important}
 #gc{display:block;width:100%;touch-action:none}
 .agnd{height:10px;background:linear-gradient(180deg,#4c1d95,#2e1065);border-top:2px solid #7c3aed}
 
 /* overlays */
-.gover{position:absolute;inset:0;background:rgba(0,0,0,.82);border-radius:15px;pointer-events:none;pointer-events:auto;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:10px;z-index:30;backdrop-filter:blur(5px)}
-.go-d{font-size:4.5rem;animation:ptero 1.5s ease-in-out infinite}
-.go-t{font-family:'Fredoka One',cursive;font-size:1.8rem;color:#a78bfa;text-align:center;
+.gover{position:absolute;inset:0;background:rgba(0,0,0,.88);border-radius:15px;pointer-events:none;pointer-events:auto;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  gap:7px;z-index:30;backdrop-filter:blur(5px);overflow-y:auto;padding:12px 6px 10px}
+.go-d{font-size:3rem;animation:ptero 1.5s ease-in-out infinite}
+.go-t{font-family:'Fredoka One',cursive;font-size:1.3rem;color:#a78bfa;text-align:center;
   text-shadow:2px 2px 0 rgba(80,0,200,.4)}
 .go-s{font-family:'Fredoka One',cursive;font-size:.9rem;color:#c4b5fd;text-align:center;line-height:1.5}
 .go-btn{padding:14px 32px;border:none;border-radius:50px;
