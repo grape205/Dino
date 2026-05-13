@@ -1112,7 +1112,15 @@ async function saveVocab(){
   const photo=(imgEl.style.display!=='none'&&imgEl.src&&imgEl.src!==location.href)?imgEl.src:'';
   const vc=document.getElementById('vDrawCanvas');
   const vd=vCtx?vCtx.getImageData(0,0,vc.width,vc.height):null;
-  const hasDrawing=vd&&Array.from(vd.data).some((v,i)=>i%4===3&&v>10&&(vd.data[i-3]>30||vd.data[i-2]>30||vd.data[i-1]>30));
+  // 背景色 #1a1a2e = rgb(26,26,46)，只要有像素明顯偏離背景色就算有畫
+  const hasDrawing=vd&&(()=>{
+    const d=vd.data;
+    for(let i=0;i<d.length;i+=4){
+      const r=d[i],g=d[i+1],b=d[i+2],a=d[i+3];
+      if(a>10&&!(r<40&&g<40&&b<60))return true; // 不是背景色
+    }
+    return false;
+  })();
   const drawing=hasDrawing?vc.toDataURL('image/jpeg',0.6):'';
 
   const editIdx=window._editingVocabIdx;
