@@ -923,7 +923,48 @@ function confirmRedeem(){if(selectedReward===null){showToast('請先選一個獎
 // DIARY
 function openDiaryEditor(){document.getElementById('diaryEditor').classList.add('open');selectedMood='';}
 function selMood(btn,mood){selectedMood=mood;document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');}
-function toggleVoice(){const btn=document.getElementById('voiceBtn');if(voiceRecog){voiceRecog.stop();voiceRecog=null;btn.classList.remove('on');btn.textContent='🎤 按住說話！';return;}const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){showToast('此裝置不支援語音輸入');return;}voiceRecog=new SR();voiceRecog.lang='zh-TW';voiceRecog.continuous=true;voiceRecog.interimResults=true;voiceRecog.onresult=e=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById('diaryText').value=t;};voiceRecog.onend=()=>{voiceRecog=null;btn.classList.remove('on');btn.textContent='🎤 按住說話！';};voiceRecog.start();btn.classList.add('on');btn.textContent='🔴 說話中...（再按停止）';}
+function toggleVoice(){
+  const btn=document.getElementById('voiceBtn');
+  if(voiceRecog){
+    voiceRecog._manualStop=true;
+    voiceRecog.stop();voiceRecog=null;
+    btn.classList.remove('on');btn.textContent='🎤 按住說話！';
+    return;
+  }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){showToast('此裝置不支援語音輸入');return;}
+  let finalText='';
+  function startRecog(){
+    const r=new SR();
+    r.lang='zh-TW';
+    r.continuous=true;
+    r.interimResults=true;
+    r._manualStop=false;
+    r.onresult=e=>{
+      let interim='';let final='';
+      for(let i=0;i<e.results.length;i++){
+        if(e.results[i].isFinal)final+=e.results[i][0].transcript;
+        else interim+=e.results[i][0].transcript;
+      }
+      if(final)finalText=final;
+      document.getElementById('diaryText').value=finalText+interim;
+    };
+    r.onend=()=>{
+      if(r._manualStop){voiceRecog=null;btn.classList.remove('on');btn.textContent='🎤 按住說話！';return;}
+      // 自動斷掉時重啟（mobile 常見），保留已有文字繼續錄
+      try{r.start();}catch(e2){voiceRecog=null;btn.classList.remove('on');btn.textContent='🎤 按住說話！';}
+    };
+    r.onerror=e=>{
+      if(e.error==='no-speech'){try{r.start();}catch(e2){}}
+      else{r._manualStop=true;voiceRecog=null;btn.classList.remove('on');btn.textContent='🎤 按住說話！';}
+    };
+    r.start();
+    voiceRecog=r;
+  }
+  finalText=document.getElementById('diaryText').value;
+  startRecog();
+  btn.classList.add('on');btn.textContent='🔴 說話中...（再按停止）';
+}
 
 // CANVAS
 const dc=document.getElementById('drawCanvas'),dctx=dc.getContext('2d');
@@ -1102,10 +1143,22 @@ function renderVocabList(){
   const list=document.getElementById('vocabList');
   if(VOCAB.length===0){list.innerHTML='<div style="text-align:center;color:#42a5f5;opacity:.5;padding:40px;font-size:.9rem">還沒有單字！<br>按「➕ 新增單字」開始收集！📖</div>';return;}
   list.innerHTML=VOCAB.map((v,i)=>{
+    // 縮圖區：上傳圖 + 手繪同時顯示
     let imgHtml='';
-    if(v.photo)imgHtml=`<img src="${v.photo}" style="width:54px;height:54px;border-radius:10px;object-fit:cover">`;
-    else if(v.drawing&&v.drawing.length>10)imgHtml=`<img src="${v.drawing}" style="width:54px;height:54px;border-radius:10px;object-fit:contain;background:#1a1a2e">`;
-    else imgHtml=`<span style="font-size:2.2rem">${v.emoji||'📖'}</span>`;
+    const hasPhoto=v.photo&&v.photo.length>10;
+    const hasDrawing=v.drawing&&v.drawing.length>10;
+    if(hasPhoto&&hasDrawing){
+      imgHtml=`<div style="display:flex;flex-direction:column;gap:3px;width:54px">
+        <img src="${v.photo}" style="width:54px;height:30px;border-radius:6px;object-fit:cover">
+        <img src="${v.drawing}" style="width:54px;height:22px;border-radius:6px;object-fit:contain;background:#1a1a2e">
+      </div>`;
+    } else if(hasPhoto){
+      imgHtml=`<img src="${v.photo}" style="width:54px;height:54px;border-radius:10px;object-fit:cover">`;
+    } else if(hasDrawing){
+      imgHtml=`<img src="${v.drawing}" style="width:54px;height:54px;border-radius:10px;object-fit:contain;background:#1a1a2e">`;
+    } else {
+      imgHtml=`<span style="font-size:2.2rem">${v.emoji||'📖'}</span>`;
+    }
     return `<div class="vocab-card" id="vc-${i}"
       onclick="openVcModal(${i})"
       ontouchstart="vcLongStart(${i})" ontouchend="vcLongEnd()" ontouchcancel="vcLongEnd()"
@@ -1160,9 +1213,26 @@ function openVcModal(i){
   vcCurrentWord=VOCAB[i];const v=vcCurrentWord;
   const modal=document.getElementById('vcModal');
   const imgDiv=document.getElementById('vcModalImg');
-  if(v.photo)imgDiv.innerHTML=`<img src="${v.photo}" style="width:150px;height:150px;border-radius:14px;object-fit:cover">`;
-  else if(v.drawing&&v.drawing.length>10)imgDiv.innerHTML=`<img src="${v.drawing}" style="width:150px;height:100px;border-radius:12px;object-fit:contain;background:#1a1a2e">`;
-  else imgDiv.innerHTML=`<span style="font-size:6rem">${v.emoji||'📖'}</span>`;
+  const hasPhoto=v.photo&&v.photo.length>10;
+  const hasDrawing=v.drawing&&v.drawing.length>10;
+  if(hasPhoto&&hasDrawing){
+    imgDiv.innerHTML=`<div style="display:flex;gap:10px;justify-content:center;align-items:flex-end;margin-bottom:4px">
+      <div style="text-align:center">
+        <img src="${v.photo}" style="width:110px;height:110px;border-radius:12px;object-fit:cover;display:block">
+        <div style="font-size:.6rem;color:#81c784;margin-top:3px">照片</div>
+      </div>
+      <div style="text-align:center">
+        <img src="${v.drawing}" style="width:110px;height:80px;border-radius:10px;object-fit:contain;background:#1a1a2e;display:block">
+        <div style="font-size:.6rem;color:#81c784;margin-top:3px">手繪</div>
+      </div>
+    </div>`;
+  } else if(hasPhoto){
+    imgDiv.innerHTML=`<img src="${v.photo}" style="width:150px;height:150px;border-radius:14px;object-fit:cover">`;
+  } else if(hasDrawing){
+    imgDiv.innerHTML=`<img src="${v.drawing}" style="width:150px;height:100px;border-radius:12px;object-fit:contain;background:#1a1a2e">`;
+  } else {
+    imgDiv.innerHTML=`<span style="font-size:6rem">${v.emoji||'📖'}</span>`;
+  }
   document.getElementById('vcModalWord').textContent=v.word;
   document.getElementById('vcModalPhon').textContent=v.phonetic||'';
   document.getElementById('vcModalZh').textContent=v.zh;
