@@ -241,36 +241,36 @@ body{font-family:'Nunito',sans-serif;background:#0a0a1a;min-height:100vh;overflo
 <div class="toast hide" id="toast"></div>
 
 <script>
-    // ══ CANVAS SETUP ══
-    const canvas = document.getElementById('gc');
-    const ctx = canvas.getContext('2d');
-    const DW = 80, DH = 80;
+  // ══ CANVAS SETUP ══
+const canvas = document.getElementById('gc');
+const ctx = canvas.getContext('2d');
+const DW = 80, DH = 80;
 
-    // ══ GAME STATE ══
-    let score = 0, lives = 3, streakCount = 0, gameLevel = 1, frame = 0;
-    let gameActive = false, gameRaf = null, idleRafId = null;
-    let letters = [], parts = [];
-    let dinoX = 200, prevDX = 200;
-    let fallSpd = 1.75, spawnInt = 84;
-    let chomping = false, chompT = 0, mouthA = 0, mouthDir = 1;
+// ══ GAME STATE ══
+let score=0, lives=3, streakCount=0, gameLevel=1, frame=0;
+let gameActive=false, gameRaf=null, idleRafId=null;
+let letters=[], parts=[];
+let dinoX=200, prevDX=200;
+let fallSpd=1.75, spawnInt=84;
+let chomping=false, chompT=0, mouthA=0, mouthDir=1;
 
-    function resize() {
-        canvas.width = canvas.offsetWidth || 360;
-        const arenaH = canvas.parentElement.offsetHeight || 370;
-        canvas.height = Math.max(300, arenaH - 10);
-        dinoX = canvas.width / 2;
-        prevDX = dinoX;
-    }
-    window.addEventListener('resize', resize);
+function resize(){
+  canvas.width = canvas.offsetWidth || 360;
+  const arenaH = canvas.parentElement.offsetHeight || 370;
+  canvas.height = Math.max(300, arenaH - 10);
+  dinoX = canvas.width / 2;
+  prevDX = dinoX;
+}
+window.addEventListener('resize', resize);
 
-    function resetGame() {
-        score = 0; lives = 3; streakCount = 0; gameLevel = 1; frame = 0;
-        letters = []; parts = [];
-        chomping = false; chompT = 0; mouthA = 0; mouthDir = 1;
-        fallSpd = 1.75; spawnInt = 84;
-        dinoX = canvas.width / 2; prevDX = dinoX;
-        newEquation();
-    }
+function resetGame(){
+  score=0; lives=3; streakCount=0; gameLevel=1; frame=0;
+  letters=[]; parts=[];
+  chomping=false; chompT=0; mouthA=0; mouthDir=1;
+  fallSpd=1.75; spawnInt=84;
+  dinoX=canvas.width/2; prevDX=dinoX;
+  newEquation();
+}
 // ══ LEVELS ══
 const LEVELS = [
   {id:1, label:'1–10',   max:10,  need:0,   stars:0},
