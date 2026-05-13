@@ -132,26 +132,29 @@ const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 })();
 
 async function init(){
-  // 處理 OAuth 回來的 token
-  const hash=location.hash;
-  if(hash&&hash.includes('access_token')){
-    // 等 supabase 處理完 session
-    await new Promise(r=>setTimeout(r,500));
-    const {data:{session}}=await sb.auth.getSession();
-    if(session){
-      // 清掉 hash 再跳轉
-      history.replaceState(null,'',location.pathname);
-      location.replace(MAIN);
-      return;
+  try{
+    const hash=location.hash;
+    if(hash&&hash.includes('access_token')){
+      await new Promise(r=>setTimeout(r,500));
+      const {data:{session},error}=await sb.auth.getSession();
+      if(session&&!error){
+        history.replaceState(null,'',location.pathname);
+        location.replace(MAIN);
+        return;
+      }
     }
+    const {data:{session},error}=await sb.auth.getSession();
+    if(session&&!error){
+      const {data:refreshed,error:rErr}=await sb.auth.refreshSession();
+      if(refreshed?.session&&!rErr){
+        location.replace(MAIN);
+        return;
+      }
+      await sb.auth.signOut();
+    }
+  }catch(e){
+    console.warn('auth init error',e);
   }
-  // 已有 session 直接跳
-  const {data:{session}}=await sb.auth.getSession();
-  if(session){
-    location.replace(MAIN);
-    return;
-  }
-  // 沒登入就顯示登入頁（預設已顯示）
 }
 
 async function loginGoogle(){
