@@ -170,6 +170,12 @@ body{font-family:'Nunito',sans-serif;background:#0a0a1a;min-height:100vh;overflo
     </div>
   </div>
 
+  <!-- LEVEL SELECTOR -->
+  <div class="level-wrap">
+    <div class="level-title">⚡ 選擇等級</div>
+    <div class="level-grid" id="levelGrid"></div>
+  </div>
+
   <!-- EQUATION DISPLAY -->
   <div class="eq-box">
     <div class="eq-title">👆 接住正確的答案！</div>
@@ -204,20 +210,22 @@ body{font-family:'Nunito',sans-serif;background:#0a0a1a;min-height:100vh;overflo
     <div class="lvbanner" id="lvBanner">⚡ 升級！</div>
     <div class="gover" id="gOver">
       <div class="go-d">🦕</div>
-      <div class="go-t" id="goTitle">翼龍加法<br>大冒險！</div>
-      <div class="go-s" id="gMsg">👆 選好等級再按開始！</div>
-      <!-- 等級選擇器放在 overlay 裡 -->
-      <div style="width:90%;margin:8px 0">
-        <div style="font-family:'Fredoka One',cursive;font-size:.75rem;color:#a78bfa;margin-bottom:6px">⚡ 選擇等級</div>
-        <div class="level-grid" id="levelGrid" style="gap:5px"></div>
-      </div>
-      <button class="go-btn" id="goOverlayBtn"
-        ontouchstart="try{document.documentElement.requestFullscreen?document.documentElement.requestFullscreen():document.documentElement.webkitRequestFullscreen&&document.documentElement.webkitRequestFullscreen();}catch(e){}"
-        ontouchend="event.preventDefault();doMathStart();"
-        onclick="doMathStart();">🎮 開始遊戲！</button>
+      <div class="go-t">翼龍加法<br>大冒險！</div>
+      <div class="go-s" id="gMsg">接住正確的答案！<br>接錯了要扣血哦 🌙</div>
     </div>
   </div>
   <div class="drag-hint">👈 左右滑動翼龍接答案 👉</div>
+  <!-- 開始按鈕在 arena 外面 -->
+  <div id="goverStartArea" style="padding:8px 16px 12px">
+    <div id="levelHint" style="text-align:center;color:#a78bfa;font-size:.82rem;margin-bottom:8px">👆 先選上方等級，再按開始！</div>
+    <button id="mathStartBtn"
+      ontouchstart="try{document.documentElement.requestFullscreen?document.documentElement.requestFullscreen():document.documentElement.webkitRequestFullscreen&&document.documentElement.webkitRequestFullscreen();}catch(e){}"
+      ontouchend="event.preventDefault();document.getElementById('mathStartBtn').style.display='none';document.getElementById('levelHint').style.display='none';startGame();"
+      onclick="try{document.documentElement.requestFullscreen?document.documentElement.requestFullscreen():document.documentElement.webkitRequestFullscreen&&document.documentElement.webkitRequestFullscreen();}catch(e){}document.getElementById('mathStartBtn').style.display='none';document.getElementById('levelHint').style.display='none';startGame();"
+      style="width:100%;background:linear-gradient(135deg,#4c1d95,#7c3aed);border:none;border-radius:99px;padding:20px;color:#fff;font-family:'Fredoka One',cursive;font-size:1.3rem;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,.5)">
+      🎮 開始遊戲！
+    </button>
+  </div>
 <!-- SOUND BTN -->
   <div id="soundBar2">
     <button id="btnEq" onclick="readEquation()">
@@ -226,51 +234,9 @@ body{font-family:'Nunito',sans-serif;background:#0a0a1a;min-height:100vh;overflo
   </div>
 </div>
 
-<!-- A-ADS 廣告：固定底部 banner -->
-<div style="position:fixed;bottom:0;left:0;right:0;z-index:9000">
-  <input autocomplete="off" type="checkbox" id="aadsClose" hidden>
-  <div>
-    <label for="aadsClose" style="position:absolute;top:-20px;right:8px;background:rgba(20,0,40,.9);border:1px solid rgba(167,139,250,.35);border-radius:99px;padding:2px 9px;color:#c4b5fd;font-size:.65rem;cursor:pointer;font-family:'Fredoka One',Arial,sans-serif">✕ 關閉</label>
-    <div style="width:100%;background:rgba(10,10,26,.97);border-top:1px solid rgba(124,58,237,.25);display:flex;justify-content:center;padding:3px 0">
-      <iframe data-aa="2437486" src="//ad.a-ads.com/2437486/?size=320x50&background_color=0a0a1a" style="border:0;padding:0;width:320px;height:50px;overflow:hidden;display:block"></iframe>
-    </div>
-  </div>
-  <style>#aadsClose:checked+div{display:none}</style>
-</div>
-
 <div class="toast hide" id="toast"></div>
 
 <script>
-    // ══ CANVAS SETUP ══
-    const canvas = document.getElementById('gc');
-    const ctx = canvas.getContext('2d');
-    const DW = 80, DH = 80;
-
-    // ══ GAME STATE ══
-    let score = 0, lives = 3, streakCount = 0, gameLevel = 1, frame = 0;
-    let gameActive = false, gameRaf = null, idleRafId = null;
-    let letters = [], parts = [];
-    let dinoX = 200, prevDX = 200;
-    let fallSpd = 1.75, spawnInt = 84;
-    let chomping = false, chompT = 0, mouthA = 0, mouthDir = 1;
-
-    function resize() {
-        canvas.width = canvas.offsetWidth || 360;
-        const arenaH = canvas.parentElement.offsetHeight || 370;
-        canvas.height = Math.max(300, arenaH - 10);
-        dinoX = canvas.width / 2;
-        prevDX = dinoX;
-    }
-    window.addEventListener('resize', resize);
-
-    function resetGame() {
-        score = 0; lives = 3; streakCount = 0; gameLevel = 1; frame = 0;
-        letters = []; parts = [];
-        chomping = false; chompT = 0; mouthA = 0; mouthDir = 1;
-        fallSpd = 1.75; spawnInt = 84;
-        dinoX = canvas.width / 2; prevDX = dinoX;
-        newEquation();
-    }
 // ══ LEVELS ══
 const LEVELS = [
   {id:1, label:'1–10',   max:10,  need:0,   stars:0},
@@ -459,6 +425,7 @@ function startGame(){
   resetGame();
   gameActive=true;
   document.getElementById('gOver').style.display='none';
+  document.getElementById('mathStartBtn').style.display='none';
   document.getElementById('soundBar2').style.display='none';
   resize();
   updateHUD();
@@ -730,14 +697,17 @@ function doEndGame(){
   stopBGM();
   stars+=score*3;totalScore+=score;saveData();updateStarUI();
   confetti();
-  document.getElementById('soundBar2').style.display='flex';
+  document.getElementById('soundBar2').style.display='';
   const ov=document.getElementById('gOver');
   ov.style.display='flex';
-  document.getElementById('goTitle').innerHTML='🎮 遊戲結束！';
   document.getElementById('gMsg').innerHTML=
-    `得了 <span style="color:#fbbf24;font-size:1.4em">${score}</span> 分！獲得 <span style="color:#fbbf24">${score*3}</span> 顆⭐<br><span style="font-size:.8em;opacity:.7">換個等級再戰一場 👇</span>`;
-  document.getElementById('goOverlayBtn').textContent='🔄 再玩一次！';
-  renderLevels();
+    `得了 <span style="color:#fbbf24;font-size:1.4em">${score}</span> 分！<br>`+
+    `獲得 <span style="color:#fbbf24">${score*3}</span> 顆⭐`;
+  // 顯示再玩按鈕
+  const rb=document.getElementById('mathStartBtn');
+  if(rb){rb.style.display='block';rb.textContent='🔄 再玩一次！';}
+  const lh=document.getElementById('levelHint');
+  if(lh)lh.style.display='none'; // 再玩不需要提示
   showToast(`🎮 結束！得${score}分 +${score*3}⭐`);
 }
 
@@ -752,12 +722,7 @@ function renderLevels(){
     btn.innerHTML=`${lv.label}<span class="lv-range">${unlocked?'✅':'🔒 '+lv.need+'分'}</span>`;
     btn.onclick=()=>{
       if(!unlocked){showToast(`🔒 需要 ${lv.need} 總分才能解鎖！現在有 ${totalScore} 分`);return;}
-      curLvId=lv.id;renderLevels();newEquation();
-      const msg=document.getElementById('gMsg');
-      if(msg&&document.getElementById('gOver').style.display!=='none'){
-        const lv2=LEVELS.find(l=>l.id===curLvId);
-        msg.innerHTML=`✅ 已選 <span style="color:#fbbf24">${lv2.label}</span>，按開始！`;
-      }
+      curLvId=lv.id;renderLevels();newEquation();showToast(`⚡ 切換到 ${lv.label}！`);
     };
     grid.appendChild(btn);
   });
@@ -790,9 +755,6 @@ startIdle();
 function doMathStart(){
   if(window._ms)return;window._ms=1;setTimeout(()=>window._ms=0,2000);
   try{const el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}catch(e){}
-  document.getElementById('goTitle').innerHTML='翼龍加法<br>大冒險！';
-  document.getElementById('gMsg').innerHTML='👆 選好等級再按開始！';
-  document.getElementById('goOverlayBtn').textContent='🎮 開始遊戲！';
   startGame();
 }
 function injectStartBtn(label){

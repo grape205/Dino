@@ -361,8 +361,6 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
           🎮 開始遊戲！
         </button>
         <div id="gameOverMsg" style="display:none;text-align:center;color:#fbbf24;font-family:'Fredoka One',cursive;font-size:1rem"></div>
-        <!-- 返回按鈕 -->
-        <button onclick="switchTab('habits',document.querySelector('.nb'))" style="background:transparent;border:1.5px solid rgba(92,184,92,.3);border-radius:99px;padding:8px 22px;color:#81c784;font-family:'Fredoka One',cursive;font-size:.85rem;cursor:pointer">⬅️ 返回主選單</button>
       </div>
     </div>
   </div>
@@ -925,48 +923,7 @@ function confirmRedeem(){if(selectedReward===null){showToast('請先選一個獎
 // DIARY
 function openDiaryEditor(){document.getElementById('diaryEditor').classList.add('open');selectedMood='';}
 function selMood(btn,mood){selectedMood=mood;document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');}
-function toggleVoice(){
-  const btn=document.getElementById('voiceBtn');
-  if(voiceRecog){
-    voiceRecog._manualStop=true;
-    voiceRecog.stop();voiceRecog=null;
-    btn.classList.remove('on');btn.textContent='🎤 按住說話！';
-    return;
-  }
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){showToast('此裝置不支援語音輸入');return;}
-  let finalText='';
-  function startRecog(){
-    const r=new SR();
-    r.lang='zh-TW';
-    r.continuous=true;
-    r.interimResults=true;
-    r._manualStop=false;
-    r.onresult=e=>{
-      let interim='';let final='';
-      for(let i=0;i<e.results.length;i++){
-        if(e.results[i].isFinal)final+=e.results[i][0].transcript;
-        else interim+=e.results[i][0].transcript;
-      }
-      if(final)finalText=final;
-      document.getElementById('diaryText').value=finalText+interim;
-    };
-    r.onend=()=>{
-      if(r._manualStop){voiceRecog=null;btn.classList.remove('on');btn.textContent='🎤 按住說話！';return;}
-      // 自動斷掉時重啟（mobile 常見），保留已有文字繼續錄
-      try{r.start();}catch(e2){voiceRecog=null;btn.classList.remove('on');btn.textContent='🎤 按住說話！';}
-    };
-    r.onerror=e=>{
-      if(e.error==='no-speech'){try{r.start();}catch(e2){}}
-      else{r._manualStop=true;voiceRecog=null;btn.classList.remove('on');btn.textContent='🎤 按住說話！';}
-    };
-    r.start();
-    voiceRecog=r;
-  }
-  finalText=document.getElementById('diaryText').value;
-  startRecog();
-  btn.classList.add('on');btn.textContent='🔴 說話中...（再按停止）';
-}
+function toggleVoice(){const btn=document.getElementById('voiceBtn');if(voiceRecog){voiceRecog.stop();voiceRecog=null;btn.classList.remove('on');btn.textContent='🎤 按住說話！';return;}const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){showToast('此裝置不支援語音輸入');return;}voiceRecog=new SR();voiceRecog.lang='zh-TW';voiceRecog.continuous=true;voiceRecog.interimResults=true;voiceRecog.onresult=e=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById('diaryText').value=t;};voiceRecog.onend=()=>{voiceRecog=null;btn.classList.remove('on');btn.textContent='🎤 按住說話！';};voiceRecog.start();btn.classList.add('on');btn.textContent='🔴 說話中...（再按停止）';}
 
 // CANVAS
 const dc=document.getElementById('drawCanvas'),dctx=dc.getContext('2d');
@@ -1114,15 +1071,7 @@ async function saveVocab(){
   const photo=(imgEl.style.display!=='none'&&imgEl.src&&imgEl.src!==location.href)?imgEl.src:'';
   const vc=document.getElementById('vDrawCanvas');
   const vd=vCtx?vCtx.getImageData(0,0,vc.width,vc.height):null;
-  // 背景色 #1a1a2e = rgb(26,26,46)，只要有像素明顯偏離背景色就算有畫
-  const hasDrawing=vd&&(()=>{
-    const d=vd.data;
-    for(let i=0;i<d.length;i+=4){
-      const r=d[i],g=d[i+1],b=d[i+2],a=d[i+3];
-      if(a>10&&!(r<40&&g<40&&b<60))return true; // 不是背景色
-    }
-    return false;
-  })();
+  const hasDrawing=vd&&Array.from(vd.data).some((v,i)=>i%4===3&&v>10&&(vd.data[i-3]>30||vd.data[i-2]>30||vd.data[i-1]>30));
   const drawing=hasDrawing?vc.toDataURL('image/jpeg',0.6):'';
 
   const editIdx=window._editingVocabIdx;
@@ -1153,22 +1102,10 @@ function renderVocabList(){
   const list=document.getElementById('vocabList');
   if(VOCAB.length===0){list.innerHTML='<div style="text-align:center;color:#42a5f5;opacity:.5;padding:40px;font-size:.9rem">還沒有單字！<br>按「➕ 新增單字」開始收集！📖</div>';return;}
   list.innerHTML=VOCAB.map((v,i)=>{
-    // 縮圖區：上傳圖 + 手繪同時顯示
     let imgHtml='';
-    const hasPhoto=v.photo&&v.photo.length>10;
-    const hasDrawing=v.drawing&&v.drawing.length>10;
-    if(hasPhoto&&hasDrawing){
-      imgHtml=`<div style="display:flex;flex-direction:column;gap:3px;width:54px">
-        <img src="${v.photo}" style="width:54px;height:30px;border-radius:6px;object-fit:cover">
-        <img src="${v.drawing}" style="width:54px;height:22px;border-radius:6px;object-fit:contain;background:#1a1a2e">
-      </div>`;
-    } else if(hasPhoto){
-      imgHtml=`<img src="${v.photo}" style="width:54px;height:54px;border-radius:10px;object-fit:cover">`;
-    } else if(hasDrawing){
-      imgHtml=`<img src="${v.drawing}" style="width:54px;height:54px;border-radius:10px;object-fit:contain;background:#1a1a2e">`;
-    } else {
-      imgHtml=`<span style="font-size:2.2rem">${v.emoji||'📖'}</span>`;
-    }
+    if(v.photo)imgHtml=`<img src="${v.photo}" style="width:54px;height:54px;border-radius:10px;object-fit:cover">`;
+    else if(v.drawing&&v.drawing.length>10)imgHtml=`<img src="${v.drawing}" style="width:54px;height:54px;border-radius:10px;object-fit:contain;background:#1a1a2e">`;
+    else imgHtml=`<span style="font-size:2.2rem">${v.emoji||'📖'}</span>`;
     return `<div class="vocab-card" id="vc-${i}"
       onclick="openVcModal(${i})"
       ontouchstart="vcLongStart(${i})" ontouchend="vcLongEnd()" ontouchcancel="vcLongEnd()"
@@ -1223,26 +1160,9 @@ function openVcModal(i){
   vcCurrentWord=VOCAB[i];const v=vcCurrentWord;
   const modal=document.getElementById('vcModal');
   const imgDiv=document.getElementById('vcModalImg');
-  const hasPhoto=v.photo&&v.photo.length>10;
-  const hasDrawing=v.drawing&&v.drawing.length>10;
-  if(hasPhoto&&hasDrawing){
-    imgDiv.innerHTML=`<div style="display:flex;gap:10px;justify-content:center;align-items:flex-end;margin-bottom:4px">
-      <div style="text-align:center">
-        <img src="${v.photo}" style="width:110px;height:110px;border-radius:12px;object-fit:cover;display:block">
-        <div style="font-size:.6rem;color:#81c784;margin-top:3px">照片</div>
-      </div>
-      <div style="text-align:center">
-        <img src="${v.drawing}" style="width:110px;height:80px;border-radius:10px;object-fit:contain;background:#1a1a2e;display:block">
-        <div style="font-size:.6rem;color:#81c784;margin-top:3px">手繪</div>
-      </div>
-    </div>`;
-  } else if(hasPhoto){
-    imgDiv.innerHTML=`<img src="${v.photo}" style="width:150px;height:150px;border-radius:14px;object-fit:cover">`;
-  } else if(hasDrawing){
-    imgDiv.innerHTML=`<img src="${v.drawing}" style="width:150px;height:100px;border-radius:12px;object-fit:contain;background:#1a1a2e">`;
-  } else {
-    imgDiv.innerHTML=`<span style="font-size:6rem">${v.emoji||'📖'}</span>`;
-  }
+  if(v.photo)imgDiv.innerHTML=`<img src="${v.photo}" style="width:150px;height:150px;border-radius:14px;object-fit:cover">`;
+  else if(v.drawing&&v.drawing.length>10)imgDiv.innerHTML=`<img src="${v.drawing}" style="width:150px;height:100px;border-radius:12px;object-fit:contain;background:#1a1a2e">`;
+  else imgDiv.innerHTML=`<span style="font-size:6rem">${v.emoji||'📖'}</span>`;
   document.getElementById('vcModalWord').textContent=v.word;
   document.getElementById('vcModalPhon').textContent=v.phonetic||'';
   document.getElementById('vcModalZh').textContent=v.zh;
@@ -1608,17 +1528,5 @@ pickTarget();
 renderHabits();
 initAuth();
 </script>
-<!-- A-ADS 廣告：固定底部 banner -->
-<div style="position:fixed;bottom:0;left:0;right:0;z-index:9000">
-  <input autocomplete="off" type="checkbox" id="aadsClose" hidden>
-  <div>
-    <label for="aadsClose" style="position:absolute;top:-20px;right:8px;background:rgba(0,20,0,.9);border:1px solid rgba(76,175,80,.35);border-radius:99px;padding:2px 9px;color:#81c784;font-size:.65rem;cursor:pointer;font-family:'Fredoka One',Arial,sans-serif">✕ 關閉</label>
-    <div style="width:100%;background:rgba(7,26,7,.97);border-top:1px solid rgba(76,175,80,.2);display:flex;justify-content:center;padding:3px 0">
-      <iframe data-aa="2437486" src="//ad.a-ads.com/2437486/?size=320x50&background_color=071a07" style="border:0;padding:0;width:320px;height:50px;overflow:hidden;display:block"></iframe>
-    </div>
-  </div>
-  <style>#aadsClose:checked+div{display:none}</style>
-</div>
-
 </body>
 </html>
