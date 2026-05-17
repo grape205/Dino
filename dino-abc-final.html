@@ -754,8 +754,8 @@ function stopBGM(){bgmPlaying=false;clearTimeout(bgmLoopTimer);if(bgmCtx){try{bg
 
 // SPEECH
 function say(text,lang){if(!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=lang||'en-US';u.rate=0.85;u.pitch=1.1;speechSynthesis.speak(u);}
-function tapSayLetter(){if(currentTarget){say(currentTarget.l,'en-US');setTimeout(()=>say(currentTarget.w,'en-US'),600);}}
-function tapSayWord(){if(currentTarget)say(currentTarget.w,'en-US');}
+function tapSayLetter(){if(currentTarget){say(currentTarget.l,'en-US');setTimeout(()=>say(currentTarget.w,'en-US'),600);setTimeout(()=>{if(currentTarget.zh)say(currentTarget.zh,'zh-TW');},1400);}}
+function tapSayWord(){if(currentTarget){say(currentTarget.w,'en-US');setTimeout(()=>{if(currentTarget.zh)say(currentTarget.zh,'zh-TW');},800);}}
 
 // IDLE
 function drawDino(ctx2d,t){ctx2d.clearRect(0,0,80,80);ctx2d.font='54px serif';ctx2d.textAlign='center';ctx2d.fillText('🦖',40,56+Math.sin(t*0.05)*4);}
@@ -774,7 +774,7 @@ function pickTarget(){
   document.getElementById('tEmoji').textContent=currentTarget.e;
   document.getElementById('barLetter').textContent=currentTarget.l;
   document.getElementById('barWord').textContent=currentTarget.w;
-  if(gameActive){say(currentTarget.l,'en-US');setTimeout(()=>say(currentTarget.w,'en-US'),700);}
+  if(gameActive){say(currentTarget.l,'en-US');setTimeout(()=>say(currentTarget.w,'en-US'),700);setTimeout(()=>{if(currentTarget.zh)say(currentTarget.zh,'zh-TW');},1500);}
 }
 function updateLivesUI(){document.getElementById('sLives').textContent='❤️'.repeat(lives);}
 function spawnFaller(){
@@ -1288,8 +1288,8 @@ async function deleteVocab(i){
 
 // ── 提示圖點擊發音 ──
 document.getElementById('tEmoji').style.cursor='pointer';
-document.getElementById('tEmoji').addEventListener('click',()=>{if(currentTarget){say(currentTarget.l,'en-US');setTimeout(()=>say(currentTarget.w,'en-US'),700);}});
-document.getElementById('tEmoji').addEventListener('touchend',e=>{e.preventDefault();if(currentTarget){say(currentTarget.l,'en-US');setTimeout(()=>say(currentTarget.w,'en-US'),700);}});
+document.getElementById('tEmoji').addEventListener('click',()=>{if(currentTarget){say(currentTarget.l,'en-US');setTimeout(()=>say(currentTarget.w,'en-US'),700);setTimeout(()=>{if(currentTarget.zh)say(currentTarget.zh,'zh-TW');},1500);}});
+document.getElementById('tEmoji').addEventListener('touchend',e=>{e.preventDefault();if(currentTarget){say(currentTarget.l,'en-US');setTimeout(()=>say(currentTarget.w,'en-US'),700);setTimeout(()=>{if(currentTarget.zh)say(currentTarget.zh,'zh-TW');},1500);}});
 
 // ── 死亡音效 Super Mario Bros (精確版) ──
 function sndDead(){
