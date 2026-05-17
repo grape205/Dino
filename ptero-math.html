@@ -383,6 +383,14 @@ function updateEqDisplay(){
   document.getElementById('eqB2').textContent=eqB;
 }
 
+function readEquation(){
+  if(!window.speechSynthesis)return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(eqA+' 加 '+eqB+' 等於多少？');
+  u.lang='zh-TW';u.rate=0.85;
+  speechSynthesis.speak(u);
+}
+
 // ══ CANVAS SETUP ══
 const canvas = document.getElementById('gc');
 const ctx = canvas.getContext('2d');

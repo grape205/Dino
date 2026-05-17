@@ -541,7 +541,8 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
     <div class="vc-modal-phon" id="vcModalPhon"></div>
     <div class="vc-modal-zh" id="vcModalZh"></div>
     <div class="vc-modal-btns">
-      <button class="btn-yes" onclick="speakCurrent()">🔊 發音！</button>
+      <button class="btn-yes" onclick="speakCurrent()">🔊 英文</button>
+      <button class="btn-yes" onclick="speakCurrentZh()" style="background:linear-gradient(135deg,#388e3c,#81c784)">🇹🇼 中文</button>
       <button class="btn-no" onclick="closeVcModal()">✕ 關閉</button>
     </div>
   </div>
@@ -985,7 +986,15 @@ function renderDiary(){
   const list=document.getElementById('diaryList');
   const diaries=JSON.parse(localStorage.getItem('diaries')||'[]');
   if(diaries.length===0){list.innerHTML='<div style="text-align:center;color:#ff8fab;opacity:.6;padding:30px">還沒有日記！快來寫第一篇！📔</div>';return;}
-  list.innerHTML=diaries.map(d=>'<div class="diary-card"><div class="diary-card-top"><span class="diary-card-date">'+d.date+'</span><span class="diary-card-mood">'+(d.mood||'')+'</span></div>'+(d.text?'<div class="diary-card-text">'+d.text+'</div>':'')+(d.drawing&&d.drawing!=='data:,'?'<img class="diary-card-img" src="'+d.drawing+'">':'')+'</div>').join('');
+  list.innerHTML=diaries.map((d,i)=>'<div class="diary-card"><div class="diary-card-top"><span class="diary-card-date">'+d.date+'</span><span class="diary-card-mood">'+(d.mood||'')+'</span><button onclick="deleteDiary('+i+')" style="background:rgba(200,40,40,.7);border:none;border-radius:99px;color:#fff;font-size:.7rem;padding:3px 10px;cursor:pointer;margin-left:auto">🗑️ 刪除</button></div>'+(d.text?'<div class="diary-card-text">'+d.text+'</div>':'')+(d.drawing&&d.drawing!=='data:,'?'<img class="diary-card-img" src="'+d.drawing+'">':'')+'</div>').join('');
+}
+function deleteDiary(i){
+  const diaries=JSON.parse(localStorage.getItem('diaries')||'[]');
+  const title=diaries[i]?.date||'這篇';
+  diaries.splice(i,1);
+  localStorage.setItem('diaries',JSON.stringify(diaries));
+  renderDiary();
+  showToast('🗑️ 刪除了「'+title+'」的日記');
 }
 
 // TIMER
@@ -1103,14 +1112,15 @@ function renderVocabList(){
   if(VOCAB.length===0){list.innerHTML='<div style="text-align:center;color:#42a5f5;opacity:.5;padding:40px;font-size:.9rem">還沒有單字！<br>按「➕ 新增單字」開始收集！📖</div>';return;}
   list.innerHTML=VOCAB.map((v,i)=>{
     let imgHtml='';
-    if(v.photo)imgHtml=`<img src="${v.photo}" style="width:54px;height:54px;border-radius:10px;object-fit:cover">`;
-    else if(v.drawing&&v.drawing.length>10)imgHtml=`<img src="${v.drawing}" style="width:54px;height:54px;border-radius:10px;object-fit:contain;background:#1a1a2e">`;
+    const _ph=v.photo?`<img src="${v.photo}" style="width:80px;height:80px;border-radius:10px;object-fit:cover">`: '';
+    const _dw=(v.drawing&&v.drawing.length>10)?`<img src="${v.drawing}" style="width:80px;height:80px;border-radius:10px;object-fit:contain;background:#1a1a2e">`: '';
+    if(_ph||_dw)imgHtml=_ph+_dw;
     else imgHtml=`<span style="font-size:2.2rem">${v.emoji||'📖'}</span>`;
     return `<div class="vocab-card" id="vc-${i}"
       onclick="openVcModal(${i})"
       ontouchstart="vcLongStart(${i})" ontouchend="vcLongEnd()" ontouchcancel="vcLongEnd()"
       onmousedown="vcLongStart(${i})" onmouseup="vcLongEnd()" onmouseleave="vcLongEnd()">
-      <div class="vc-img">${imgHtml}</div>
+      <div class="vc-img" style="width:auto;min-width:54px;flex-wrap:wrap;gap:4px">${imgHtml}</div>
       <div class="vc-body">
         <div class="vc-word">${v.word}</div>
         ${v.phonetic?`<div class="vc-phon">${v.phonetic}</div>`:''}
@@ -1118,6 +1128,7 @@ function renderVocabList(){
       </div>
       <div class="vc-btns">
         <button class="vc-speak-btn" onclick="event.stopPropagation();say('${v.word}','en-US')">🔊</button>
+        <button class="vc-speak-btn" onclick="event.stopPropagation();say('${v.zh}','zh-TW')" style="margin-top:4px;font-size:.65rem">🇹🇼</button>
       </div>
       <div class="vc-actions" id="vca-${i}" style="display:none;position:absolute;inset:0;border-radius:18px;background:rgba(0,0,0,.82);display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:5">
         <div style="font-size:.8rem;color:#a78bfa;margin-bottom:2px">「${v.word}」</div>
@@ -1160,9 +1171,10 @@ function openVcModal(i){
   vcCurrentWord=VOCAB[i];const v=vcCurrentWord;
   const modal=document.getElementById('vcModal');
   const imgDiv=document.getElementById('vcModalImg');
-  if(v.photo)imgDiv.innerHTML=`<img src="${v.photo}" style="width:150px;height:150px;border-radius:14px;object-fit:cover">`;
-  else if(v.drawing&&v.drawing.length>10)imgDiv.innerHTML=`<img src="${v.drawing}" style="width:150px;height:100px;border-radius:12px;object-fit:contain;background:#1a1a2e">`;
-  else imgDiv.innerHTML=`<span style="font-size:6rem">${v.emoji||'📖'}</span>`;
+  let _mc='';
+  if(v.photo)_mc+=`<img src="${v.photo}" style="width:220px;height:220px;border-radius:14px;object-fit:cover;display:block;margin:0 auto 8px">`;
+  if(v.drawing&&v.drawing.length>10)_mc+=`<img src="${v.drawing}" style="width:220px;height:160px;border-radius:12px;object-fit:contain;background:#1a1a2e;display:block;margin:0 auto">`;
+  imgDiv.innerHTML=_mc||`<span style="font-size:6rem">${v.emoji||'📖'}</span>`;
   document.getElementById('vcModalWord').textContent=v.word;
   document.getElementById('vcModalPhon').textContent=v.phonetic||'';
   document.getElementById('vcModalZh').textContent=v.zh;
@@ -1171,6 +1183,7 @@ function openVcModal(i){
 }
 function closeVcModal(){document.getElementById('vcModal').classList.remove('open');vcCurrentWord=null;}
 function speakCurrent(){if(vcCurrentWord)say(vcCurrentWord.word,'en-US');}
+function speakCurrentZh(){if(vcCurrentWord)say(vcCurrentWord.zh,'zh-TW');}
 function deleteVocab(i){const w=VOCAB[i].word;VOCAB.splice(i,1);saveVocabLocal();renderVocabList();showToast('🗑️ 刪除「'+w+'」');}
 
 // ── 提示圖點擊發音 ──
