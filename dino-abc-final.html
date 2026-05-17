@@ -350,10 +350,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
           </div>
         </div>
       </div>
-      <!-- 返回按鈕（遊戲中顯示）-->
-      <div id="abcBackBtn" style="display:none;padding:4px 0 0">
-        <button onclick="endGame()" style="background:rgba(0,0,0,.5);border:1.5px solid rgba(92,184,92,.4);border-radius:99px;padding:6px 16px;color:#81c784;font-family:'Fredoka One',cursive;font-size:.82rem;cursor:pointer">← 返回</button>
-      </div>
+      <!-- 返回按鈕（遊戲中顯示，左上角固定位置）-->
       <!-- 開始遊戲覆蓋層：在 arena 外，觸控正常 -->
       <div id="goScreen" style="display:flex;flex-direction:column;align-items:center;padding:20px 16px;gap:10px">
         <div style="font-size:3.5rem">🦖</div>
@@ -1644,5 +1641,7 @@ initAuth();
   </div>
   <style>#aadsCloseMain:checked+div{display:none}</style>
 </div>
+<!-- 字母遊戲返回按鈕（左上角，遊戲中才顯示）-->
+<button id="abcBackBtn" onclick="endGame()" style="display:none;position:fixed;top:12px;left:12px;z-index:999;background:rgba(0,0,0,.6);border:1.5px solid rgba(255,255,255,.3);border-radius:99px;padding:8px 16px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:.85rem;cursor:pointer;text-decoration:none">⬅️ 返回</button>
 </body>
 </html>
