@@ -383,6 +383,37 @@ function updateEqDisplay(){
   document.getElementById('eqB2').textContent=eqB;
 }
 
+// ══ CANVAS SETUP ══
+const canvas = document.getElementById('gc');
+const ctx = canvas.getContext('2d');
+const DW = 80, DH = 80;
+
+// ══ GAME STATE ══
+let score = 0, lives = 3, streakCount = 0, gameLevel = 1, frame = 0;
+let gameActive = false, gameRaf = null, idleRafId = null;
+let letters = [], parts = [];
+let dinoX = 200, prevDX = 200;
+let fallSpd = 1.75, spawnInt = 84;
+let chomping = false, chompT = 0, mouthA = 0, mouthDir = 1;
+
+function resize() {
+  canvas.width = canvas.offsetWidth || 360;
+  const arenaH = canvas.parentElement.offsetHeight || 370;
+  canvas.height = Math.max(300, arenaH - 10);
+  dinoX = canvas.width / 2;
+  prevDX = dinoX;
+}
+window.addEventListener('resize', resize);
+
+function resetGame() {
+  score = 0; lives = 3; streakCount = 0; gameLevel = 1; frame = 0;
+  letters = []; parts = [];
+  chomping = false; chompT = 0; mouthA = 0; mouthDir = 1;
+  fallSpd = 1.75; spawnInt = 84;
+  dinoX = canvas.width / 2; prevDX = dinoX;
+  newEquation();
+}
+
 // ══ INPUT ══
 let drag=false,dragSX=0,dragDX=0;
 canvas.addEventListener('touchstart',e=>{
