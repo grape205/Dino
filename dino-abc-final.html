@@ -577,6 +577,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
     <div class="color-dot" style="background:#42a5f5;width:30px;height:30px" onclick="setFullColor(this,'#42a5f5')"></div>
     <div class="color-dot" style="background:#ab47bc;width:30px;height:30px" onclick="setFullColor(this,'#ab47bc')"></div>
     <div class="color-dot" style="background:#ef5350;width:30px;height:30px" onclick="setFullColor(this,'#ef5350')"></div>
+    <div class="color-dot" style="background:linear-gradient(135deg,#555,#888);width:50px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#fff" onclick="setFullColor(this,'__eraser__')">🧹擦</div>
     <input type="range" style="width:100px;accent-color:#ff8fab" min="2" max="30" value="8" id="fullSizeInput">
     <button onclick="clearFullCanvas()" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:5px 12px;color:#aaa;font-family:'Fredoka One',Arial,sans-serif;font-size:.75rem;cursor:pointer">🗑️清除</button>
   </div>
@@ -594,6 +595,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
     <div class="color-dot" style="background:#4caf50;width:28px;height:28px" onclick="setVFullColor(this,'#4caf50')"></div>
     <div class="color-dot" style="background:#42a5f5;width:28px;height:28px" onclick="setVFullColor(this,'#42a5f5')"></div>
     <div class="color-dot" style="background:#ef5350;width:28px;height:28px" onclick="setVFullColor(this,'#ef5350')"></div>
+    <div class="color-dot" style="background:linear-gradient(135deg,#555,#888);width:50px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#fff" onclick="setVFullColor(this,'__eraser__')">🧹擦</div>
     <input type="range" style="width:90px;accent-color:#42a5f5" min="2" max="30" value="8" id="vFullSizeInput">
     <button onclick="clearVFullCanvas()" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:5px 10px;color:#aaa;font-family:'Fredoka One',Arial,sans-serif;font-size:.72rem;cursor:pointer">🗑️清除</button>
   </div>
@@ -1006,7 +1008,7 @@ function closeDrawFull(){
   try{dctx.drawImage(fc,0,0,600,300);}catch(e){}
   document.getElementById('drawFullOv').classList.remove('open');
 }
-function setFullColor(el,c){drawColor=c;document.querySelectorAll('#drawFullOv .color-dot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');}
+function setFullColor(el,c){drawColor=c==='__eraser__'?'#1a1a2e':c;document.querySelectorAll('#drawFullOv .color-dot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');}
 
 async function saveDiary(){
   const text=document.getElementById('diaryText').value.trim();
@@ -1620,7 +1622,7 @@ function closeVDrawFull(){
   if(vCtx&&fc){vCtx.fillStyle='#1a1a2e';vCtx.fillRect(0,0,600,200);try{vCtx.drawImage(fc,0,0,600,200);}catch(e){}}
   document.getElementById('vDrawFullOv').classList.remove('open');
 }
-function setVFullColor(el,c){vDrawColor=c;document.querySelectorAll('#vDrawFullOv .color-dot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');}
+function setVFullColor(el,c){vDrawColor=c==='__eraser__'?'#1a1a2e':c;document.querySelectorAll('#vDrawFullOv .color-dot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');}
 
 // INIT
 updateStarUI();
