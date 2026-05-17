@@ -246,6 +246,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
       <button class="nb" onclick="switchTab('game',this)"><span class="ni">🎮</span>字母</button>
       <button class="nb" onclick="switchTab('math',this)"><span class="ni">🔢</span>加法</button>
       <button class="nb" onclick="switchTab('zhuyin',this)"><span class="ni">🔤</span>注音</button>
+      <button class="nb" onclick="switchTab('mine',this)"><span class="ni">🥚</span>考古</button>
       <button class="nb" id="vocabNavBtn" onclick="switchTab('vocab',this)"><span class="ni">📖</span>單字書</button>
       <button class="nb" onclick="switchTab('wish',this)"><span class="ni">🌟</span>許願池</button>
     </div>
@@ -326,7 +327,10 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
           <div class="tword" id="tWord">Apple</div>
           <div class="tzh" id="tZh">蘋果</div>
         </div>
-        <div><div class="temoji" id="tEmoji">🍎</div></div>
+        <div>
+          <div class="temoji" id="tEmoji">🍎</div>
+          <img id="tDrawing" src="" style="display:none;width:64px;height:64px;border-radius:10px;object-fit:contain;background:#1a1a2e;margin-top:4px">
+        </div>
       </div>
       <div id="soundBar">
         <button onclick="tapSayLetter()"><span>🔊</span><span>念字母<br><b id="barLetter">A</b></span></button>
@@ -391,6 +395,19 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
       <a href="dino-zhuyin.html"
         style="display:block;width:100%;max-width:280px;background:linear-gradient(135deg,#e65100,#ff9800);border:none;border-radius:99px;padding:18px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:1.2rem;text-align:center;text-decoration:none;box-shadow:0 6px 24px rgba(255,152,0,.4)">
         🔤 開始注音遊戲！
+      </a>
+    </div>
+  </div>
+
+  <!-- 🦕 恐龍考古踩地雷 -->
+  <div class="panel" id="panel-mine">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;gap:16px">
+      <div style="font-size:4rem;animation:bob 2s ease-in-out infinite">🥚</div>
+      <div style="font-size:1.6rem;color:#4caf50;text-align:center;line-height:1.3">恐龍考古<br>踩地雷！</div>
+      <div style="font-size:.85rem;color:#a5d6a7;text-align:center">挖開沙坑找恐龍蛋！<br>小心別嚇跑恐龍！</div>
+      <a href="dino-mine.html"
+        style="display:block;width:100%;max-width:280px;background:linear-gradient(135deg,#1b5e20,#4caf50);border:none;border-radius:99px;padding:18px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:1.2rem;text-align:center;text-decoration:none;box-shadow:0 6px 24px rgba(76,175,80,.4)">
+        🪣 開始考古挖掘！
       </a>
     </div>
   </div>
@@ -774,6 +791,10 @@ function pickTarget(){
   document.getElementById('tEmoji').textContent=currentTarget.e;
   document.getElementById('barLetter').textContent=currentTarget.l;
   document.getElementById('barWord').textContent=currentTarget.w;
+  // 若該單字有手繪圖就顯示
+  const dImg=document.getElementById('tDrawing');
+  if(currentTarget.drawing&&currentTarget.drawing.length>100){dImg.src=currentTarget.drawing;dImg.style.display='block';}
+  else{dImg.style.display='none';dImg.src='';}
   if(gameActive){say(currentTarget.l,'en-US');setTimeout(()=>say(currentTarget.w,'en-US'),700);setTimeout(()=>{if(currentTarget.zh)say(currentTarget.zh,'zh-TW');},1500);}
 }
 function updateLivesUI(){document.getElementById('sLives').textContent='❤️'.repeat(lives);}
@@ -823,7 +844,7 @@ function startGame(){
   document.getElementById('goScreen').style.display='none';
   document.getElementById('abcBackBtn').style.display='block';
   // 注入單字書詞彙
-  const vocabExtra=VOCAB.filter(v=>v.word&&v.word.trim()).map(v=>({l:v.word.trim()[0].toUpperCase(),w:v.word.trim(),zh:v.zh_meaning||'',e:v.emoji||'📚'}));
+  const vocabExtra=VOCAB.filter(v=>v.word&&v.word.trim()).map(v=>({l:v.word.trim()[0].toUpperCase(),w:v.word.trim(),zh:v.zh_meaning||v.zh||'',e:v.emoji||'📚',drawing:v.drawing||''}));
   window._gameABC=[...ABC,...vocabExtra];
   // 放大遊戲區塊填滿畫面
   const panel=document.getElementById('panel-game');
