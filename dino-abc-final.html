@@ -307,6 +307,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
         <div class="color-dot" style="background:#ab47bc" onclick="setColor(this,'#ab47bc')"></div>
         <div class="color-dot" style="background:#ef5350" onclick="setColor(this,'#ef5350')"></div>
         <input type="range" class="draw-size" id="drawSize" min="2" max="20" value="5">
+        <div class="color-dot" id="diaryEraserBtn" style="background:linear-gradient(135deg,#555,#888);font-size:.6rem;display:flex;align-items:center;justify-content:center;color:#fff;width:28px;height:28px" onclick="setColor(this,'__eraser__')" title="橡皮擦">⬜</div>
         <button class="draw-clear" onclick="clearCanvas()">清除</button>
       </div>
       <button class="diary-save-btn" onclick="saveDiary()">💾 儲存日記！</button>
@@ -443,6 +444,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
         <div class="color-dot" style="background:#4caf50" onclick="setVColor(this,'#4caf50')"></div>
         <div class="color-dot" style="background:#42a5f5" onclick="setVColor(this,'#42a5f5')"></div>
         <div class="color-dot" style="background:#ef5350" onclick="setVColor(this,'#ef5350')"></div>
+        <div class="color-dot" id="vocabEraserBtn" style="background:linear-gradient(135deg,#555,#888);font-size:.6rem;display:flex;align-items:center;justify-content:center;color:#fff;width:24px;height:24px" onclick="setVColor(this,'__eraser__')" title="橡皮擦">⬜</div>
         <input type="range" class="draw-size" min="2" max="20" value="5" id="vDrawSizeInput">
         <button class="draw-clear" onclick="clearVDraw()">清除</button>
       </div>
@@ -924,7 +926,7 @@ function confirmRedeem(){if(selectedReward===null){showToast('請先選一個獎
 // DIARY
 function openDiaryEditor(){document.getElementById('diaryEditor').classList.add('open');selectedMood='';}
 function selMood(btn,mood){selectedMood=mood;document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');}
-function toggleVoice(){const btn=document.getElementById('voiceBtn');if(voiceRecog){voiceRecog.stop();voiceRecog=null;btn.classList.remove('on');btn.textContent='🎤 按住說話！';return;}const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){showToast('此裝置不支援語音輸入');return;}voiceRecog=new SR();voiceRecog.lang='zh-TW';voiceRecog.continuous=true;voiceRecog.interimResults=true;voiceRecog.onresult=e=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById('diaryText').value=t;};voiceRecog.onend=()=>{voiceRecog=null;btn.classList.remove('on');btn.textContent='🎤 按住說話！';};voiceRecog.start();btn.classList.add('on');btn.textContent='🔴 說話中...（再按停止）';}
+function toggleVoice(){const btn=document.getElementById('voiceBtn');if(voiceRecog){voiceRecog.stop();voiceRecog=null;btn.classList.remove('on');btn.textContent='🎤 按住說話！';return;}const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){showToast('此裝置不支援語音輸入');return;}voiceRecog=new SR();voiceRecog.lang='zh-TW';voiceRecog.continuous=true;voiceRecog.interimResults=true;voiceRecog._base=document.getElementById('diaryText').value;voiceRecog.onresult=e=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById('diaryText').value=(voiceRecog._base?voiceRecog._base+' ':'')+t;};voiceRecog.onend=()=>{voiceRecog=null;btn.classList.remove('on');btn.textContent='🎤 按住說話！';};voiceRecog.start();btn.classList.add('on');btn.textContent='🔴 說話中...（再按停止）';}
 
 // CANVAS
 const dc=document.getElementById('drawCanvas'),dctx=dc.getContext('2d');
@@ -936,7 +938,12 @@ dc.addEventListener('touchend',()=>isDrawing=false);
 dc.addEventListener('mousedown',e=>{isDrawing=true;const p=getPos(e,dc);dctx.beginPath();dctx.moveTo(p.x,p.y);});
 dc.addEventListener('mousemove',e=>{if(!isDrawing)return;const p=getPos(e,dc);dctx.strokeStyle=drawColor;dctx.lineWidth=drawSize;dctx.lineCap='round';dctx.lineTo(p.x,p.y);dctx.stroke();});
 dc.addEventListener('mouseup',()=>isDrawing=false);
-function setColor(el,c){drawColor=c;document.querySelectorAll('.draw-tools .color-dot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');}
+let _diaryEraserMode=false;
+function setColor(el,c){
+  if(c==='__eraser__'){_diaryEraserMode=true;drawColor='#1a1a2e';}
+  else{_diaryEraserMode=false;drawColor=c;}
+  document.querySelectorAll('.draw-tools .color-dot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');
+}
 document.getElementById('drawSize').addEventListener('input',e=>drawSize=parseInt(e.target.value));
 function clearCanvas(){dctx.fillStyle='#1a1a2e';dctx.fillRect(0,0,600,300);}
 
@@ -1041,7 +1048,12 @@ function initVDraw(){
   document.getElementById('vDrawSizeInput').oninput=e=>vDrawSize=parseInt(e.target.value);
 }
 
-function setVColor(el,c){vDrawColor=c;document.querySelectorAll('.vocab-draw-tools .color-dot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');}
+let _vocabEraserMode=false;
+function setVColor(el,c){
+  if(c==='__eraser__'){_vocabEraserMode=true;vDrawColor='#1a1a2e';}
+  else{_vocabEraserMode=false;vDrawColor=c;}
+  document.querySelectorAll('.vocab-draw-tools .color-dot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');
+}
 function clearVDraw(){if(vCtx){vCtx.fillStyle='#1a1a2e';vCtx.fillRect(0,0,600,200);}}
 
 function openVocabEditor(keepValues){
@@ -1120,7 +1132,7 @@ function renderVocabList(){
       onclick="openVcModal(${i})"
       ontouchstart="vcLongStart(${i})" ontouchend="vcLongEnd()" ontouchcancel="vcLongEnd()"
       onmousedown="vcLongStart(${i})" onmouseup="vcLongEnd()" onmouseleave="vcLongEnd()">
-      <div class="vc-img" style="width:auto;min-width:54px;flex-wrap:wrap;gap:4px">${imgHtml}</div>
+      <div class="vc-img" style="width:auto;min-width:54px;flex-wrap:wrap;gap:4px;justify-content:center;align-items:center">${imgHtml}</div>
       <div class="vc-body">
         <div class="vc-word">${v.word}</div>
         ${v.phonetic?`<div class="vc-phon">${v.phonetic}</div>`:''}
