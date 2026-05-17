@@ -1036,19 +1036,28 @@ async function renderDiary(){
   if(currentUser){
     try{
       const {data}=await sb.from('diary').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
-      if(data&&data.length>0)diaries=data.map(d=>({date:d.diary_date||d.date||'',text:d.content||d.text||'',mood:d.mood||'',drawing:d.drawing||''}));
+      if(data&&data.length>0){
+        // 去除重複（同日期同內容）
+        const seen=new Set();
+        diaries=data.filter(d=>{const k=(d.diary_date||'')+'|'+(d.content||'').slice(0,20);if(seen.has(k))return false;seen.add(k);return true;})
+          .map(d=>({id:d.id,date:d.diary_date||d.date||'',text:d.content||d.text||'',mood:d.mood||'',drawing:d.drawing||''}));
+      }
     }catch(e){}
   }
   if(!diaries.length)diaries=JSON.parse(localStorage.getItem('diaries')||'[]');
   if(!diaries.length){list.innerHTML='<div style="text-align:center;color:#ff8fab;opacity:.6;padding:30px">還沒有日記！快來寫第一篇！📔</div>';return;}
-  list.innerHTML=diaries.map((d,i)=>'<div class="diary-card"><div class="diary-card-top"><span class="diary-card-date">'+d.date+'</span><span class="diary-card-mood">'+(d.mood||'')+'</span>'+(currentUser?'':`<button onclick="deleteDiary(${i})" style="background:rgba(200,40,40,.7);border:none;border-radius:99px;color:#fff;font-size:.7rem;padding:3px 10px;cursor:pointer;margin-left:auto">🗑️ 刪除</button>`)+'</div>'+(d.text?'<div class="diary-card-text">'+d.text+'</div>':'')+(d.drawing&&d.drawing!=='data:,'?'<img class="diary-card-img" src="'+d.drawing+'">':'')+'</div>').join('');
+  list.innerHTML=diaries.map((d,i)=>'<div class="diary-card"><div class="diary-card-top"><span class="diary-card-date">'+d.date+'</span><span class="diary-card-mood">'+(d.mood||'')+'</span><button onclick="deleteDiary('+i+',\''+( d.id||'')+'\')" style="background:rgba(200,40,40,.7);border:none;border-radius:99px;color:#fff;font-size:.7rem;padding:3px 10px;cursor:pointer;margin-left:auto">🗑️ 刪除</button></div>'+(d.text?'<div class="diary-card-text">'+d.text+'</div>':'')+(d.drawing&&d.drawing!=='data:,'?'<img class="diary-card-img" src="'+d.drawing+'">':'')+'</div>').join('');
 }
-function deleteDiary(i){
-  const diaries=JSON.parse(localStorage.getItem('diaries')||'[]');
-  const title=diaries[i]?.date||'這篇';
-  diaries.splice(i,1);
-  localStorage.setItem('diaries',JSON.stringify(diaries));
-  renderDiary();
+async function deleteDiary(i,dbId){
+  if(currentUser&&dbId){
+    try{await sb.from('diary').delete().eq('id',dbId).eq('user_id',currentUser.id);}catch(e){showToast('刪除失敗');return;}
+    showToast('🗑️ 日記刪除了！');renderDiary();
+  } else {
+    const diaries=JSON.parse(localStorage.getItem('diaries')||'[]');
+    const title=diaries[i]?.date||'這篇';
+    diaries.splice(i,1);localStorage.setItem('diaries',JSON.stringify(diaries));
+    showToast('🗑️ 刪除了「'+title+'」的日記');renderDiary();
+  }
   showToast('🗑️ 刪除了「'+title+'」的日記');
 }
 
@@ -1100,8 +1109,10 @@ async function loadVocabFromDB(){
   try{
     const {data}=await sb.from('vocab_words').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
     if(data){
-      // 登入後完全以 DB 為主，取代本地資料
-      VOCAB=data.map(r=>({id:r.id,word:r.word,zh:r.zh_meaning,phonetic:r.phonetic||'',emoji:r.emoji||'',photo:r.photo||'',drawing:r.drawing||''}));
+      // 登入後完全以 DB 為主，取代本地資料，並去除重複單字
+      const seenW=new Set();
+      VOCAB=data.filter(r=>{if(seenW.has((r.word||'').toLowerCase()))return false;seenW.add((r.word||'').toLowerCase());return true;})
+        .map(r=>({id:r.id,word:r.word,zh:r.zh_meaning,phonetic:r.phonetic||'',emoji:r.emoji||'',photo:r.photo||'',drawing:r.drawing||''}));
       saveVocabLocal();
       if(currentTab==='vocab')renderVocabList();
     }
