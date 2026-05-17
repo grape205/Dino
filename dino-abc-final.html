@@ -247,6 +247,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
       <button class="nb" onclick="switchTab('math',this)"><span class="ni">🔢</span>加法</button>
       <button class="nb" onclick="switchTab('zhuyin',this)"><span class="ni">🔤</span>注音</button>
       <button class="nb" id="vocabNavBtn" onclick="switchTab('vocab',this)"><span class="ni">📖</span>單字書</button>
+      <button class="nb" onclick="switchTab('wish',this)"><span class="ni">🌟</span>許願池</button>
     </div>
   </div>
 
@@ -349,6 +350,10 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
           </div>
         </div>
       </div>
+      <!-- 返回按鈕（遊戲中顯示）-->
+      <div id="abcBackBtn" style="display:none;padding:4px 0 0">
+        <button onclick="endGame()" style="background:rgba(0,0,0,.5);border:1.5px solid rgba(92,184,92,.4);border-radius:99px;padding:6px 16px;color:#81c784;font-family:'Fredoka One',cursive;font-size:.82rem;cursor:pointer">← 返回</button>
+      </div>
       <!-- 開始遊戲覆蓋層：在 arena 外，觸控正常 -->
       <div id="goScreen" style="display:flex;flex-direction:column;align-items:center;padding:20px 16px;gap:10px">
         <div style="font-size:3.5rem">🦖</div>
@@ -390,6 +395,21 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
         style="display:block;width:100%;max-width:280px;background:linear-gradient(135deg,#e65100,#ff9800);border:none;border-radius:99px;padding:18px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:1.2rem;text-align:center;text-decoration:none;box-shadow:0 6px 24px rgba(255,152,0,.4)">
         🔤 開始注音遊戲！
       </a>
+    </div>
+  </div>
+
+  <!-- 🌟 許願池討論區 -->
+  <div class="panel" id="panel-wish">
+    <div style="padding:0 11px 8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 2px 10px">
+        <span style="font-family:'Fredoka One',cursive;font-size:1rem;color:#fbbf24">🌟 許願池</span>
+        <span style="font-size:.7rem;color:#a78bfa">說說你想要什麼新功能！</span>
+      </div>
+      <div style="background:rgba(0,0,0,.42);border:2px solid rgba(251,191,36,.2);border-radius:18px;padding:14px;margin-bottom:14px">
+        <textarea id="wishText" maxlength="200" placeholder="我希望新增...（例如：更多遊戲關卡、單字測驗、畫畫功能...）" style="width:100%;background:rgba(0,0,0,.3);border:1.5px solid rgba(251,191,36,.25);border-radius:12px;padding:10px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:.85rem;min-height:75px;resize:vertical;box-sizing:border-box;outline:none"></textarea>
+        <button onclick="submitWish()" style="width:100%;background:linear-gradient(135deg,#b45309,#fbbf24);border:none;border-radius:99px;padding:11px;color:#fff;font-family:'Fredoka One',cursive;font-size:.95rem;cursor:pointer;margin-top:8px">🌟 送出許願！</button>
+      </div>
+      <div id="wishList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:60px"></div>
     </div>
   </div>
 
@@ -717,6 +737,7 @@ function doSwitchTab(name,btn){
   if(name==='rewards')renderRewards();
   if(name==='diary')renderDiary();
   if(name==='vocab')renderVocabList();
+  if(name==='wish')loadWishes();
   if(name==='game'){} // 全螢幕只在按開始時觸發
   else{try{if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();}catch(e){}}
 }
@@ -744,8 +765,9 @@ function stopIdle(){if(idleRafId){cancelAnimationFrame(idleRafId);idleRafId=null
 
 // ══ GAME ══
 function pickTarget(){
+  const gamePool=window._gameABC||ABC;
   let pick;
-  do{pick=ABC[Math.floor(Math.random()*ABC.length)];}while(currentTarget&&pick.w===currentTarget.w);
+  do{pick=gamePool[Math.floor(Math.random()*gamePool.length)];}while(currentTarget&&pick.w===currentTarget.w);
   currentTarget=pick;
   document.getElementById('tLetter').textContent=currentTarget.l;
   document.getElementById('tWord').textContent=currentTarget.w;
@@ -759,8 +781,16 @@ function updateLivesUI(){document.getElementById('sLives').textContent='❤️'.
 function spawnFaller(){
   if(!gameActive)return;
   const arena=document.getElementById('arena');const W=arena.clientWidth;
+  const gamePool=window._gameABC||ABC;
+  // 5% 機率掉一顆愛心補血
+  if(Math.random()<0.05&&lives<5){
+    const el=document.createElement('div');el.className='faller';el.textContent='❤️';
+    el.style.left=Math.random()*(W-50)+10+'px';el.style.fontSize='2rem';el.dataset.heart='1';
+    arena.appendChild(el);fallers.push({el,y:-50,speed:1.0+Math.random()*0.4});
+    return;
+  }
   const isCorrect=Math.random()<0.4;let letter;
-  if(isCorrect){letter=currentTarget.l;}else{let r;do{r=ABC[Math.floor(Math.random()*ABC.length)].l;}while(r===currentTarget.l);letter=r;}
+  if(isCorrect){letter=currentTarget.l;}else{let r;do{r=gamePool[Math.floor(Math.random()*gamePool.length)].l;}while(r===currentTarget.l);letter=r;}
   const el=document.createElement('div');el.className='faller';el.textContent=letter;el.style.left=Math.random()*(W-60)+10+'px';el.dataset.correct=isCorrect?'1':'0';
   arena.appendChild(el);fallers.push({el,y:-50,speed:1.2+level*0.3+Math.random()*0.8});
 }
@@ -775,6 +805,7 @@ function gameLoop(){
     const fR=f.el.getBoundingClientRect();const caught=fR.bottom>=dRect.top&&fR.top<=dRect.bottom&&fR.right>=dRect.left&&fR.left<=dRect.right;
     if(f.y>aH||caught){
       if(caught){
+        if(f.el.dataset.heart==='1'){lives=Math.min(lives+1,5);updateLivesUI();sndCorrect();showToast('❤️ 補血！');f.el.remove();fallers.splice(i,1);return;}
         if(f.el.dataset.correct==='1'){score++;document.getElementById('sScore').textContent=score;checkGrow();sndCorrect();f.el.classList.add('correct');if(score%10===0&&score>0){level++;document.getElementById('sLevel').textContent=level;showToast('⚡ 升級！Level '+level);}pickTarget();}
         else{lives--;updateLivesUI();sndWrong();f.el.classList.add('wrong');if(lives<=0){f.el.remove();fallers.splice(i,1);endGame();return;}}
       }
@@ -791,6 +822,10 @@ function startGame(){
   document.getElementById('growBar').style.width='0%';document.getElementById('growLabel').textContent=GROW[0].label;document.getElementById('growNext').textContent='+'+GROW[0].next+'分長大';
   updateLivesUI();
   document.getElementById('goScreen').style.display='none';
+  document.getElementById('abcBackBtn').style.display='block';
+  // 注入單字書詞彙
+  const vocabExtra=VOCAB.filter(v=>v.word&&v.word.trim()).map(v=>({l:v.word.trim()[0].toUpperCase(),w:v.word.trim(),zh:v.zh_meaning||'',e:v.emoji||'📚'}));
+  window._gameABC=[...ABC,...vocabExtra];
   // 放大遊戲區塊填滿畫面
   const panel=document.getElementById('panel-game');
   panel.style.position='fixed';
@@ -807,6 +842,7 @@ function endGame(){
   gameActive=false;clearInterval(fallerTimer);clearInterval(dailyTimer);
   fallers.forEach(f=>f.el.remove());fallers=[];stopBGM();
   sndDead();
+  document.getElementById('abcBackBtn').style.display='none';
   // 還原版面
   const panel=document.getElementById('panel-game');
   panel.style.position='';panel.style.inset='';panel.style.zIndex='';
@@ -989,11 +1025,19 @@ async function saveDiary(){
   clearCanvas();document.getElementById('diaryEditor').classList.remove('open');
   showToast('📔 日記儲存了！');renderDiary();
 }
-function renderDiary(){
+async function renderDiary(){
   const list=document.getElementById('diaryList');
-  const diaries=JSON.parse(localStorage.getItem('diaries')||'[]');
-  if(diaries.length===0){list.innerHTML='<div style="text-align:center;color:#ff8fab;opacity:.6;padding:30px">還沒有日記！快來寫第一篇！📔</div>';return;}
-  list.innerHTML=diaries.map((d,i)=>'<div class="diary-card"><div class="diary-card-top"><span class="diary-card-date">'+d.date+'</span><span class="diary-card-mood">'+(d.mood||'')+'</span><button onclick="deleteDiary('+i+')" style="background:rgba(200,40,40,.7);border:none;border-radius:99px;color:#fff;font-size:.7rem;padding:3px 10px;cursor:pointer;margin-left:auto">🗑️ 刪除</button></div>'+(d.text?'<div class="diary-card-text">'+d.text+'</div>':'')+(d.drawing&&d.drawing!=='data:,'?'<img class="diary-card-img" src="'+d.drawing+'">':'')+'</div>').join('');
+  list.innerHTML='<div style="text-align:center;color:#ff8fab;opacity:.5;padding:20px;font-size:.82rem">載入中...</div>';
+  let diaries=[];
+  if(currentUser){
+    try{
+      const {data}=await sb.from('diary').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
+      if(data&&data.length>0)diaries=data.map(d=>({date:d.diary_date||d.date||'',text:d.content||d.text||'',mood:d.mood||'',drawing:d.drawing||''}));
+    }catch(e){}
+  }
+  if(!diaries.length)diaries=JSON.parse(localStorage.getItem('diaries')||'[]');
+  if(!diaries.length){list.innerHTML='<div style="text-align:center;color:#ff8fab;opacity:.6;padding:30px">還沒有日記！快來寫第一篇！📔</div>';return;}
+  list.innerHTML=diaries.map((d,i)=>'<div class="diary-card"><div class="diary-card-top"><span class="diary-card-date">'+d.date+'</span><span class="diary-card-mood">'+(d.mood||'')+'</span>'+(currentUser?'':`<button onclick="deleteDiary(${i})" style="background:rgba(200,40,40,.7);border:none;border-radius:99px;color:#fff;font-size:.7rem;padding:3px 10px;cursor:pointer;margin-left:auto">🗑️ 刪除</button>`)+'</div>'+(d.text?'<div class="diary-card-text">'+d.text+'</div>':'')+(d.drawing&&d.drawing!=='data:,'?'<img class="diary-card-img" src="'+d.drawing+'">':'')+'</div>').join('');
 }
 function deleteDiary(i){
   const diaries=JSON.parse(localStorage.getItem('diaries')||'[]');
@@ -1002,6 +1046,34 @@ function deleteDiary(i){
   localStorage.setItem('diaries',JSON.stringify(diaries));
   renderDiary();
   showToast('🗑️ 刪除了「'+title+'」的日記');
+}
+
+// 許願池
+async function loadWishes(){
+  const list=document.getElementById('wishList');
+  if(!list)return;
+  list.innerHTML='<div style="text-align:center;color:#fbbf24;opacity:.5;padding:16px;font-size:.8rem">載入中...</div>';
+  let wishes=[];
+  try{
+    const {data}=await sb.from('wishes').select('*').order('created_at',{ascending:false}).limit(50);
+    if(data&&data.length)wishes=data;
+  }catch(e){}
+  if(!wishes.length)wishes=JSON.parse(localStorage.getItem('wishes')||'[]');
+  if(!wishes.length){list.innerHTML='<div style="text-align:center;color:#fbbf24;opacity:.5;padding:24px">還沒有許願！第一個來許願吧 🌟</div>';return;}
+  list.innerHTML=wishes.map(w=>`<div style="background:rgba(0,0,0,.42);border:1.5px solid rgba(251,191,36,.18);border-radius:14px;padding:12px 14px"><div style="font-size:.72rem;color:#fbbf24;opacity:.7;margin-bottom:4px">${w.user_name||'匿名玩家'} · ${(w.created_at||w.date||'').slice(0,10)}</div><div style="font-size:.88rem;color:#fff;line-height:1.5">${w.content||w.text||''}</div></div>`).join('');
+}
+async function submitWish(){
+  const ta=document.getElementById('wishText');
+  const text=(ta?.value||'').trim();
+  if(!text){showToast('請先寫下你的願望！');return;}
+  const name=currentUser?(currentUser.user_metadata?.full_name||currentUser.email||'玩家'):'匿名玩家';
+  const entry={user_name:name,content:text,date:new Date().toISOString().slice(0,10)};
+  try{await sb.from('wishes').insert({...entry,user_id:currentUser?.id||null,created_at:new Date().toISOString()});}catch(e){}
+  const local=JSON.parse(localStorage.getItem('wishes')||'[]');
+  local.unshift(entry);localStorage.setItem('wishes',JSON.stringify(local.slice(0,50)));
+  if(ta)ta.value='';
+  showToast('🌟 許願成功！');
+  loadWishes();
 }
 
 // TIMER

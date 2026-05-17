@@ -212,12 +212,13 @@ body{font-family:'Nunito',sans-serif;background:#0a0a1a;min-height:100vh;overflo
       <div class="go-d">🦕</div>
       <div class="go-t">翼龍加法<br>大冒險！</div>
       <div class="go-s" id="gMsg">接住正確的答案！<br>接錯了要扣血哦 🌙</div>
-      <a id="kofiBtn" href="https://ko-fi.com/grape205" target="_blank" style="display:none;margin-top:8px;padding:8px 20px;background:linear-gradient(135deg,#FF5E5B,#ff8a65);border-radius:99px;color:#fff;font-family:'Fredoka One',cursive;font-size:.9rem;text-decoration:none;box-shadow:0 4px 14px rgba(255,94,91,.4)">☕ 支持一下！Ko-fi</a>
     </div>
   </div>
   <div class="drag-hint">👈 左右滑動翼龍接答案 👉</div>
   <!-- 開始按鈕在 arena 外面 -->
   <div id="goverStartArea" style="padding:8px 16px 12px">
+    <a id="kofiBtn" href="https://ko-fi.com/grape205" target="_blank"
+      style="display:none;width:100%;text-align:center;margin-bottom:10px;padding:12px 20px;background:linear-gradient(135deg,#FF5E5B,#ff8a65);border-radius:99px;color:#fff;font-family:'Fredoka One',cursive;font-size:1rem;text-decoration:none;box-shadow:0 4px 14px rgba(255,94,91,.4)">☕ 支持一下！Ko-fi</a>
     <div id="levelHint" style="text-align:center;color:#a78bfa;font-size:.82rem;margin-bottom:8px">👆 先選上方等級，再按開始！</div>
     <button id="mathStartBtn"
       ontouchend="event.preventDefault();doMathStart();"
@@ -469,6 +470,7 @@ function startGame(){
   document.getElementById('kofiBtn').style.display='none';
   document.querySelector('.arena').classList.add('arena-fs');
   document.querySelector('.stats').style.cssText='position:fixed;top:0;left:0;right:0;z-index:801;padding:3px 6px;background:rgba(10,10,26,.85);display:flex;gap:4px';
+  document.querySelector('.eq-box').style.cssText='position:fixed;top:46px;left:0;right:0;z-index:801;margin:0;border-radius:0;padding:5px 16px;background:rgba(10,10,26,.95);border-bottom:1px solid rgba(124,58,237,.35)';
   setTimeout(()=>{resize();updateHUD();startBGM();gameLoop();},60);
 }
 function updateHUD(){
@@ -486,12 +488,6 @@ function gameLoop(){
   frame++;
   ctx.clearRect(0,0,canvas.width,canvas.height);
   drawBG();
-  // equation overlay on canvas (visible in fullscreen)
-  ctx.save();
-  ctx.font="bold 20px 'Fredoka One',cursive";
-  ctx.fillStyle='rgba(255,255,255,.85)';ctx.textAlign='center';
-  ctx.fillText(eqA+' + '+eqB+' = ?',canvas.width/2,28);
-  ctx.restore();
 
   const vx=dinoX-prevDX; prevDX=dinoX;
 
@@ -522,7 +518,8 @@ function gameLoop(){
     f.wobble+=f.wSpd;
     const fx=f.x+Math.sin(f.wobble)*8;
 
-    if(Math.hypot(fx-mTipX,f.y-mTipY)<f.r+14 && mouthA>.18){
+    const wingHit=f.y>dinoTopY&&f.y<dinoTopY+DH&&Math.abs(fx-dinoX)<DW*1.5;
+    if((Math.hypot(fx-mTipX,f.y-mTipY)<f.r+14 && mouthA>.18)||wingHit){
       if(f.isAns){
         score++;totalScore++;stars+=3;streakCount++;saveData();updateStarUI();
         sndCorrect();chomping=true;chompT=0;sndChomp();
@@ -744,13 +741,14 @@ function doEndGame(){
   confetti();
   document.querySelector('.arena').classList.remove('arena-fs');
   document.querySelector('.stats').style.cssText='';
+  document.querySelector('.eq-box').style.cssText='';
   document.getElementById('soundBar2').style.display='';
   const ov=document.getElementById('gOver');
   ov.style.display='flex';
   document.getElementById('gMsg').innerHTML=
     `得了 <span style="color:#fbbf24;font-size:1.4em">${score}</span> 分！<br>`+
     `獲得 <span style="color:#fbbf24">${score*3}</span> 顆⭐`;
-  document.getElementById('kofiBtn').style.display='inline-block';
+  document.getElementById('kofiBtn').style.display='block';
   const rb=document.getElementById('mathStartBtn');
   if(rb){rb.style.display='block';rb.textContent='🔄 再玩一次！';}
   const lh=document.getElementById('levelHint');
