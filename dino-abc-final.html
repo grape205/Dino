@@ -1017,9 +1017,14 @@ async function saveDiary(){
   const drawing=dc.toDataURL('image/jpeg',0.5);
   const today=new Date().toISOString().slice(0,10);
   const entry={date:today,text,mood:selectedMood,drawing};
-  if(currentUser){const name=currentUser.user_metadata?.full_name||currentUser.email||'玩家';await sb.from('diary').insert({player_name:name,diary_date:today,content:text,mood:selectedMood,drawing,user_id:currentUser.id});}
-  const diaries=JSON.parse(localStorage.getItem('diaries')||'[]');
-  diaries.unshift(entry);localStorage.setItem('diaries',JSON.stringify(diaries.slice(0,30)));
+  if(currentUser){
+    const name=currentUser.user_metadata?.full_name||currentUser.email||'玩家';
+    const {error}=await sb.from('diary').insert({player_name:name,diary_date:today,content:text,mood:selectedMood,drawing,user_id:currentUser.id});
+    if(error)showToast('❗ 儲存失敗：'+error.message);
+  } else {
+    const diaries=JSON.parse(localStorage.getItem('diaries')||'[]');
+    diaries.unshift(entry);localStorage.setItem('diaries',JSON.stringify(diaries.slice(0,30)));
+  }
   document.getElementById('diaryText').value='';selectedMood='';
   document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('sel'));
   clearCanvas();document.getElementById('diaryEditor').classList.remove('open');
@@ -1095,12 +1100,9 @@ async function loadVocabFromDB(){
   if(!currentUser)return;
   try{
     const {data}=await sb.from('vocab_words').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-    if(data&&data.length>0){
-      // 合併 DB 的資料（以 DB 優先）
-      const localIds=new Set(VOCAB.map(v=>v.id));
-      data.forEach(r=>{
-        if(!localIds.has(r.id)){VOCAB.push({id:r.id,word:r.word,zh:r.zh_meaning,phonetic:r.phonetic||'',emoji:r.emoji||'',photo:r.photo||'',drawing:r.drawing||''});}
-      });
+    if(data){
+      // 登入後完全以 DB 為主，取代本地資料
+      VOCAB=data.map(r=>({id:r.id,word:r.word,zh:r.zh_meaning,phonetic:r.phonetic||'',emoji:r.emoji||'',photo:r.photo||'',drawing:r.drawing||''}));
       saveVocabLocal();
       if(currentTab==='vocab')renderVocabList();
     }
@@ -1268,7 +1270,11 @@ function openVcModal(i){
 function closeVcModal(){document.getElementById('vcModal').classList.remove('open');vcCurrentWord=null;}
 function speakCurrent(){if(vcCurrentWord)say(vcCurrentWord.word,'en-US');}
 function speakCurrentZh(){if(vcCurrentWord)say(vcCurrentWord.zh,'zh-TW');}
-function deleteVocab(i){const w=VOCAB[i].word;VOCAB.splice(i,1);saveVocabLocal();renderVocabList();showToast('🗑️ 刪除「'+w+'」');}
+async function deleteVocab(i){
+  const v=VOCAB[i];const w=v.word;
+  if(currentUser&&v.id){try{await sb.from('vocab_words').delete().eq('id',v.id).eq('user_id',currentUser.id);}catch(e){}}
+  VOCAB.splice(i,1);saveVocabLocal();renderVocabList();showToast('🗑️ 刪除「'+w+'」');
+}
 
 // ── 提示圖點擊發音 ──
 document.getElementById('tEmoji').style.cursor='pointer';
