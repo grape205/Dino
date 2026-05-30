@@ -312,6 +312,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
         <div class="color-dot" style="background:#ef5350" onclick="setColor(this,'#ef5350')"></div>
         <input type="range" class="draw-size" id="drawSize" min="2" max="20" value="5">
         <div class="color-dot" id="diaryEraserBtn" style="background:linear-gradient(135deg,#555,#888);font-size:.75rem;display:flex;align-items:center;justify-content:center;color:#fff;width:44px;height:28px;border-radius:8px" onclick="setColor(this,'__eraser__')" title="橡皮擦">🧹擦</div>
+        <button class="draw-clear" onclick="fillCanvas()" title="塗滿整頁同一色">🪣塗滿</button>
         <button class="draw-clear" onclick="clearCanvas()">清除</button>
       </div>
       <button class="diary-save-btn" onclick="saveDiary()">💾 儲存日記！</button>
@@ -482,6 +483,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
         <div class="color-dot" style="background:#ef5350" onclick="setVColor(this,'#ef5350')"></div>
         <div class="color-dot" id="vocabEraserBtn" style="background:linear-gradient(135deg,#555,#888);font-size:.75rem;display:flex;align-items:center;justify-content:center;color:#fff;width:44px;height:24px;border-radius:8px" onclick="setVColor(this,'__eraser__')" title="橡皮擦">🧹擦</div>
         <input type="range" class="draw-size" min="2" max="20" value="5" id="vDrawSizeInput">
+        <button class="draw-clear" onclick="fillVDraw()" title="塗滿整頁同一色">🪣塗滿</button>
         <button class="draw-clear" onclick="clearVDraw()">清除</button>
       </div>
       <button class="vocab-save-btn" onclick="saveVocab()">💾 儲存單字！</button>
@@ -598,6 +600,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
     <div class="color-dot" style="background:#ef5350;width:30px;height:30px" onclick="setFullColor(this,'#ef5350')"></div>
     <div class="color-dot" style="background:linear-gradient(135deg,#555,#888);width:50px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#fff" onclick="setFullColor(this,'__eraser__')">🧹擦</div>
     <input type="range" style="width:100px;accent-color:#ff8fab" min="2" max="30" value="8" id="fullSizeInput">
+    <button onclick="fillFullCanvas()" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:5px 12px;color:#aaa;font-family:'Fredoka One',Arial,sans-serif;font-size:.75rem;cursor:pointer">🪣塗滿</button>
     <button onclick="clearFullCanvas()" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:5px 12px;color:#aaa;font-family:'Fredoka One',Arial,sans-serif;font-size:.75rem;cursor:pointer">🗑️清除</button>
   </div>
   <canvas class="draw-full-canvas" id="fullCanvas"></canvas>
@@ -616,6 +619,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
     <div class="color-dot" style="background:#ef5350;width:28px;height:28px" onclick="setVFullColor(this,'#ef5350')"></div>
     <div class="color-dot" style="background:linear-gradient(135deg,#555,#888);width:50px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#fff" onclick="setVFullColor(this,'__eraser__')">🧹擦</div>
     <input type="range" style="width:90px;accent-color:#42a5f5" min="2" max="30" value="8" id="vFullSizeInput">
+    <button onclick="fillVFullCanvas()" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:5px 10px;color:#aaa;font-family:'Fredoka One',Arial,sans-serif;font-size:.72rem;cursor:pointer">🪣塗滿</button>
     <button onclick="clearVFullCanvas()" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:5px 10px;color:#aaa;font-family:'Fredoka One',Arial,sans-serif;font-size:.72rem;cursor:pointer">🗑️清除</button>
   </div>
   <canvas id="vFullCanvas" style="border-radius:14px;touch-action:none;cursor:crosshair;background:#1a1a2e;border:2px solid rgba(66,165,245,.3)"></canvas>
@@ -676,32 +680,124 @@ async function doLogout(){
 
 // ══ ABC DATA ══
 const ABC=[
+  // A
   {l:'A',e:'🍎',w:'Apple',zh:'蘋果'},{l:'A',e:'🐜',w:'Ant',zh:'螞蟻'},{l:'A',e:'🥑',w:'Avocado',zh:'酪梨'},{l:'A',e:'✈️',w:'Airplane',zh:'飛機'},
+  {l:'A',e:'🐊',w:'Alligator',zh:'鱷魚'},{l:'A',e:'⚓',w:'Anchor',zh:'錨'},{l:'A',e:'🍦',w:'Afternoon',zh:'下午'},
+  {l:'A',e:'😠',w:'Angry',zh:'生氣'},{l:'A',e:'🩹',w:'Arm',zh:'手臂'},{l:'A',e:'🌸',w:'April',zh:'四月'},
+  // B
   {l:'B',e:'🐝',w:'Bee',zh:'蜜蜂'},{l:'B',e:'🍌',w:'Banana',zh:'香蕉'},{l:'B',e:'🐻',w:'Bear',zh:'熊'},{l:'B',e:'🦋',w:'Butterfly',zh:'蝴蝶'},{l:'B',e:'⚽',w:'Ball',zh:'球'},
+  {l:'B',e:'🛏️',w:'Bed',zh:'床'},{l:'B',e:'📕',w:'Book',zh:'書本'},{l:'B',e:'🚌',w:'Bus',zh:'公車'},{l:'B',e:'🍞',w:'Bread',zh:'麵包'},
+  {l:'B',e:'🧴',w:'Bottle',zh:'瓶子'},{l:'B',e:'🧸',w:'Baby',zh:'寶寶'},{l:'B',e:'🩺',w:'Body',zh:'身體'},{l:'B',e:'🌉',w:'Bridge',zh:'橋'},
+  // C
   {l:'C',e:'🐱',w:'Cat',zh:'貓咪'},{l:'C',e:'🥕',w:'Carrot',zh:'紅蘿蔔'},{l:'C',e:'🐛',w:'Caterpillar',zh:'毛毛蟲'},{l:'C',e:'🍰',w:'Cake',zh:'蛋糕'},{l:'C',e:'🚗',w:'Car',zh:'汽車'},
+  {l:'C',e:'🪑',w:'Chair',zh:'椅子'},{l:'C',e:'☁️',w:'Cloud',zh:'雲'},{l:'C',e:'🧥',w:'Coat',zh:'外套'},
+  {l:'C',e:'🍪',w:'Cookie',zh:'餅乾'},{l:'C',e:'🌽',w:'Corn',zh:'玉米'},{l:'C',e:'🎨',w:'Color',zh:'顏色'},{l:'C',e:'❄️',w:'Cold',zh:'冷'},
+  // D
   {l:'D',e:'🐶',w:'Dog',zh:'狗狗'},{l:'D',e:'🦆',w:'Duck',zh:'鴨子'},{l:'D',e:'🐲',w:'Dragon',zh:'龍'},{l:'D',e:'🥁',w:'Drum',zh:'鼓'},
+  {l:'D',e:'🚪',w:'Door',zh:'門'},{l:'D',e:'👗',w:'Dress',zh:'洋裝'},{l:'D',e:'🍹',w:'Drink',zh:'飲料'},
+  {l:'D',e:'🌙',w:'Dark',zh:'黑暗'},{l:'D',e:'💃',w:'Dance',zh:'跳舞'},{l:'D',e:'🥣',w:'Dinner',zh:'晚餐'},
+  // E
   {l:'E',e:'🐘',w:'Elephant',zh:'大象'},{l:'E',e:'🥚',w:'Egg',zh:'雞蛋'},{l:'E',e:'🦅',w:'Eagle',zh:'老鷹'},
+  {l:'E',e:'👂',w:'Ear',zh:'耳朵'},{l:'E',e:'😮',w:'Eat',zh:'吃'},{l:'E',e:'🌃',w:'Evening',zh:'傍晚'},
+  {l:'E',e:'🪣',w:'Empty',zh:'空的'},{l:'E',e:'🌍',w:'Earth',zh:'地球'},
+  // F
   {l:'F',e:'🐸',w:'Frog',zh:'青蛙'},{l:'F',e:'🐟',w:'Fish',zh:'魚'},{l:'F',e:'🦊',w:'Fox',zh:'狐狸'},{l:'F',e:'🌸',w:'Flower',zh:'花'},
+  {l:'F',e:'🍴',w:'Fork',zh:'叉子'},{l:'F',e:'👣',w:'Foot',zh:'腳'},{l:'F',e:'🌲',w:'Forest',zh:'森林'},
+  {l:'F',e:'🍟',w:'French Fries',zh:'薯條'},{l:'F',e:'🫂',w:'Friend',zh:'朋友'},{l:'F',e:'🍑',w:'Fruit',zh:'水果'},
+  // G
   {l:'G',e:'🍇',w:'Grape',zh:'葡萄'},{l:'G',e:'🦒',w:'Giraffe',zh:'長頸鹿'},{l:'G',e:'🐐',w:'Goat',zh:'山羊'},{l:'G',e:'🌿',w:'Grass',zh:'草'},
+  {l:'G',e:'🎮',w:'Game',zh:'遊戲'},{l:'G',e:'🚪',w:'Gate',zh:'大門'},{l:'G',e:'🎁',w:'Gift',zh:'禮物'},
+  {l:'G',e:'👴',w:'Grandpa',zh:'爺爺'},{l:'G',e:'👵',w:'Grandma',zh:'奶奶'},{l:'G',e:'💚',w:'Green',zh:'綠色'},
+  // H
   {l:'H',e:'🐹',w:'Hamster',zh:'倉鼠'},{l:'H',e:'🐴',w:'Horse',zh:'馬'},{l:'H',e:'🏠',w:'House',zh:'房子'},{l:'H',e:'🎩',w:'Hat',zh:'帽子'},
+  {l:'H',e:'✋',w:'Hand',zh:'手'},{l:'H',e:'😊',w:'Happy',zh:'快樂'},{l:'H',e:'❤️',w:'Heart',zh:'心'},
+  {l:'H',e:'🌡️',w:'Hot',zh:'熱'},{l:'H',e:'😋',w:'Hungry',zh:'餓'},{l:'H',e:'🤗',w:'Hug',zh:'擁抱'},
+  // I
   {l:'I',e:'🍦',w:'Ice Cream',zh:'冰淇淋'},{l:'I',e:'🏝️',w:'Island',zh:'島嶼'},
-  {l:'J',e:'🪁',w:'Jet',zh:'飛機'},{l:'J',e:'🕹️',w:'Joystick',zh:'搖桿'},{l:'J',e:'🦘',w:'Jumper',zh:'跳跳'},
+  {l:'I',e:'🦷',w:'Inside',zh:'裡面'},{l:'I',e:'🧊',w:'Ice',zh:'冰塊'},{l:'I',e:'😷',w:'Ill',zh:'生病'},
+  // J
+  {l:'J',e:'🛩️',w:'Jet',zh:'噴射機'},{l:'J',e:'🕹️',w:'Joystick',zh:'搖桿'},{l:'J',e:'🏃',w:'Jump',zh:'跳'},
+  {l:'J',e:'🍊',w:'Juice',zh:'果汁'},{l:'J',e:'😂',w:'Joke',zh:'笑話'},{l:'J',e:'1️⃣',w:'January',zh:'一月'},
+  // K
   {l:'K',e:'🪁',w:'Kite',zh:'風箏'},{l:'K',e:'🦘',w:'Kangaroo',zh:'袋鼠'},{l:'K',e:'🔑',w:'Key',zh:'鑰匙'},
+  {l:'K',e:'🍳',w:'Kitchen',zh:'廚房'},{l:'K',e:'💋',w:'Kiss',zh:'親親'},{l:'K',e:'🪢',w:'Knot',zh:'結'},
+  // L
   {l:'L',e:'🦁',w:'Lion',zh:'獅子'},{l:'L',e:'🦎',w:'Lizard',zh:'蜥蜴'},{l:'L',e:'🍋',w:'Lemon',zh:'檸檬'},
+  {l:'L',e:'🦵',w:'Leg',zh:'腿'},{l:'L',e:'💡',w:'Light',zh:'燈'},{l:'L',e:'😂',w:'Laugh',zh:'笑'},
+  {l:'L',e:'💙',w:'Love',zh:'愛'},
+  // M
   {l:'M',e:'🐒',w:'Monkey',zh:'猴子'},{l:'M',e:'🌙',w:'Moon',zh:'月亮'},{l:'M',e:'🍄',w:'Mushroom',zh:'蘑菇'},{l:'M',e:'🐭',w:'Mouse',zh:'老鼠'},
-  {l:'N',e:'🌙',w:'Night',zh:'夜晚'},{l:'N',e:'🪺',w:'Nest',zh:'鳥巢'},{l:'N',e:'🍜',w:'Noodles',zh:'麵條'},
+  {l:'M',e:'🥛',w:'Milk',zh:'牛奶'},{l:'M',e:'👩',w:'Mom',zh:'媽媽'},{l:'M',e:'👄',w:'Mouth',zh:'嘴巴'},
+  {l:'M',e:'🎵',w:'Music',zh:'音樂'},{l:'M',e:'🌅',w:'Morning',zh:'早上'},
+  // N
+  {l:'N',e:'🌃',w:'Night',zh:'夜晚'},{l:'N',e:'🪺',w:'Nest',zh:'鳥巢'},{l:'N',e:'🍜',w:'Noodles',zh:'麵條'},
+  {l:'N',e:'👃',w:'Nose',zh:'鼻子'},{l:'N',e:'📔',w:'Notebook',zh:'筆記本'},{l:'N',e:'🌰',w:'Nut',zh:'堅果'},
+  // O
   {l:'O',e:'🐙',w:'Octopus',zh:'章魚'},{l:'O',e:'🦦',w:'Otter',zh:'水獺'},{l:'O',e:'🍊',w:'Orange',zh:'橘子'},
+  {l:'O',e:'🏢',w:'Office',zh:'辦公室'},{l:'O',e:'🔓',w:'Open',zh:'打開'},{l:'O',e:'🦉',w:'Owl',zh:'貓頭鷹'},
+  // P
   {l:'P',e:'🐼',w:'Panda',zh:'熊貓'},{l:'P',e:'🐧',w:'Penguin',zh:'企鵝'},{l:'P',e:'🍑',w:'Peach',zh:'桃子'},{l:'P',e:'🐷',w:'Pig',zh:'豬'},
-  {l:'Q',e:'👸',w:'Queen',zh:'女王'},{l:'Q',e:'❓',w:'Question',zh:'問題'},
+  {l:'P',e:'✏️',w:'Pencil',zh:'鉛筆'},{l:'P',e:'📌',w:'Park',zh:'公園'},{l:'P',e:'🍕',w:'Pizza',zh:'披薩'},
+  {l:'P',e:'🩴',w:'Pants',zh:'褲子'},{l:'P',e:'🍐',w:'Pear',zh:'梨子'},{l:'P',e:'🌺',w:'Purple',zh:'紫色'},
+  // Q
+  {l:'Q',e:'👸',w:'Queen',zh:'女王'},{l:'Q',e:'❓',w:'Question',zh:'問題'},{l:'Q',e:'🤫',w:'Quiet',zh:'安靜'},
+  // R
   {l:'R',e:'🌈',w:'Rainbow',zh:'彩虹'},{l:'R',e:'🐇',w:'Rabbit',zh:'兔子'},{l:'R',e:'🚀',w:'Rocket',zh:'火箭'},{l:'R',e:'🌹',w:'Rose',zh:'玫瑰'},
+  {l:'R',e:'🍚',w:'Rice',zh:'米飯'},{l:'R',e:'🏃',w:'Run',zh:'跑步'},{l:'R',e:'🌧️',w:'Rain',zh:'雨'},
+  {l:'R',e:'❤️',w:'Red',zh:'紅色'},{l:'R',e:'📏',w:'Ruler',zh:'尺'},
+  // S
   {l:'S',e:'⭐',w:'Star',zh:'星星'},{l:'S',e:'🐍',w:'Snake',zh:'蛇'},{l:'S',e:'🍓',w:'Strawberry',zh:'草莓'},{l:'S',e:'☀️',w:'Sun',zh:'太陽'},{l:'S',e:'🐑',w:'Sheep',zh:'羊'},
+  {l:'S',e:'🏫',w:'School',zh:'學校'},{l:'S',e:'👕',w:'Shirt',zh:'上衣'},{l:'S',e:'👞',w:'Shoes',zh:'鞋子'},
+  {l:'S',e:'😴',w:'Sleep',zh:'睡覺'},{l:'S',e:'🧦',w:'Socks',zh:'襪子'},{l:'S',e:'🥣',w:'Soup',zh:'湯'},
+  {l:'S',e:'🏪',w:'Store',zh:'商店'},{l:'S',e:'🥄',w:'Spoon',zh:'湯匙'},
+  // T
   {l:'T',e:'🐯',w:'Tiger',zh:'老虎'},{l:'T',e:'🐢',w:'Turtle',zh:'烏龜'},{l:'T',e:'🌳',w:'Tree',zh:'樹'},{l:'T',e:'🚂',w:'Train',zh:'火車'},
+  {l:'T',e:'📞',w:'Telephone',zh:'電話'},{l:'T',e:'🧸',w:'Toy',zh:'玩具'},{l:'T',e:'🍅',w:'Tomato',zh:'番茄'},
+  {l:'T',e:'🪥',w:'Toothbrush',zh:'牙刷'},{l:'T',e:'🚿',w:'Towel',zh:'毛巾'},{l:'T',e:'🚕',w:'Taxi',zh:'計程車'},
+  // U
   {l:'U',e:'☂️',w:'Umbrella',zh:'雨傘'},{l:'U',e:'🦄',w:'Unicorn',zh:'獨角獸'},
+  {l:'U',e:'⬆️',w:'Up',zh:'上面'},{l:'U',e:'🎓',w:'Uncle',zh:'叔叔'},
+  // V
   {l:'V',e:'🎻',w:'Violin',zh:'小提琴'},{l:'V',e:'🌋',w:'Volcano',zh:'火山'},
+  {l:'V',e:'🥦',w:'Vegetable',zh:'蔬菜'},{l:'V',e:'🎬',w:'Video',zh:'影片'},
+  // W
   {l:'W',e:'🐳',w:'Whale',zh:'鯨魚'},{l:'W',e:'🌊',w:'Wave',zh:'海浪'},{l:'W',e:'🍉',w:'Watermelon',zh:'西瓜'},{l:'W',e:'🐺',w:'Wolf',zh:'狼'},
-  {l:'X',e:'🎸',w:'Xylophone',zh:'木琴'},
+  {l:'W',e:'🚶',w:'Walk',zh:'走路'},{l:'W',e:'⌚',w:'Watch',zh:'手錶'},{l:'W',e:'🌬️',w:'Wind',zh:'風'},
+  {l:'W',e:'🪟',w:'Window',zh:'窗戶'},{l:'W',e:'🌍',w:'World',zh:'世界'},
+  // X
+  {l:'X',e:'🎸',w:'Xylophone',zh:'木琴'},{l:'X',e:'❌',w:'Cross',zh:'叉叉'},
+  // Y
   {l:'Y',e:'🧶',w:'Yarn',zh:'毛線球'},{l:'Y',e:'🟡',w:'Yellow',zh:'黃色'},
-  {l:'Z',e:'🦓',w:'Zebra',zh:'斑馬'},{l:'Z',e:'⚡',w:'Zap',zh:'閃電'},
+  {l:'Y',e:'🥱',w:'Yawn',zh:'打哈欠'},{l:'Y',e:'📅',w:'Yesterday',zh:'昨天'},
+  // Z
+  {l:'Z',e:'🦓',w:'Zebra',zh:'斑馬'},{l:'Z',e:'⚡',w:'Zap',zh:'閃電'},{l:'Z',e:'🔢',w:'Zero',zh:'零'},
+  // 常用生活單字（按字母）
+  {l:'A',e:'🩹',w:'Ambulance',zh:'救護車'},{l:'A',e:'🎨',w:'Art',zh:'藝術'},
+  {l:'B',e:'🩸',w:'Blood',zh:'血'},{l:'B',e:'🦷',w:'Brush',zh:'刷牙'},
+  {l:'C',e:'🖥️',w:'Computer',zh:'電腦'},{l:'C',e:'☕',w:'Coffee',zh:'咖啡'},
+  {l:'D',e:'👨',w:'Dad',zh:'爸爸'},{l:'D',e:'💊',w:'Doctor',zh:'醫生'},
+  {l:'E',e:'💌',w:'Email',zh:'電子郵件'},{l:'E',e:'🏁',w:'End',zh:'結束'},
+  {l:'F',e:'🔥',w:'Fire',zh:'火'},{l:'F',e:'🏃',w:'Fast',zh:'快'},
+  {l:'G',e:'👧',w:'Girl',zh:'女孩'},{l:'G',e:'🍎',w:'Good',zh:'好'},
+  {l:'H',e:'🏥',w:'Hospital',zh:'醫院'},{l:'H',e:'🌈',w:'Hello',zh:'你好'},
+  {l:'I',e:'📱',w:'Internet',zh:'網路'},{l:'I',e:'🎂',w:'Invite',zh:'邀請'},
+  {l:'J',e:'👶',w:'Junior',zh:'幼兒'},{l:'J',e:'✂️',w:'Jobs',zh:'工作'},
+  {l:'K',e:'😘',w:'Kind',zh:'善良'},{l:'K',e:'🔪',w:'Knife',zh:'刀子'},
+  {l:'L',e:'📚',w:'Library',zh:'圖書館'},{l:'L',e:'🎂',w:'Lunch',zh:'午餐'},
+  {l:'M',e:'🗺️',w:'Map',zh:'地圖'},{l:'M',e:'💊',w:'Medicine',zh:'藥'},
+  {l:'N',e:'🌙',w:'Nap',zh:'小睡'},{l:'N',e:'📰',w:'News',zh:'新聞'},
+  {l:'O',e:'🌊',w:'Ocean',zh:'海洋'},{l:'O',e:'🔶',w:'Orange',zh:'橘色'},
+  {l:'P',e:'😊',w:'Please',zh:'請'},{l:'P',e:'📦',w:'Package',zh:'包裹'},{l:'P',e:'🤝',w:'Promise',zh:'承諾'},
+  {l:'Q',e:'👸',w:'Quick',zh:'快速'},{l:'Q',e:'🃏',w:'Quiz',zh:'測驗'},
+  {l:'R',e:'📻',w:'Radio',zh:'收音機'},{l:'R',e:'🎀',w:'Ribbon',zh:'緞帶'},
+  {l:'S',e:'✂️',w:'Scissors',zh:'剪刀'},{l:'S',e:'🧼',w:'Soap',zh:'肥皂'},{l:'S',e:'🥤',w:'Snack',zh:'點心'},
+  {l:'T',e:'🌡️',w:'Temperature',zh:'溫度'},{l:'T',e:'😊',w:'Thank You',zh:'謝謝'},
+  {l:'U',e:'🧸',w:'Under',zh:'下面'},{l:'U',e:'🦊',w:'Useful',zh:'有用的'},
+  {l:'V',e:'🔊',w:'Voice',zh:'聲音'},{l:'V',e:'🥕',w:'Vitamin',zh:'維他命'},
+  {l:'W',e:'😢',w:'Water',zh:'水'},{l:'W',e:'🏋️',w:'Work',zh:'工作'},
+  {l:'X',e:'✖️',w:'Extra',zh:'額外的'},
+  {l:'Y',e:'☀️',w:'Year',zh:'年'},{l:'Y',e:'😊',w:'Yes',zh:'是的'},
+  {l:'Z',e:'😴',w:'Zzz',zh:'睡著了'},
 ];
 const DEFAULT_HABITS=[{e:'🦷',t:'刷牙'},{e:'📚',t:'閱讀'},{e:'🥦',t:'吃蔬菜'},{e:'🛁',t:'洗澡'},{e:'😴',t:'早睡'},{e:'🏃',t:'運動'}];
 const REWARDS=[{e:'🍭',t:'糖果一顆',c:20},{e:'📱',t:'玩手機30分',c:50},{e:'🎬',t:'看卡通一集',c:40},{e:'🧸',t:'買新玩具',c:150},{e:'🍕',t:'吃披薩',c:80},{e:'🎮',t:'玩遊戲1小時',c:60}];
@@ -1013,6 +1109,7 @@ function setColor(el,c){
 }
 document.getElementById('drawSize').addEventListener('input',e=>drawSize=parseInt(e.target.value));
 function clearCanvas(){dctx.fillStyle='#1a1a2e';dctx.fillRect(0,0,600,300);}
+function fillCanvas(){const c=_diaryEraserMode?'#1a1a2e':drawColor;dctx.fillStyle=c;dctx.fillRect(0,0,600,300);}
 
 // DRAW FULLSCREEN
 let fullCtx=null,fullDrawing=false;
@@ -1034,6 +1131,7 @@ function openDrawFull(){
   fc.onmouseup=()=>fullDrawing=false;
 }
 function clearFullCanvas(){if(fullCtx){const fc=document.getElementById('fullCanvas');const W=fc.width/2,H=fc.height/2;fullCtx.fillStyle='#1a1a2e';fullCtx.fillRect(0,0,W,H);clearCanvas();}}
+function fillFullCanvas(){if(fullCtx){const fc=document.getElementById('fullCanvas');const W=fc.width/2,H=fc.height/2;const c=(drawColor==='#1a1a2e')?'#1a1a2e':drawColor;fullCtx.fillStyle=c;fullCtx.fillRect(0,0,W,H);dctx.fillStyle=c;dctx.fillRect(0,0,600,300);}}
 function closeDrawFull(){
   const fc=document.getElementById('fullCanvas');
   dctx.fillStyle='#1a1a2e';dctx.fillRect(0,0,600,300);
@@ -1171,6 +1269,7 @@ function setVColor(el,c){
   document.querySelectorAll('.vocab-draw-tools .color-dot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');
 }
 function clearVDraw(){if(vCtx){vCtx.fillStyle='#1a1a2e';vCtx.fillRect(0,0,600,200);}}
+function fillVDraw(){if(vCtx){const c=_vocabEraserMode?'#1a1a2e':vDrawColor;vCtx.fillStyle=c;vCtx.fillRect(0,0,600,200);}}
 
 function openVocabEditor(keepValues){
   const ed=document.getElementById('vocabEditor');ed.classList.add('open');
@@ -1660,6 +1759,7 @@ function openVDrawFull(){
   fc.onmouseup=()=>vFullDrawing=false;
 }
 function clearVFullCanvas(){if(vFullCtx){const fc=document.getElementById('vFullCanvas');vFullCtx.fillStyle='#1a1a2e';vFullCtx.fillRect(0,0,fc.width/2,fc.height/2);}}
+function fillVFullCanvas(){if(vFullCtx){const fc=document.getElementById('vFullCanvas');const c=_vocabEraserMode?'#1a1a2e':vDrawColor;vFullCtx.fillStyle=c;vFullCtx.fillRect(0,0,fc.width/2,fc.height/2);if(vCtx){vCtx.fillStyle=c;vCtx.fillRect(0,0,600,200);}}}
 function closeVDrawFull(){
   const fc=document.getElementById('vFullCanvas');
   if(vCtx&&fc){vCtx.fillStyle='#1a1a2e';vCtx.fillRect(0,0,600,200);try{vCtx.drawImage(fc,0,0,600,200);}catch(e){}}
