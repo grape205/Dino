@@ -89,6 +89,31 @@ body{
   animation:pulse .8s ease-in-out infinite;
 }
 @keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* WebView 警告框 */
+.webview-msg{
+  display:none;
+  background:rgba(255,193,7,.12);
+  border:1.5px solid rgba(255,193,7,.5);
+  border-radius:14px;
+  padding:18px 16px;
+  color:#ffe082;
+  font-size:.88rem;
+  line-height:1.6;
+  margin-bottom:14px;
+  text-align:left;
+}
+.webview-msg strong{display:block;font-size:1rem;margin-bottom:6px;color:#ffd54f}
+.copy-link-btn{
+  width:100%;margin-top:12px;
+  background:rgba(255,193,7,.2);
+  border:1.5px solid rgba(255,193,7,.5);
+  border-radius:10px;
+  padding:10px;
+  color:#ffd54f;
+  font-family:'Fredoka One',Arial,sans-serif;
+  font-size:.9rem;cursor:pointer;
+}
 </style>
 </head>
 <body>
@@ -99,6 +124,13 @@ body{
   <span class="dino">🦖</span>
   <div class="title">恐龍<em>學習</em>世界</div>
   <div class="subtitle">Dino Learning World 🌴</div>
+
+  <div class="webview-msg" id="webviewMsg">
+    <strong>⚠️ 無法在此瀏覽器登入</strong>
+    你目前是從 APP（LINE / Facebook 等）內開啟網頁，Google 不允許在這裡登入。<br><br>
+    請複製連結，用 <strong>Chrome</strong> 或 <strong>Safari</strong> 開啟後再登入。
+    <button class="copy-link-btn" onclick="copyLink()">📋 複製網頁連結</button>
+  </div>
 
   <button class="google-btn" id="loginBtn" onclick="loginGoogle()">
     <svg width="22" height="22" viewBox="0 0 48 48">
@@ -158,7 +190,18 @@ async function init(){
   // 沒登入就顯示登入頁（預設已顯示）
 }
 
+function isWebView(){
+  const ua=navigator.userAgent;
+  return /FBAN|FBAV|Instagram|Line\/|MicroMessenger|; wv\)/.test(ua)||
+    (/(iPhone|iPod|iPad)/.test(ua)&&!/Safari\//.test(ua)&&/AppleWebKit/.test(ua));
+}
+
 async function loginGoogle(){
+  if(isWebView()){
+    document.getElementById('webviewMsg').style.display='block';
+    document.getElementById('loginBtn').style.display='none';
+    return;
+  }
   document.getElementById('loginBtn').style.display='none';
   document.getElementById('skipBtn').style.display='none';
   document.getElementById('loading').style.display='block';
@@ -168,6 +211,16 @@ async function loginGoogle(){
       redirectTo:'https://grape205.github.io/Dino/index.html',
       queryParams:{prompt:'select_account'}
     }
+  });
+}
+
+function copyLink(){
+  navigator.clipboard.writeText(location.href).then(()=>{
+    const btn=document.querySelector('.copy-link-btn');
+    btn.textContent='✅ 已複製！';
+    setTimeout(()=>{btn.textContent='📋 複製網頁連結';},2000);
+  }).catch(()=>{
+    prompt('請複製此連結：',location.href);
   });
 }
 

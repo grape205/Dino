@@ -693,7 +693,18 @@ function setUser(u){
   loadVocabFromDB();
 }
 function clearUser(){currentUser=null;document.getElementById('loginPill').style.display='flex';document.getElementById('userPill').style.display='none';}
-async function loginGoogle(){await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:SITE_URL}});}
+function isWebView(){
+  const ua=navigator.userAgent;
+  return /FBAN|FBAV|Instagram|Line\/|MicroMessenger|; wv\)/.test(ua)||
+    (/(iPhone|iPod|iPad)/.test(ua)&&!/Safari\//.test(ua)&&/AppleWebKit/.test(ua));
+}
+async function loginGoogle(){
+  if(isWebView()){
+    showToast('⚠️ 請用 Chrome 或 Safari 開啟後再登入（不支援 APP 內瀏覽器）');
+    return;
+  }
+  await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:SITE_URL}});
+}
 function showLogin(){if(currentUser){showToast('已登入：'+(currentUser.user_metadata?.full_name||currentUser.email));return;}document.getElementById('loginOv').classList.add('open');}
 
 function showUserMenu(){
