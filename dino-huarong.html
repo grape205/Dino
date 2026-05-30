@@ -6,525 +6,457 @@
 <title>🦖 恐龍華容道</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:none}
-body{background:#1a3a1a;font-family:'Fredoka One',cursive;overflow:hidden;width:100vw;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{overflow:hidden;width:100vw;height:100vh;touch-action:none}
+body{background:#1a3a1a;font-family:'Fredoka One',cursive;display:flex;flex-direction:column;align-items:center}
 
-/* BG */
 .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 50% 0%,#2d5a27 0%,#1a3a1a 60%,#0d1f0d 100%)}
-.bg-deco{position:fixed;z-index:0;pointer-events:none;user-select:none}
-.sun{top:18px;right:18px;font-size:2.8rem;animation:sunPulse 3s ease-in-out infinite}
-.volcano{bottom:0;left:4%;font-size:5rem;opacity:.35}
-.volcano2{bottom:0;right:6%;font-size:4rem;opacity:.28}
-.tree1{bottom:0;left:18%;font-size:3.5rem;opacity:.45}
-.tree2{bottom:0;right:22%;font-size:3rem;opacity:.4}
-.cloud1{top:12px;left:10%;font-size:2.2rem;opacity:.6;animation:cloudDrift 8s ease-in-out infinite}
-.cloud2{top:28px;left:40%;font-size:1.6rem;opacity:.45;animation:cloudDrift 11s ease-in-out infinite reverse}
-.footprint{position:fixed;bottom:20px;font-size:1rem;opacity:.18;letter-spacing:24px}
-@keyframes sunPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
-@keyframes cloudDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(18px)}}
+.deco{position:fixed;z-index:0;pointer-events:none;user-select:none;font-size:3.5rem}
+.sun{top:10px;right:12px;font-size:2.6rem;animation:sP 3s ease-in-out infinite}
+.vol1{bottom:-6px;left:2%;opacity:.35}
+.vol2{bottom:-6px;right:4%;font-size:3rem;opacity:.3}
+.tr1{bottom:-4px;left:16%;font-size:3rem;opacity:.4}
+.tr2{bottom:-4px;right:20%;font-size:2.6rem;opacity:.35}
+.cl1{top:10px;left:8%;font-size:2rem;opacity:.55;animation:cD 9s ease-in-out infinite}
+.cl2{top:24px;left:38%;font-size:1.5rem;opacity:.4;animation:cD 13s ease-in-out infinite reverse}
+.fp{position:fixed;bottom:12px;left:0;right:0;text-align:center;font-size:.9rem;opacity:.14;letter-spacing:20px;z-index:0}
+@keyframes sP{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes cD{0%,100%{transform:translateX(0)}50%{transform:translateX(16px)}}
 
-/* Header */
-.header{position:relative;z-index:10;width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 14px 0;max-width:480px}
-.back-btn{background:rgba(0,0,0,.55);border:1.5px solid rgba(255,255,255,.25);border-radius:99px;padding:7px 15px;color:#fff;font-family:'Fredoka One',cursive;font-size:.82rem;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:5px}
-.level-pill{background:rgba(255,200,50,.18);border:1.5px solid #f59e0b;border-radius:99px;padding:5px 14px;color:#fde68a;font-size:.8rem}
-.stars-pill{background:rgba(255,255,100,.15);border:1.5px solid #fbbf24;border-radius:99px;padding:5px 12px;color:#fde68a;font-size:.85rem}
+.header{position:relative;z-index:10;width:100%;max-width:500px;display:flex;align-items:center;justify-content:space-between;padding:8px 12px 0}
+.back-btn{background:rgba(0,0,0,.55);border:1.5px solid rgba(255,255,255,.25);border-radius:99px;padding:7px 14px;color:#fff;font-family:'Fredoka One',cursive;font-size:.8rem;cursor:pointer;text-decoration:none}
+.pill{border-radius:99px;padding:5px 12px;font-size:.78rem;cursor:pointer}
+.lv-pill{background:rgba(255,200,50,.15);border:1.5px solid #f59e0b;color:#fde68a}
+.st-pill{background:rgba(255,255,100,.12);border:1.5px solid #fbbf24;color:#fde68a}
 
-/* Title */
-.game-title{position:relative;z-index:10;color:#fde68a;font-size:1.4rem;text-align:center;margin:4px 0 2px;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.title{position:relative;z-index:10;color:#fde68a;font-size:1.3rem;text-align:center;margin:3px 0 0;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.obj{position:relative;z-index:10;background:rgba(0,0,0,.38);border:1.5px solid rgba(255,200,50,.28);border-radius:10px;padding:4px 14px;color:#86efac;font-size:.73rem;text-align:center;margin:3px auto 0;max-width:320px}
+.mbar{position:relative;z-index:10;display:flex;gap:14px;align-items:center;justify-content:center;margin:3px 0;color:#d1fae5;font-size:.8rem}
+.mc{background:rgba(0,0,0,.38);border:1.5px solid rgba(74,222,128,.28);border-radius:99px;padding:2px 12px}
+.par-hint{opacity:.65;font-size:.72rem}
 
-/* Objective bar */
-.obj-bar{position:relative;z-index:10;background:rgba(0,0,0,.4);border:1.5px solid rgba(255,200,50,.3);border-radius:12px;padding:5px 14px;color:#86efac;font-size:.75rem;text-align:center;margin:2px auto 6px;max-width:320px}
+.bwrap{position:relative;z-index:10;margin:4px auto 0;display:flex;align-items:center;justify-content:center}
+.board{position:relative;border-radius:14px;border:3px solid rgba(255,255,255,.13);background:rgba(0,0,0,.32);box-shadow:0 8px 32px rgba(0,0,0,.55);overflow:visible}
 
-/* Board wrapper */
-.board-wrap{position:relative;z-index:10;display:flex;align-items:center;justify-content:center;margin:0 auto}
-.board{position:relative;border-radius:16px;border:3px solid rgba(255,255,255,.15);background:rgba(0,0,0,.35);overflow:visible;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.exit{position:absolute;right:-26px;color:#4ade80;font-size:1.5rem;pointer-events:none;animation:eP 1s ease-in-out infinite}
+@keyframes eP{0%,100%{transform:translateX(0);opacity:1}50%{transform:translateX(4px);opacity:.65}}
 
-/* Exit arrow */
-.exit-arrow{position:absolute;right:-28px;display:flex;align-items:center;color:#4ade80;font-size:1.6rem;animation:exitPulse 1.2s ease-in-out infinite;pointer-events:none}
-@keyframes exitPulse{0%,100%{transform:translateX(0);opacity:1}50%{transform:translateX(5px);opacity:.7}}
+.gl{position:absolute;background:rgba(255,255,255,.055);pointer-events:none}
 
-/* Grid lines */
-.grid-line{position:absolute;background:rgba(255,255,255,.06);pointer-events:none}
+.piece{position:absolute;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:grab;user-select:none;border:3px solid rgba(255,255,255,.32);box-shadow:0 4px 14px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.38);font-family:'Fredoka One',cursive;text-align:center;line-height:1.15;transition:box-shadow .08s}
+.piece.dragging{box-shadow:0 10px 28px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.38);cursor:grabbing;z-index:50!important}
+.pt{background:linear-gradient(145deg,#4ade80,#16a34a);color:#fff}
+.pb{background:linear-gradient(145deg,#a78bfa,#7c3aed);color:#fff}
+.pc{background:linear-gradient(145deg,#fb923c,#ea580c);color:#fff}
+.pr{background:linear-gradient(145deg,#f472b6,#db2777);color:#fff}
+.pe{background:linear-gradient(145deg,#94a3b8,#64748b);color:#ddd;cursor:not-allowed;border-color:rgba(255,255,255,.18)}
+.emoji{line-height:1}
+.name{font-size:.55rem;opacity:.88;letter-spacing:.3px}
 
-/* Pieces */
-.piece{position:absolute;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:grab;user-select:none;transition:box-shadow .1s;font-size:.68rem;text-align:center;line-height:1.2;font-family:'Fredoka One',cursive;border:3px solid rgba(255,255,255,.35);box-shadow:0 4px 12px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.4)}
-.piece:active{cursor:grabbing;box-shadow:0 8px 24px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.4)}
-.piece-trex{background:linear-gradient(145deg,#4ade80,#16a34a);color:#fff}
-.piece-tricera{background:linear-gradient(145deg,#fb923c,#ea580c);color:#fff}
-.piece-bronto{background:linear-gradient(145deg,#a78bfa,#7c3aed);color:#fff}
-.piece-raptor{background:linear-gradient(145deg,#f472b6,#db2777);color:#fff}
-.piece-egg{background:linear-gradient(145deg,#94a3b8,#64748b);color:#fff;cursor:not-allowed;border-color:rgba(255,255,255,.2)}
-.piece-label{font-size:1.9rem;line-height:1;margin-bottom:2px}
-.piece-name{font-size:.58rem;opacity:.9;letter-spacing:.5px}
-
-/* Win overlay */
-.win-ov{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);opacity:0;pointer-events:none;transition:opacity .4s}
-.win-ov.show{opacity:1;pointer-events:all}
-.win-box{background:linear-gradient(145deg,#14532d,#166534);border:3px solid #4ade80;border-radius:24px;padding:28px 32px;text-align:center;max-width:320px;width:90%;animation:winPop .5s cubic-bezier(.34,1.56,.64,1) both}
-@keyframes winPop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
-.win-dino{font-size:4.5rem;animation:winDance .5s ease-in-out infinite alternate}
-@keyframes winDance{from{transform:rotate(-8deg) scale(1)}to{transform:rotate(8deg) scale(1.1)}}
-.win-title{color:#bbf7d0;font-size:1.5rem;margin:8px 0 4px}
-.win-sub{color:#86efac;font-size:.9rem;margin-bottom:14px}
-.stars-row{font-size:2rem;letter-spacing:4px;margin-bottom:16px}
-.win-btn{background:linear-gradient(135deg,#4ade80,#16a34a);border:none;border-radius:99px;padding:12px 28px;color:#fff;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer;margin:4px 6px;transition:transform .15s}
-.win-btn:active{transform:scale(.95)}
-.win-btn.next{background:linear-gradient(135deg,#fbbf24,#f59e0b)}
+/* Win */
+.wov{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);opacity:0;pointer-events:none;transition:opacity .35s}
+.wov.show{opacity:1;pointer-events:all}
+.wbox{background:linear-gradient(145deg,#14532d,#166534);border:3px solid #4ade80;border-radius:22px;padding:26px 28px;text-align:center;max-width:300px;width:88%;animation:wP .45s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes wP{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.wdino{font-size:4rem;animation:wD .5s ease-in-out infinite alternate}
+@keyframes wD{from{transform:rotate(-8deg) scale(1)}to{transform:rotate(8deg) scale(1.1)}}
+.wt{color:#bbf7d0;font-size:1.4rem;margin:6px 0 2px}
+.ws{color:#86efac;font-size:.88rem;margin-bottom:10px}
+.wstars{font-size:1.9rem;letter-spacing:4px;margin-bottom:14px}
+.wbtn{background:linear-gradient(135deg,#4ade80,#16a34a);border:none;border-radius:99px;padding:11px 22px;color:#fff;font-family:'Fredoka One',cursive;font-size:.95rem;cursor:pointer;margin:4px 5px;touch-action:manipulation}
+.wbtn.next{background:linear-gradient(135deg,#fbbf24,#f59e0b)}
 
 /* Level select */
-.lvl-ov{position:fixed;inset:0;z-index:150;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75)}
-.lvl-box{background:linear-gradient(145deg,#1e3a5f,#1e3a8a);border:3px solid #60a5fa;border-radius:24px;padding:24px 20px;text-align:center;max-width:340px;width:92%}
-.lvl-title{color:#bfdbfe;font-size:1.3rem;margin-bottom:16px}
-.lvl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.lvl-btn{background:rgba(255,255,255,.1);border:2px solid rgba(100,180,255,.4);border-radius:14px;padding:14px 8px;cursor:pointer;color:#e0f2fe;font-family:'Fredoka One',cursive;transition:transform .15s,background .15s}
-.lvl-btn:hover,.lvl-btn:active{background:rgba(96,165,250,.25);transform:scale(.97)}
-.lvl-btn.unlocked{border-color:#4ade80}
-.lvl-btn.locked{opacity:.45;cursor:default}
-.lvl-icon{font-size:1.8rem;margin-bottom:4px}
-.lvl-name{font-size:.72rem}
-.lvl-stars{font-size:.85rem;letter-spacing:2px;min-height:1em}
+.lov{position:fixed;inset:0;z-index:150;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.78)}
+.lbox{background:linear-gradient(145deg,#1e3a5f,#1e3a8a);border:3px solid #60a5fa;border-radius:22px;padding:20px;text-align:center;max-width:340px;width:92%}
+.lbtitle{color:#bfdbfe;font-size:1.2rem;margin-bottom:14px}
+.lgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.lbtn{background:rgba(255,255,255,.08);border:2px solid rgba(100,180,255,.35);border-radius:12px;padding:12px 6px;cursor:pointer;color:#e0f2fe;font-family:'Fredoka One',cursive;transition:transform .12s,background .12s;touch-action:manipulation}
+.lbtn:active{transform:scale(.96);background:rgba(96,165,250,.22)}
+.lbtn.ok{border-color:#4ade80}
+.lbtn.locked{opacity:.38;cursor:default}
+.licon{font-size:1.7rem;margin-bottom:3px}
+.lname{font-size:.68rem}
+.lstars{font-size:.8rem;letter-spacing:2px;min-height:1em}
 
-/* Move counter */
-.move-bar{position:relative;z-index:10;display:flex;gap:16px;align-items:center;justify-content:center;margin:4px 0;color:#d1fae5;font-size:.82rem}
-.move-count{background:rgba(0,0,0,.4);border:1.5px solid rgba(74,222,128,.3);border-radius:99px;padding:3px 14px}
-
-/* Confetti */
-.confetti{position:fixed;top:0;left:0;pointer-events:none;z-index:300;width:100vw;height:100vh}
+.confcv{position:fixed;top:0;left:0;pointer-events:none;z-index:300;width:100vw;height:100vh}
 </style>
 </head>
 <body>
 
-<!-- BG -->
 <div class="bg"></div>
-<div class="bg-deco sun">☀️</div>
-<div class="bg-deco volcano">🌋</div>
-<div class="bg-deco volcano2">🌋</div>
-<div class="bg-deco tree1">🌴</div>
-<div class="bg-deco tree2">🌿</div>
-<div class="bg-deco cloud1">☁️</div>
-<div class="bg-deco cloud2">☁️</div>
-<div class="bg-deco footprint" style="bottom:16px;left:0;right:0;text-align:center">🦕🦕🦕🦕🦕🦕</div>
+<div class="deco sun">☀️</div>
+<div class="deco vol1">🌋</div>
+<div class="deco vol2">🌋</div>
+<div class="deco tr1">🌴</div>
+<div class="deco tr2">🌿</div>
+<div class="deco cl1">☁️</div>
+<div class="deco cl2">☁️</div>
+<div class="fp">🦕🦕🦕🦕🦕🦕🦕</div>
 
-<!-- Header -->
 <div class="header">
   <a href="dino-abc-final.html" class="back-btn">⬅️ 返回</a>
-  <span class="level-pill" id="levelPill">第 1 關</span>
-  <span class="stars-pill" id="starsPill">⭐ 0</span>
+  <span class="pill lv-pill" id="lvPill" onclick="openLvl()">第 1 關</span>
+  <span class="pill st-pill" id="stPill">⭐ 0</span>
+</div>
+<div class="title">🦖 恐龍華容道</div>
+<div class="obj">幫助小暴龍 🦖 往右滑出去！</div>
+<div class="mbar">
+  <span class="mc">步數：<b id="mn">0</b></span>
+  <span class="par-hint" id="ph"></span>
 </div>
 
-<div class="game-title">🦖 恐龍華容道</div>
-<div class="obj-bar" id="objBar">幫助小暴龍 🦖 往右滑出去！</div>
-<div class="move-bar"><span class="move-count">步數：<b id="moveNum">0</b></span><span id="parSpan" style="opacity:.7"></span></div>
-
-<!-- Board -->
-<div class="board-wrap">
+<div class="bwrap">
   <div class="board" id="board">
-    <div class="exit-arrow" id="exitArrow">➤</div>
+    <div class="exit" id="exitArr">➤</div>
   </div>
 </div>
 
-<!-- Win overlay -->
-<div class="win-ov" id="winOv">
-  <div class="win-box">
-    <div class="win-dino" id="winDino">🦖</div>
-    <div class="win-title">你好棒！</div>
-    <div class="win-sub">恐龍成功回家了！🏠</div>
-    <div class="stars-row" id="winStars">⭐⭐⭐</div>
-    <div>
-      <button class="win-btn" onclick="restartLevel()">🔄 再玩一次</button>
-      <button class="win-btn next" id="nextBtn" onclick="nextLevel()">下一關 ➤</button>
-    </div>
+<!-- Win -->
+<div class="wov" id="wov">
+  <div class="wbox">
+    <div class="wdino">🦖</div>
+    <div class="wt">你好棒！</div>
+    <div class="ws">恐龍成功回家了！🏠</div>
+    <div class="wstars" id="wstars">⭐⭐⭐</div>
+    <button class="wbtn" onclick="restartLv()">🔄 再玩</button>
+    <button class="wbtn next" id="nxtBtn" onclick="nextLv()">下一關 ➤</button>
   </div>
 </div>
 
-<!-- Level select overlay -->
-<div class="lvl-ov" id="lvlOv">
-  <div class="lvl-box">
-    <div class="lvl-title">🦕 選擇關卡</div>
-    <div class="lvl-grid" id="lvlGrid"></div>
-    <button class="win-btn" style="margin-top:14px;font-size:.85rem" onclick="closeLvlSelect()">關閉</button>
+<!-- Level select -->
+<div class="lov" id="lov">
+  <div class="lbox">
+    <div class="lbtitle">🦕 選擇關卡</div>
+    <div class="lgrid" id="lgrid"></div>
+    <button class="wbtn" style="margin-top:12px;font-size:.82rem" onclick="closeLvl()">關閉</button>
   </div>
 </div>
 
-<canvas class="confetti" id="confettiCanvas"></canvas>
+<canvas class="confcv" id="cv"></canvas>
 
 <script>
 // ── Audio ──
-const AC=new (window.AudioContext||window.webkitAudioContext)();
-function beep(freq,dur,type='sine',vol=0.18){
+let AC;
+function initAC(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();}
+function beep(f,d,t='sine',v=.15){
+  initAC();
   const o=AC.createOscillator(),g=AC.createGain();
   o.connect(g);g.connect(AC.destination);
-  o.frequency.value=freq;o.type=type;
-  g.gain.setValueAtTime(vol,AC.currentTime);
-  g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+dur);
-  o.start();o.stop(AC.currentTime+dur);
+  o.frequency.value=f;o.type=t;
+  g.gain.setValueAtTime(v,AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);
+  o.start();o.stop(AC.currentTime+d);
 }
-function sndMove(){beep(320,.08,'sine',.12);setTimeout(()=>beep(420,.08,'sine',.1),60)}
+function sndMove(){beep(300,.07,'sine',.1);setTimeout(()=>beep(400,.07,'sine',.08),55)}
+function sndBump(){beep(150,.09,'sawtooth',.07)}
 function sndWin(){
-  [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.18,'sine',.22),i*120));
-  setTimeout(()=>{[1047,1319,1568].forEach((f,i)=>setTimeout(()=>beep(f,.22,'sine',.25),i*100))},600);
+  [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.18,'sine',.2),i*110));
+  setTimeout(()=>[1047,1319,1568].forEach((f,i)=>setTimeout(()=>beep(f,.2,'sine',.22),i*90)),550);
 }
-function sndBlock(){beep(160,.1,'sawtooth',.08)}
 
-// ── Level definitions ──
-// Each piece: {id, type, row, col, len, dir:'H'|'V', emoji, name, cls}
-// dir H = moves left/right, V = moves up/down
-// Grid is COLS x ROWS (cols wide, rows tall)
-// trex: must reach col==COLS (exit right side), always H, row==exitRow
+// ── Levels ──
+// dir H = horizontal (moves left/right), V = vertical (moves up/down)
+// trex must reach col >= cols (exit right), always H, placed at exitRow
 const LEVELS=[
-  // Lv1: 4x4, 2 moves
+  // Lv1: 4×4, solution: Bronto down 2 → T-Rex exit  (2 moves)
   {cols:4,rows:4,exitRow:1,par:2,name:'小試身手',icon:'🥚',
    pieces:[
-    {id:'trex',type:'trex',row:1,col:0,len:2,dir:'H',emoji:'🦖',name:'小暴龍',cls:'piece-trex'},
-    {id:'b1',type:'bronto',row:0,col:2,len:2,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
-    {id:'r1',type:'raptor',row:2,col:2,len:1,dir:'V',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
-    {id:'e1',type:'egg',row:3,col:0,len:1,dir:'H',emoji:'🥚',name:'恐龍蛋',cls:'piece-egg'},
+    {id:'tx',type:'t',row:1,col:0,len:2,dir:'H',em:'🦖',nm:'小暴龍',cs:'pt'},
+    {id:'b1',type:'b',row:0,col:2,len:2,dir:'V',em:'🦕',nm:'腕龍',  cs:'pb'},
+    {id:'e1',type:'e',row:3,col:3,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
    ]},
-  // Lv2: 4x4, 3 moves
-  {cols:4,rows:4,exitRow:2,par:3,name:'暖身一下',icon:'🦎',
+  // Lv2: 4×4, solution: Tricera left → Bronto down 2 → T-Rex exit  (3 moves)
+  {cols:4,rows:4,exitRow:1,par:3,name:'暖身一下',icon:'🦎',
    pieces:[
-    {id:'trex',type:'trex',row:2,col:0,len:2,dir:'H',emoji:'🦖',name:'小暴龍',cls:'piece-trex'},
-    {id:'b1',type:'bronto',row:0,col:2,len:3,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
-    {id:'r1',type:'raptor',row:2,col:3,len:2,dir:'V',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
-    {id:'t1',type:'tricera',row:0,col:0,len:2,dir:'H',emoji:'🐊',name:'三角龍',cls:'piece-tricera'},
+    {id:'tx',type:'t',row:1,col:0,len:2,dir:'H',em:'🦖',nm:'小暴龍',cs:'pt'},
+    {id:'b1',type:'b',row:0,col:2,len:2,dir:'V',em:'🦕',nm:'腕龍',  cs:'pb'},
+    {id:'c1',type:'c',row:2,col:2,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
+    {id:'e1',type:'e',row:3,col:0,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
    ]},
-  // Lv3: 5x5, 4 moves
-  {cols:5,rows:5,exitRow:2,par:4,name:'加油前進',icon:'🦕',
+  // Lv3: 5×5, solution: Raptor down → Bronto down 2 → T-Rex exit  (3 moves, par 3)
+  {cols:5,rows:5,exitRow:2,par:3,name:'加油前進',icon:'🦕',
    pieces:[
-    {id:'trex',type:'trex',row:2,col:0,len:2,dir:'H',emoji:'🦖',name:'小暴龍',cls:'piece-trex'},
-    {id:'b1',type:'bronto',row:0,col:2,len:3,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
-    {id:'t1',type:'tricera',row:2,col:3,len:2,dir:'H',emoji:'🐊',name:'三角龍',cls:'piece-tricera'},
-    {id:'r1',type:'raptor',row:0,col:3,len:2,dir:'V',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
-    {id:'e1',type:'egg',row:4,col:1,len:1,dir:'H',emoji:'🥚',name:'恐龍蛋',cls:'piece-egg'},
+    {id:'tx',type:'t',row:2,col:0,len:2,dir:'H',em:'🦖',nm:'小暴龍',cs:'pt'},
+    {id:'b1',type:'b',row:0,col:2,len:2,dir:'V',em:'🦕',nm:'腕龍',  cs:'pb'},
+    {id:'r1',type:'r',row:3,col:2,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'c1',type:'c',row:2,col:3,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
+    {id:'e1',type:'e',row:0,col:0,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
    ]},
-  // Lv4: 5x5, 5 moves
-  {cols:5,rows:5,exitRow:1,par:5,name:'勇敢挑戰',icon:'🐊',
+  // Lv4: 5×5, solution: Raptor2 down → Bronto right col clear → Raptor up → T-Rex exit (4 moves)
+  {cols:5,rows:5,exitRow:1,par:4,name:'勇敢挑戰',icon:'🐊',
    pieces:[
-    {id:'trex',type:'trex',row:1,col:0,len:2,dir:'H',emoji:'🦖',name:'小暴龍',cls:'piece-trex'},
-    {id:'b1',type:'bronto',row:0,col:2,len:3,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
-    {id:'t1',type:'tricera',row:1,col:3,len:2,dir:'V',emoji:'🐊',name:'三角龍',cls:'piece-tricera'},
-    {id:'r1',type:'raptor',row:3,col:0,len:2,dir:'H',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
-    {id:'r2',type:'raptor',row:4,col:2,len:2,dir:'H',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
-    {id:'e1',type:'egg',row:0,col:0,len:1,dir:'H',emoji:'🥚',name:'恐龍蛋',cls:'piece-egg'},
+    {id:'tx',type:'t',row:1,col:0,len:2,dir:'H',em:'🦖',nm:'小暴龍',cs:'pt'},
+    {id:'b1',type:'b',row:0,col:2,len:3,dir:'V',em:'🦕',nm:'腕龍',  cs:'pb'},
+    {id:'r1',type:'r',row:3,col:2,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'c1',type:'c',row:3,col:0,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
+    {id:'e1',type:'e',row:4,col:4,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
    ]},
-  // Lv5: 5x5, 6 moves
-  {cols:5,rows:5,exitRow:2,par:6,name:'超級高手',icon:'🦖',
+  // Lv5: 5×5, 5-step challenge
+  {cols:5,rows:5,exitRow:2,par:5,name:'超級高手',icon:'🦖',
    pieces:[
-    {id:'trex',type:'trex',row:2,col:0,len:2,dir:'H',emoji:'🦖',name:'小暴龍',cls:'piece-trex'},
-    {id:'b1',type:'bronto',row:0,col:2,len:2,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
-    {id:'b2',type:'bronto',row:2,col:3,len:3,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
-    {id:'t1',type:'tricera',row:0,col:3,len:2,dir:'H',emoji:'🐊',name:'三角龍',cls:'piece-tricera'},
-    {id:'r1',type:'raptor',row:3,col:0,len:2,dir:'H',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
-    {id:'r2',type:'raptor',row:4,col:1,len:2,dir:'H',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
+    {id:'tx',type:'t',row:2,col:0,len:2,dir:'H',em:'🦖',nm:'小暴龍',cs:'pt'},
+    {id:'b1',type:'b',row:0,col:2,len:2,dir:'V',em:'🦕',nm:'腕龍',  cs:'pb'},
+    {id:'b2',type:'b',row:3,col:2,len:2,dir:'V',em:'🦕',nm:'腕龍',  cs:'pb'},
+    {id:'c1',type:'c',row:2,col:2,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
+    {id:'r1',type:'r',row:0,col:3,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'e1',type:'e',row:4,col:0,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
    ]},
-  // Lv6: 6x6, 7 moves
-  {cols:6,rows:6,exitRow:2,par:7,name:'恐龍勇士',icon:'⭐',
+  // Lv6: 6×6, 6-step challenge
+  {cols:6,rows:6,exitRow:2,par:6,name:'恐龍勇士',icon:'⭐',
    pieces:[
-    {id:'trex',type:'trex',row:2,col:0,len:2,dir:'H',emoji:'🦖',name:'小暴龍',cls:'piece-trex'},
-    {id:'b1',type:'bronto',row:0,col:2,len:3,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
-    {id:'b2',type:'bronto',row:2,col:4,len:3,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
-    {id:'t1',type:'tricera',row:0,col:3,len:2,dir:'H',emoji:'🐊',name:'三角龍',cls:'piece-tricera'},
-    {id:'t2',type:'tricera',row:2,col:2,len:2,dir:'H',emoji:'🐊',name:'三角龍',cls:'piece-tricera'},
-    {id:'r1',type:'raptor',row:4,col:0,len:2,dir:'H',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
-    {id:'e1',type:'egg',row:5,col:3,len:1,dir:'H',emoji:'🥚',name:'恐龍蛋',cls:'piece-egg'},
+    {id:'tx',type:'t',row:2,col:0,len:2,dir:'H',em:'🦖',nm:'小暴龍',cs:'pt'},
+    {id:'b1',type:'b',row:0,col:2,len:3,dir:'V',em:'🦕',nm:'腕龍',  cs:'pb'},
+    {id:'b2',type:'b',row:3,col:4,len:3,dir:'V',em:'🦕',nm:'腕龍',  cs:'pb'},
+    {id:'c1',type:'c',row:2,col:3,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
+    {id:'r1',type:'r',row:3,col:2,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'r2',type:'r',row:0,col:4,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'e1',type:'e',row:5,col:1,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
    ]},
 ];
 
-let currentLevel=0;
-let pieces=[];// deep copy of level pieces (mutable state)
-let moves=0;
-let totalStars=JSON.parse(localStorage.getItem('huarong_stars')||'[]');// array of stars per level
+let curLv=0, moves=0, CELL=60;
+let pieces=[];
+let totalStars=JSON.parse(localStorage.getItem('hr_stars')||'[]');
 
-const CELL=Math.min(Math.floor((window.innerWidth*.92)/6),72);// cell px, max 72
+// ── Global drag state ──
+// Attached once to document; pieces just set this on pointerdown
+let drag=null;
 
-// ── Render board ──
-function renderBoard(){
-  const lv=LEVELS[currentLevel];
-  const board=document.getElementById('board');
-  const bw=lv.cols*CELL, bh=lv.rows*CELL;
-  board.style.width=bw+'px';board.style.height=bh+'px';
+document.addEventListener('pointermove', onPtrMove);
+document.addEventListener('pointerup',   onPtrUp);
+document.addEventListener('pointercancel', ()=>{ if(drag){cancelDrag();}});
 
-  // Exit arrow position
-  const ea=document.getElementById('exitArrow');
-  ea.style.top=(lv.exitRow*CELL+(CELL-32)/2)+'px';
-
-  // Clear pieces (keep exit arrow)
-  [...board.querySelectorAll('.piece,.grid-line')].forEach(e=>e.remove());
-
-  // Grid lines
-  for(let r=1;r<lv.rows;r++){
-    const l=document.createElement('div');
-    l.className='grid-line';l.style.cssText=`left:0;right:0;top:${r*CELL}px;height:1px`;
-    board.appendChild(l);
+function onPtrMove(e){
+  if(!drag) return;
+  e.preventDefault();
+  const {p,el,x0,y0,c0,r0,maxL,maxR,maxU,maxD}=drag;
+  if(p.dir==='H'){
+    const dx=e.clientX-x0;
+    const lo=-maxL*CELL, hi=(maxR+(p.type==='t'?1:0))*CELL;
+    const clamped=Math.max(lo,Math.min(hi,dx));
+    el.style.left=(c0*CELL+3+clamped)+'px';
+  }else{
+    const dy=e.clientY-y0;
+    const lo=-maxU*CELL, hi=maxD*CELL;
+    const clamped=Math.max(lo,Math.min(hi,dy));
+    el.style.top=(r0*CELL+3+clamped)+'px';
   }
-  for(let c=1;c<lv.cols;c++){
-    const l=document.createElement('div');
-    l.className='grid-line';l.style.cssText=`top:0;bottom:0;left:${c*CELL}px;width:1px`;
-    board.appendChild(l);
-  }
-
-  // Pieces
-  pieces.forEach(p=>renderPiece(p));
 }
 
-function renderPiece(p){
-  const board=document.getElementById('board');
-  let el=document.getElementById('piece-'+p.id);
-  if(!el){
-    el=document.createElement('div');
-    el.className='piece '+p.cls;
-    el.id='piece-'+p.id;
-    el.innerHTML=`<div class="piece-label">${p.emoji}</div><div class="piece-name">${p.name}</div>`;
-    board.appendChild(el);
-    if(p.type!=='egg') setupDrag(el,p);
+function onPtrUp(e){
+  if(!drag) return;
+  e.preventDefault();
+  const saved=drag; drag=null;
+  const {p,el,x0,y0,c0,r0,maxL,maxR,maxU,maxD}=saved;
+  el.classList.remove('dragging');
+  el.releasePointerCapture&&el.releasePointerCapture(saved.pid);
+
+  const dx=e.clientX-x0, dy=e.clientY-y0;
+  let steps=0;
+  if(p.dir==='H'){
+    const raw=dx/CELL;
+    if(raw>0) steps=Math.min(Math.round(raw), maxR+(p.type==='t'?1:0));
+    else       steps=Math.max(Math.round(raw),-maxL);
+  }else{
+    const raw=dy/CELL;
+    if(raw>0) steps=Math.min(Math.round(raw),maxD);
+    else       steps=Math.max(Math.round(raw),-maxU);
   }
-  const pw=p.dir==='H'?p.len*CELL-6:CELL-6;
-  const ph=p.dir==='V'?p.len*CELL-6:CELL-6;
-  el.style.cssText=`left:${p.col*CELL+3}px;top:${p.row*CELL+3}px;width:${pw}px;height:${ph}px;${el.style.cssText.includes('transition')?'':''}`;
-  // emoji size by piece size
-  el.querySelector('.piece-label').style.fontSize=p.len>=3?'2.4rem':p.len===2?'1.9rem':'1.4rem';
+  p.col=c0; p.row=r0;
+  if(steps!==0) commitMove(p,steps);
+  else{ renderPiece(p); sndBump(); }
+}
+
+function cancelDrag(){
+  if(!drag)return;
+  const {p,el,c0,r0}=drag; drag=null;
+  el.classList.remove('dragging');
+  p.col=c0; p.row=r0; renderPiece(p);
+}
+
+// ── Drag start ──
+function setupPiece(el,p){
+  if(p.type==='e') return;
+  el.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    initAC();
+    // pre-compute max moves before drag starts (grid is current)
+    const mL=calcMax(p,-1), mR=calcMax(p,1);
+    drag={p,el,x0:e.clientX,y0:e.clientY,c0:p.col,r0:p.row,
+          maxL:mL,maxR:mR,maxU:mL,maxD:mR,pid:e.pointerId};
+    el.setPointerCapture(e.pointerId);
+    el.classList.add('dragging');
+  });
 }
 
 // ── Grid occupancy ──
 function buildGrid(){
-  const lv=LEVELS[currentLevel];
-  const grid=Array.from({length:lv.rows},()=>Array(lv.cols).fill(null));
+  const lv=LEVELS[curLv];
+  const g=Array.from({length:lv.rows},()=>Array(lv.cols).fill(null));
   pieces.forEach(p=>{
     for(let i=0;i<p.len;i++){
       const r=p.dir==='V'?p.row+i:p.row;
       const c=p.dir==='H'?p.col+i:p.col;
-      if(r>=0&&r<lv.rows&&c>=0&&c<lv.cols) grid[r][c]=p.id;
+      if(r>=0&&r<lv.rows&&c>=0&&c<lv.cols) g[r][c]=p.id;
     }
   });
-  return grid;
+  return g;
 }
 
-function maxMove(p,dir){// dir: -1 or +1
-  const grid=buildGrid();
-  const lv=LEVELS[currentLevel];
-  let steps=0;
+function calcMax(p,dir){
+  const g=buildGrid();
+  const lv=LEVELS[curLv];
+  let s=0;
   if(p.dir==='H'){
-    if(dir<0){// left
-      let c=p.col-1;
-      while(c>=0&&!grid[p.row][c]){steps++;c--;}
-    }else{// right
-      let c=p.col+p.len;
-      while(c<lv.cols&&!grid[p.row][c]){steps++;c++;}
-      // trex: can exit
-      if(p.type==='trex'&&c>=lv.cols) steps++;
-    }
+    if(dir<0){let c=p.col-1;    while(c>=0&&!g[p.row][c]){s++;c--;}}
+    else      {let c=p.col+p.len;while(c<lv.cols&&!g[p.row][c]){s++;c++;}
+               if(p.type==='t'&&c>=lv.cols)s++;}
   }else{
-    if(dir<0){// up
-      let r=p.row-1;
-      while(r>=0&&!grid[r][p.col]){steps++;r--;}
-    }else{// down
-      let r=p.row+p.len;
-      while(r<lv.rows&&!grid[r][p.col]){steps++;r++;}
-    }
+    if(dir<0){let r=p.row-1;    while(r>=0&&!g[r][p.col]){s++;r--;}}
+    else      {let r=p.row+p.len;while(r<lv.rows&&!g[r][p.col]){s++;r++;}}
   }
-  return steps;
+  return s;
 }
 
-function moveBy(p,steps){
-  if(steps===0)return false;
-  if(p.dir==='H') p.col+=steps;
-  else p.row+=steps;
+function commitMove(p,steps){
+  if(p.dir==='H') p.col+=steps; else p.row+=steps;
   moves++;
-  document.getElementById('moveNum').textContent=moves;
+  document.getElementById('mn').textContent=moves;
   sndMove();
   renderPiece(p);
-  // Check win
-  const lv=LEVELS[currentLevel];
-  if(p.type==='trex'&&p.col>=lv.cols){
-    setTimeout(triggerWin,250);
-  }
-  return true;
+  // win: trex's right edge past grid boundary
+  const lv=LEVELS[curLv];
+  if(p.type==='t'&&p.col+p.len>lv.cols) setTimeout(triggerWin,200);
 }
 
-// ── Drag ──
-function setupDrag(el,p){
-  let startX,startY,startCol,startRow,dragging=false,moved=false;
+// ── Render ──
+function calcCELL(){
+  const lv=LEVELS[curLv];
+  const maxW=Math.floor(window.innerWidth*.88/lv.cols);
+  const availH=window.innerHeight-190;
+  const maxH=Math.floor(availH/lv.rows);
+  return Math.min(maxW,maxH,76);
+}
 
-  function onDown(ex,ey){
-    if(AC.state==='suspended')AC.resume();
-    startX=ex;startY=ey;startCol=p.col;startRow=p.row;dragging=true;moved=false;
+function renderBoard(){
+  const lv=LEVELS[curLv];
+  CELL=calcCELL();
+  const board=document.getElementById('board');
+  board.style.width=lv.cols*CELL+'px';
+  board.style.height=lv.rows*CELL+'px';
+  // exit arrow
+  const ea=document.getElementById('exitArr');
+  ea.style.top=(lv.exitRow*CELL+(CELL-26)/2)+'px';
+  // clear old pieces + grid lines
+  [...board.querySelectorAll('.piece,.gl')].forEach(e=>e.remove());
+  // grid lines
+  for(let r=1;r<lv.rows;r++){
+    const l=document.createElement('div');
+    l.className='gl';l.style.cssText=`left:0;right:0;top:${r*CELL}px;height:1px`;
+    board.appendChild(l);
   }
-  function onMove(ex,ey){
-    if(!dragging)return;
-    const dx=ex-startX,dy=ey-startY;
-    const lv=LEVELS[currentLevel];
-    if(p.dir==='H'){
-      const raw=dx/CELL;
-      const dir=raw>0?1:-1;
-      const maxS=maxMove(p,dir);
-      const clampedSteps=Math.max(0,Math.min(Math.abs(raw),maxS));
-      const newCol=startCol+Math.round(raw<0?-clampedSteps:clampedSteps);
-      const pw=p.len*CELL-6;
-      const bw=lv.cols*CELL;
-      // visual: allow sliding beyond right for trex exit
-      const visualLeft=Math.min(newCol*CELL+3,p.type==='trex'?bw:bw-pw-3);
-      el.style.left=Math.max(3,visualLeft)+'px';
-    }else{
-      const raw=dy/CELL;
-      const dir=raw>0?1:-1;
-      const maxS=maxMove(p,dir);
-      const clampedSteps=Math.max(0,Math.min(Math.abs(raw),maxS));
-      const newRow=startRow+Math.round(raw<0?-clampedSteps:clampedSteps);
-      const ph=p.len*CELL-6;
-      const bh=lv.rows*CELL;
-      el.style.top=Math.max(3,Math.min(newRow*CELL+3,bh-ph-3))+'px';
-    }
-    moved=true;
+  for(let c=1;c<lv.cols;c++){
+    const l=document.createElement('div');
+    l.className='gl';l.style.cssText=`top:0;bottom:0;left:${c*CELL}px;width:1px`;
+    board.appendChild(l);
   }
-  function onUp(ex,ey){
-    if(!dragging)return;dragging=false;
-    if(!moved){sndBlock();return;}
-    const dx=ex-startX,dy=ey-startY;
-    if(p.dir==='H'){
-      const raw=dx/CELL;
-      const dir=raw>0?1:-1;
-      const maxS=maxMove(p,dir);
-      const steps=Math.min(Math.round(Math.abs(raw)),maxS)*(raw<0?-1:1);
-      p.col=startCol;// reset, moveBy will update
-      if(steps!==0){
-        p.col=startCol;
-        moveBy(p,steps);
-      }else{
-        p.col=startCol;
-        renderPiece(p);
-        sndBlock();
-      }
-    }else{
-      const raw=dy/CELL;
-      const dir=raw>0?1:-1;
-      const maxS=maxMove(p,dir);
-      const steps=Math.min(Math.round(Math.abs(raw)),maxS)*(raw<0?-1:1);
-      p.row=startRow;
-      if(steps!==0){
-        moveBy(p,steps);
-      }else{
-        p.row=startRow;
-        renderPiece(p);
-        sndBlock();
-      }
-    }
-  }
+  pieces.forEach(p=>{
+    const el=document.createElement('div');
+    el.className='piece '+p.cs;
+    el.id='pc-'+p.id;
+    const ems=p.len>=3?'2.2rem':p.len===2?'1.8rem':'1.3rem';
+    el.innerHTML=`<div class="emoji" style="font-size:${ems}">${p.em}</div><div class="name">${p.nm}</div>`;
+    board.appendChild(el);
+    setupPiece(el,p);
+    renderPiece(p);
+  });
+}
 
-  el.addEventListener('mousedown',e=>{e.preventDefault();onDown(e.clientX,e.clientY)});
-  window.addEventListener('mousemove',e=>{if(dragging)onMove(e.clientX,e.clientY)});
-  window.addEventListener('mouseup',e=>{if(dragging)onUp(e.clientX,e.clientY)});
-  el.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];onDown(t.clientX,t.clientY)},{passive:false});
-  el.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];onMove(t.clientX,t.clientY)},{passive:false});
-  el.addEventListener('touchend',e=>{e.preventDefault();const t=e.changedTouches[0];onUp(t.clientX,t.clientY)},{passive:false});
+function renderPiece(p){
+  const el=document.getElementById('pc-'+p.id);
+  if(!el)return;
+  const pw=p.dir==='H'?p.len*CELL-6:CELL-6;
+  const ph=p.dir==='V'?p.len*CELL-6:CELL-6;
+  el.style.left=p.col*CELL+3+'px';
+  el.style.top= p.row*CELL+3+'px';
+  el.style.width=pw+'px';
+  el.style.height=ph+'px';
 }
 
 // ── Win ──
 function triggerWin(){
   sndWin();
-  const lv=LEVELS[currentLevel];
+  const lv=LEVELS[curLv];
   const stars=moves<=lv.par?3:moves<=lv.par+2?2:1;
-  if(!totalStars[currentLevel]||totalStars[currentLevel]<stars){
-    totalStars[currentLevel]=stars;
-    localStorage.setItem('huarong_stars',JSON.stringify(totalStars));
-  }
-  document.getElementById('winStars').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
-  document.getElementById('starsPill').textContent='⭐ '+totalStars.reduce((a,b)=>a+(b||0),0);
-  document.getElementById('winOv').classList.add('show');
-  document.getElementById('nextBtn').style.display=currentLevel<LEVELS.length-1?'':'none';
-  launchConfetti();
-  // Try save score to leaderboard
-  saveHuarongScore(stars*(10-currentLevel));
+  if(!(totalStars[curLv]>=stars)){totalStars[curLv]=stars;localStorage.setItem('hr_stars',JSON.stringify(totalStars));}
+  document.getElementById('stPill').textContent='⭐ '+totalStars.reduce((a,b)=>a+(b||0),0);
+  document.getElementById('wstars').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
+  document.getElementById('nxtBtn').style.display=curLv<LEVELS.length-1?'':'none';
+  document.getElementById('wov').classList.add('show');
+  confetti();
+  trySaveScore(stars*(10-curLv));
 }
-
-async function saveHuarongScore(sc){
+async function trySaveScore(sc){
   try{
-    const sb=window._sb;
-    const user=window._currentUser;
-    if(!sb||!user)return;
-    await sb.from('leaderboard').insert({player_name:user.user_metadata?.full_name||user.email,game:'huarong',score:sc,user_id:user.id});
-  }catch(e){}
+    const sb=window._sb||window.supabase;
+    const u=window._currentUser;
+    if(!sb||!u)return;
+    await sb.from('leaderboard').insert({player_name:u.user_metadata?.full_name||u.email,game:'huarong',score:sc,user_id:u.id});
+  }catch(_){}
 }
 
-function restartLevel(){
-  document.getElementById('winOv').classList.remove('show');
-  loadLevel(currentLevel);
-}
-function nextLevel(){
-  document.getElementById('winOv').classList.remove('show');
-  if(currentLevel<LEVELS.length-1)loadLevel(currentLevel+1);
-}
-
-// ── Load level ──
-function loadLevel(idx){
-  currentLevel=idx;
-  moves=0;
-  document.getElementById('moveNum').textContent=0;
-  const lv=LEVELS[idx];
-  document.getElementById('levelPill').textContent='第 '+(idx+1)+' 關';
-  document.getElementById('parSpan').textContent='目標：'+lv.par+'步以內 ⭐⭐⭐';
-  document.getElementById('objBar').textContent='幫助小暴龍 🦖 往右滑出去！';
-  // deep copy pieces
-  pieces=lv.pieces.map(p=>({...p}));
-  renderBoard();
-}
+function restartLv(){document.getElementById('wov').classList.remove('show');loadLevel(curLv);}
+function nextLv(){document.getElementById('wov').classList.remove('show');if(curLv<LEVELS.length-1)loadLevel(curLv+1);}
 
 // ── Level select ──
-function openLvlSelect(){
-  const g=document.getElementById('lvlGrid');
+function openLvl(){
+  const g=document.getElementById('lgrid');
   g.innerHTML='';
   LEVELS.forEach((lv,i)=>{
     const s=totalStars[i]||0;
-    const unlocked=i===0||totalStars[i-1]>0;
-    const btn=document.createElement('div');
-    btn.className='lvl-btn'+(unlocked?' unlocked':' locked');
-    btn.innerHTML=`<div class="lvl-icon">${lv.icon}</div><div class="lvl-name">第${i+1}關<br>${lv.name}</div><div class="lvl-stars">${s?'⭐'.repeat(s)+'☆'.repeat(3-s):'☆☆☆'}</div>`;
-    if(unlocked) btn.onclick=()=>{closeLvlSelect();loadLevel(i)};
-    g.appendChild(btn);
+    const unlocked=i===0||(totalStars[i-1]||0)>0;
+    const d=document.createElement('div');
+    d.className='lbtn'+(unlocked?' ok':' locked');
+    d.innerHTML=`<div class="licon">${lv.icon}</div><div class="lname">第${i+1}關<br>${lv.name}</div><div class="lstars">${s?'⭐'.repeat(s)+'☆'.repeat(3-s):'☆☆☆'}</div>`;
+    if(unlocked) d.onclick=()=>{closeLvl();loadLevel(i);};
+    g.appendChild(d);
   });
-  document.getElementById('lvlOv').style.display='flex';
+  document.getElementById('lov').style.display='flex';
 }
-function closeLvlSelect(){document.getElementById('lvlOv').style.display='none'}
+function closeLvl(){document.getElementById('lov').style.display='none';}
+
+// ── Load level ──
+function loadLevel(idx){
+  curLv=idx; moves=0;
+  document.getElementById('mn').textContent=0;
+  document.getElementById('lvPill').textContent='第 '+(idx+1)+' 關';
+  document.getElementById('ph').textContent='目標：'+LEVELS[idx].par+'步以內 ⭐⭐⭐';
+  pieces=LEVELS[idx].pieces.map(p=>({...p}));
+  renderBoard();
+}
 
 // ── Confetti ──
-function launchConfetti(){
-  const cv=document.getElementById('confettiCanvas');
+function confetti(){
+  const cv=document.getElementById('cv');
   cv.width=window.innerWidth;cv.height=window.innerHeight;
   const ctx=cv.getContext('2d');
   const colors=['#4ade80','#fbbf24','#f472b6','#60a5fa','#a78bfa','#fb923c'];
-  const parts=Array.from({length:80},()=>({
-    x:Math.random()*cv.width,y:-20,
-    vx:(Math.random()-.5)*4,vy:Math.random()*4+2,
-    r:Math.random()*8+4,
-    color:colors[Math.floor(Math.random()*colors.length)],
-    rot:Math.random()*360,vrot:(Math.random()-.5)*8
+  const pts=Array.from({length:75},()=>({
+    x:Math.random()*cv.width,y:-16,
+    vx:(Math.random()-.5)*3.5,vy:Math.random()*3.5+1.5,
+    r:Math.random()*7+3,c:colors[Math.random()*colors.length|0],rot:Math.random()*360,vr:(Math.random()-.5)*7
   }));
-  let frame=0;
-  function draw(){
+  let f=0;
+  (function draw(){
     ctx.clearRect(0,0,cv.width,cv.height);
-    parts.forEach(p=>{
-      p.x+=p.vx;p.y+=p.vy;p.rot+=p.vrot;
-      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
-      ctx.fillStyle=p.color;ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r);
-      ctx.restore();
-    });
-    frame++;
-    if(frame<90)requestAnimationFrame(draw);
-    else ctx.clearRect(0,0,cv.width,cv.height);
-  }
-  draw();
+    pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle=p.c;ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r);ctx.restore();});
+    if(++f<100)requestAnimationFrame(draw); else ctx.clearRect(0,0,cv.width,cv.height);
+  })();
 }
 
-// ── Supabase bridge (use parent page's sb if available) ──
-// Injected by dino-abc-final when opening via iframe or same session
-// Standalone: try to get from localStorage user
-try{
-  const u=JSON.parse(localStorage.getItem('sb_user')||'null');
-  if(u){window._currentUser=u;}
-}catch(e){}
-
 // ── Init ──
-document.getElementById('starsPill').textContent='⭐ '+totalStars.reduce((a,b)=>a+(b||0),0);
-document.getElementById('levelPill').addEventListener('click',openLvlSelect);
+document.getElementById('stPill').textContent='⭐ '+totalStars.reduce((a,b)=>a+(b||0),0);
 loadLevel(0);
 </script>
 </body>
