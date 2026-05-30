@@ -174,44 +174,70 @@ const LEVELS=[
     {id:'c1',type:'c',row:2,col:2,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
     {id:'e1',type:'e',row:3,col:0,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
    ]},
-  // Lv3: 5×5, solution: Raptor down → Bronto down 2 → T-Rex exit  (3 moves, par 3)
+  // Lv3: 5×5 (exitRow=2, par=3)
+  // 解法: 三角龍左移2 → 迅猛龍上移2 → 小暴龍出關
+  // 格局:  . . C C .   C=三角龍(H,r0,c2,len2) 擋住A往上
+  //        . . . . .
+  //        T T A . .  →出口  A=迅猛龍(V,r2,c2,len2) 擋住暴龍
+  //        . . A . .
+  //        . . E . .   E=恐龍蛋(固定) 擋住A往下
   {cols:5,rows:5,exitRow:2,par:3,name:'加油前進',icon:'🦕',
    pieces:[
     {id:'tx',type:'t',row:2,col:0,len:2,dir:'H',em:'🦖',nm:'小暴龍',cs:'pt'},
-    {id:'b1',type:'b',row:0,col:2,len:2,dir:'V',em:'🦕',nm:'腕龍',  cs:'pb'},
-    {id:'r1',type:'r',row:3,col:2,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
-    {id:'c1',type:'c',row:2,col:3,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
-    {id:'e1',type:'e',row:0,col:0,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
+    {id:'r1',type:'r',row:2,col:2,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'c1',type:'c',row:0,col:2,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
+    {id:'e1',type:'e',row:4,col:2,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
    ]},
-  // Lv4: 5×5, solution: Raptor2 down → Bronto right col clear → Raptor up → T-Rex exit (4 moves)
+  // Lv4: 5×5 (exitRow=1, par=4)
+  // 解法: 迅猛龍D上移2 → 三角龍B右移2 → 迅猛龍A下移2 → 小暴龍出關
+  // 格局:  . . A . .   A=迅猛龍(V,r0,c2,len2) 擋第1排col2
+  //        T T A . .  →出口
+  //        E B B D .   E=蛋固定; B=三角龍(H,r2,c1,len2); D=迅猛龍(V,r2,c3,len2)
+  //        . . . D .
+  //        . . . . .
   {cols:5,rows:5,exitRow:1,par:4,name:'勇敢挑戰',icon:'🐊',
    pieces:[
     {id:'tx',type:'t',row:1,col:0,len:2,dir:'H',em:'🦖',nm:'小暴龍',cs:'pt'},
-    {id:'b1',type:'b',row:0,col:2,len:3,dir:'V',em:'🦕',nm:'腕龍',  cs:'pb'},
-    {id:'r1',type:'r',row:3,col:2,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
-    {id:'c1',type:'c',row:3,col:0,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
-    {id:'e1',type:'e',row:4,col:4,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
+    {id:'r1',type:'r',row:0,col:2,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'c1',type:'c',row:2,col:1,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
+    {id:'r2',type:'r',row:2,col:3,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'e1',type:'e',row:2,col:0,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
    ]},
-  // Lv5: 5×5, 5-step challenge
+  // Lv5: 5×5 (exitRow=2, par=5)
+  // 解法: H下1 → F下1 → C右1 → A上1 → 小暴龍出關
+  // 格局:  E . C C F   E=蛋固定; C=三角龍(H,r0,c2,len2); F=迅猛龍(V,r0,c4,len2)
+  //        . . A . F   A=迅猛龍(V,r1,c2,len2)
+  //        T T A . H  →出口  H=迅猛龍(V,r2,c4,len2)
+  //        . . E2 . H  E2=蛋固定
+  //        . . . . .
   {cols:5,rows:5,exitRow:2,par:5,name:'超級高手',icon:'🦖',
    pieces:[
     {id:'tx',type:'t',row:2,col:0,len:2,dir:'H',em:'🦖',nm:'小暴龍',cs:'pt'},
-    {id:'b1',type:'b',row:0,col:2,len:2,dir:'V',em:'🦕',nm:'腕龍',  cs:'pb'},
-    {id:'b2',type:'b',row:3,col:2,len:2,dir:'V',em:'🦕',nm:'腕龍',  cs:'pb'},
-    {id:'c1',type:'c',row:2,col:2,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
-    {id:'r1',type:'r',row:0,col:3,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
-    {id:'e1',type:'e',row:4,col:0,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
+    {id:'r1',type:'r',row:1,col:2,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'c1',type:'c',row:0,col:2,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
+    {id:'r2',type:'r',row:0,col:4,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'r3',type:'r',row:2,col:4,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'e1',type:'e',row:0,col:0,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
+    {id:'e2',type:'e',row:3,col:2,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
    ]},
-  // Lv6: 6×6, 6-step challenge
+  // Lv6: 6×6 (exitRow=2, par=6)
+  // 解法: H下1 → F下1 → C右1 → A上1 → B上2 → 小暴龍出關
+  // 格局:  E . C C F .   E=蛋固定; C=三角龍(H,r0,c2,len2); F=迅猛龍(V,r0,c4,len2)
+  //        . . A . F .   A=迅猛龍(V,r1,c2,len2)
+  //        T T A . . B  →出口  B=迅猛龍(V,r2,c5,len2) 擋出口
+  //        . . E2 . H B  E2=蛋固定; H=迅猛龍(V,r3,c4,len2)
+  //        . . . . H .
+  //        . . . . . .
   {cols:6,rows:6,exitRow:2,par:6,name:'恐龍勇士',icon:'⭐',
    pieces:[
     {id:'tx',type:'t',row:2,col:0,len:2,dir:'H',em:'🦖',nm:'小暴龍',cs:'pt'},
-    {id:'b1',type:'b',row:0,col:2,len:3,dir:'V',em:'🦕',nm:'腕龍',  cs:'pb'},
-    {id:'b2',type:'b',row:3,col:4,len:3,dir:'V',em:'🦕',nm:'腕龍',  cs:'pb'},
-    {id:'c1',type:'c',row:2,col:3,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
-    {id:'r1',type:'r',row:3,col:2,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'r1',type:'r',row:1,col:2,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'c1',type:'c',row:0,col:2,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
     {id:'r2',type:'r',row:0,col:4,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
-    {id:'e1',type:'e',row:5,col:1,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
+    {id:'r3',type:'r',row:3,col:4,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'r4',type:'r',row:2,col:5,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'e1',type:'e',row:0,col:0,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
+    {id:'e2',type:'e',row:3,col:2,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
    ]},
 ];
 
@@ -233,7 +259,7 @@ function onPtrMove(e){
   const {p,el,x0,y0,c0,r0,maxL,maxR,maxU,maxD}=drag;
   if(p.dir==='H'){
     const dx=e.clientX-x0;
-    const lo=-maxL*CELL, hi=(maxR+(p.type==='t'?1:0))*CELL;
+    const lo=-maxL*CELL, hi=maxR*CELL;
     const clamped=Math.max(lo,Math.min(hi,dx));
     el.style.left=(c0*CELL+3+clamped)+'px';
   }else{
@@ -256,7 +282,7 @@ function onPtrUp(e){
   let steps=0;
   if(p.dir==='H'){
     const raw=dx/CELL;
-    if(raw>0) steps=Math.min(Math.round(raw), maxR+(p.type==='t'?1:0));
+    if(raw>0) steps=Math.min(Math.round(raw), maxR);
     else       steps=Math.max(Math.round(raw),-maxL);
   }else{
     const raw=dy/CELL;
