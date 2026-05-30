@@ -314,6 +314,8 @@ function refreshAssign() {
 function goToRecord() {
   recordings = new Array(playerCount).fill(null);
   recChunks  = DEFS[playerCount].map(()=>[]);
+  recorders  = [];
+  recStreams  = [];
   buildRecList();
   document.getElementById('step3').style.display='block';
   document.getElementById('step3').scrollIntoView({behavior:'smooth',block:'start'});
@@ -431,6 +433,7 @@ function renderPlayers() {
 function hearts(n){ return '❤️'.repeat(Math.max(0,n))+'🖤'.repeat(Math.max(0,3-n)); }
 
 function playRandom() {
+  if(document.getElementById('resultScreen').style.display!=='none') return;
   const alive=players.map((_,i)=>i).filter(i=>!players[i].eliminated);
   if(alive.length<=1){endGame();return;}
 
