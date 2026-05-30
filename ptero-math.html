@@ -520,6 +520,11 @@ function gameLoop(){
 
     const wingHit=f.y>dinoTopY&&f.y<dinoTopY+DH&&Math.abs(fx-dinoX)<DW*1.5;
     if((Math.hypot(fx-mTipX,f.y-mTipY)<f.r+14 && mouthA>.18)||wingHit){
+      if(f.isHeart){
+        if(lives<3){lives++;updateHUD();}
+        sndCorrect();burst(fx,f.y,true);letters.splice(i,1);
+        continue;
+      }
       if(f.isAns){
         score++;totalScore++;stars+=3;streakCount++;saveData();updateStarUI();
         sndCorrect();chomping=true;chompT=0;sndChomp();
@@ -543,7 +548,8 @@ function gameLoop(){
       }
       letters.splice(i,1);continue;
     }
-    drawNumber(f,fx);
+    if(f.isHeart) drawHeart(f,fx);
+    else drawNumber(f,fx);
   }
 
   drawParts();
@@ -553,6 +559,13 @@ function gameLoop(){
 // ══ SPAWN ══
 function spawnNumber(){
   const lv=LEVELS.find(l=>l.id===curLvId)||LEVELS[0];
+  // 6% chance to spawn a heart (restore life)
+  if(Math.random()<0.06&&lives<3){
+    letters.push({x:40+Math.random()*(canvas.width-80),y:-30,isHeart:true,
+      spd:fallSpd*0.75+Math.random()*.4,wobble:Math.random()*Math.PI*2,
+      wSpd:.025+Math.random()*.02,r:22});
+    return;
+  }
   // Always include correct answer + 3-4 wrong answers
   const wrongs=[];
   while(wrongs.length<4){
@@ -581,6 +594,18 @@ function drawBG(){
   [[.15,.1],[.45,.05],[.72,.12],[.88,.08],[.33,.18],[.6,.03]].forEach(([x,y])=>{
     ctx.beginPath();ctx.arc(x*canvas.width,y*canvas.height,1,0,Math.PI*2);ctx.fill();
   });
+}
+
+// ══ DRAW HEART ══
+function drawHeart(f,fx){
+  ctx.save();
+  ctx.translate(fx,f.y);
+  ctx.shadowColor='#ff4d6d';ctx.shadowBlur=18;
+  ctx.font=`${f.r*2}px serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('❤️',0,0);
+  ctx.shadowBlur=0;
+  ctx.restore();
 }
 
 // ══ DRAW NUMBER BUBBLE ══
@@ -613,28 +638,28 @@ function drawDino(cx,cy,mA){
   ctx.beginPath();ctx.ellipse(0,DH,22,5,0,0,Math.PI*2);ctx.fill();
 
   // WINGS (spread out) — main feature of pterodactyl
-  // Left wing
+  // Left wing (smaller span)
   ctx.fillStyle='#7c3aed';
   ctx.shadowColor='#a78bfa';ctx.shadowBlur=8;
   ctx.beginPath();
   ctx.moveTo(-DW*.1,DH*.3);
-  ctx.bezierCurveTo(-DW*.7,DH*.0,-DW*.9,-DH*.1,-DW*.7,DH*.2);
-  ctx.bezierCurveTo(-DW*.5,DH*.35,-DW*.2,DH*.45,-DW*.05,DH*.4);
+  ctx.bezierCurveTo(-DW*.43,DH*.0,-DW*.55,-DH*.1,-DW*.43,DH*.2);
+  ctx.bezierCurveTo(-DW*.32,DH*.35,-DW*.13,DH*.45,-DW*.05,DH*.4);
   ctx.closePath();ctx.fill();
-  // Right wing
+  // Right wing (smaller span)
   ctx.beginPath();
   ctx.moveTo(DW*.1,DH*.3);
-  ctx.bezierCurveTo(DW*.7,DH*.0,DW*.9,-DH*.1,DW*.7,DH*.2);
-  ctx.bezierCurveTo(DW*.5,DH*.35,DW*.2,DH*.45,DW*.05,DH*.4);
+  ctx.bezierCurveTo(DW*.43,DH*.0,DW*.55,-DH*.1,DW*.43,DH*.2);
+  ctx.bezierCurveTo(DW*.32,DH*.35,DW*.13,DH*.45,DW*.05,DH*.4);
   ctx.closePath();ctx.fill();
   ctx.shadowBlur=0;
 
   // Wing membrane detail
   ctx.strokeStyle='rgba(167,139,250,.4)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(-DW*.1,DH*.35);ctx.lineTo(-DW*.7,DH*.1);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(-DW*.1,DH*.38);ctx.lineTo(-DW*.55,DH*.2);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(DW*.1,DH*.35);ctx.lineTo(DW*.7,DH*.1);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(DW*.1,DH*.38);ctx.lineTo(DW*.55,DH*.2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-DW*.1,DH*.35);ctx.lineTo(-DW*.43,DH*.1);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-DW*.1,DH*.38);ctx.lineTo(-DW*.34,DH*.2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(DW*.1,DH*.35);ctx.lineTo(DW*.43,DH*.1);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(DW*.1,DH*.38);ctx.lineTo(DW*.34,DH*.2);ctx.stroke();
 
   // Body
   ctx.fillStyle='#6d28d9';
