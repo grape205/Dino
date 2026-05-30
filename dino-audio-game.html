@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>恐龍島大冒險：聽音辨蹤跡！</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Fredoka One','Noto Sans TC',Arial,sans-serif;background:#0d1f0d;color:#fff;min-height:100vh;overflow-x:hidden}
+
+/* ── background ── */
+.bg{position:fixed;inset:0;background:radial-gradient(ellipse at 20% 30%,#1a3a1a 0%,#0d1f0d 60%);z-index:0}
+.leaf{position:fixed;font-size:1.4rem;opacity:.18;animation:fall linear infinite;pointer-events:none;z-index:0}
+@keyframes fall{from{transform:translateY(-60px) rotate(0deg)}to{transform:translateY(110vh) rotate(360deg)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@keyframes recAnim{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.7)}70%{box-shadow:0 0 0 14px rgba(239,68,68,0)}}
+@keyframes bounce{0%,100%{transform:scale(1)}40%{transform:scale(1.25)}70%{transform:scale(.92)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes crown{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+
+/* ── layout ── */
+.wrap{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:16px 14px 40px}
+
+/* ── header ── */
+.hdr{text-align:center;padding:12px 0 8px}
+.hdr h1{font-size:1.5rem;color:#4ade80;text-shadow:0 0 20px rgba(74,222,128,.5);line-height:1.2}
+.hdr p{font-size:.78rem;color:#86efac;margin-top:4px;opacity:.85}
+.back-btn{position:absolute;top:16px;left:14px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:99px;padding:6px 14px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:.8rem;cursor:pointer;text-decoration:none;z-index:10}
+
+/* ── card ── */
+.card{background:rgba(0,0,0,.45);border:1.5px solid rgba(74,222,128,.2);border-radius:20px;padding:20px 16px;margin-bottom:16px;animation:fadeIn .35s ease}
+
+/* ── step badge ── */
+.step-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(74,222,128,.15);border:1.5px solid rgba(74,222,128,.35);border-radius:99px;padding:4px 14px;font-size:.8rem;color:#4ade80;margin-bottom:12px}
+
+/* ── player count buttons ── */
+.cnt-row{display:flex;gap:10px;justify-content:center;margin-top:10px}
+.cnt-btn{flex:1;max-width:90px;background:rgba(255,255,255,.06);border:2px solid rgba(74,222,128,.3);border-radius:14px;padding:18px 6px;font-family:'Fredoka One',Arial,sans-serif;font-size:1.5rem;color:#fff;cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;gap:4px}
+.cnt-btn span{font-size:.78rem;color:#86efac}
+.cnt-btn:hover,.cnt-btn.active{background:rgba(74,222,128,.18);border-color:#4ade80;transform:scale(1.06)}
+
+/* ── record tasks ── */
+.rec-task{background:rgba(0,0,0,.35);border:1.5px solid rgba(74,222,128,.18);border-radius:16px;padding:14px;margin-bottom:10px}
+.rec-who{font-size:.9rem;color:#fbbf24;margin-bottom:6px}
+.rec-line{font-size:1rem;color:#fff;background:rgba(255,255,255,.06);border-radius:10px;padding:8px 12px;margin-bottom:10px;line-height:1.5}
+.rec-actions{display:flex;gap:8px;align-items:center}
+.rec-btn{flex:1;background:rgba(239,68,68,.15);border:2px solid rgba(239,68,68,.45);border-radius:99px;padding:11px;font-family:'Fredoka One',Arial,sans-serif;font-size:.88rem;color:#fca5a5;cursor:pointer;transition:.2s}
+.rec-btn.recording{background:rgba(239,68,68,.3);border-color:#ef4444;animation:recAnim 1s ease-in-out infinite;color:#fff}
+.rec-btn.done{background:rgba(74,222,128,.2);border-color:#4ade80;color:#4ade80;animation:none}
+.play-preview{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);border-radius:99px;padding:11px 16px;font-family:'Fredoka One',Arial,sans-serif;font-size:.82rem;color:#fff;cursor:pointer;white-space:nowrap}
+.play-preview:disabled{opacity:.35;cursor:default}
+.rec-status{font-size:.72rem;margin-top:6px;min-height:18px;color:#86efac}
+
+/* ── start game btn ── */
+.start-btn{width:100%;background:linear-gradient(135deg,#14532d,#4ade80);border:none;border-radius:99px;padding:18px;font-family:'Fredoka One',Arial,sans-serif;font-size:1.2rem;color:#fff;cursor:pointer;box-shadow:0 6px 24px rgba(74,222,128,.4);transition:.2s;margin-top:6px}
+.start-btn:disabled{opacity:.35;cursor:default;box-shadow:none}
+.start-btn:not(:disabled):hover{transform:scale(1.03)}
+
+/* ── game area ── */
+.players-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.player-card{background:rgba(0,0,0,.4);border:2px solid rgba(74,222,128,.25);border-radius:18px;padding:14px 10px;text-align:center;transition:.3s;position:relative}
+.player-card.alive{border-color:rgba(74,222,128,.5)}
+.player-card.eliminated{opacity:.45;filter:grayscale(.8);border-color:rgba(255,255,255,.1)}
+.player-card.eliminated::after{content:'淘汰';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#ef4444;background:rgba(0,0,0,.4);border-radius:16px}
+.player-name{font-size:.95rem;color:#fbbf24;margin-bottom:8px}
+.hearts{font-size:1.3rem;letter-spacing:2px;margin-bottom:10px;min-height:28px}
+.wrong-btn{background:rgba(239,68,68,.18);border:1.5px solid rgba(239,68,68,.4);border-radius:99px;padding:7px 12px;font-family:'Fredoka One',Arial,sans-serif;font-size:.78rem;color:#fca5a5;cursor:pointer;transition:.2s;width:100%}
+.wrong-btn:hover:not(:disabled){background:rgba(239,68,68,.35);border-color:#ef4444}
+.wrong-btn:disabled{opacity:.3;cursor:default}
+
+/* ── action display ── */
+.action-box{background:rgba(0,0,0,.5);border:2px solid rgba(251,191,36,.35);border-radius:20px;padding:20px;text-align:center;margin-bottom:14px;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.action-icon{font-size:3.5rem;animation:bounce .5s ease}
+.action-text{font-size:1.4rem;color:#fbbf24}
+.action-sub{font-size:.82rem;color:#e2e8f0;opacity:.8}
+
+/* ── play sound btn ── */
+.play-btn{width:100%;background:linear-gradient(135deg,#1e3a5f,#60a5fa);border:none;border-radius:99px;padding:18px;font-family:'Fredoka One',Arial,sans-serif;font-size:1.15rem;color:#fff;cursor:pointer;box-shadow:0 6px 20px rgba(96,165,250,.4);transition:.2s;margin-bottom:12px}
+.play-btn:disabled{opacity:.4;cursor:default;box-shadow:none}
+.play-btn:not(:disabled):hover{transform:scale(1.03)}
+.play-btn.playing{animation:pulse .6s ease-in-out infinite}
+
+/* ── round info ── */
+.round-bar{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:#86efac;margin-bottom:14px;background:rgba(0,0,0,.3);border-radius:12px;padding:8px 14px}
+.round-bar strong{color:#4ade80;font-size:1rem}
+
+/* ── result screen ── */
+.result-screen{text-align:center;padding:20px 10px}
+.result-trophy{font-size:5rem;animation:crown 1s ease-in-out infinite}
+.result-title{font-size:1.8rem;color:#fbbf24;margin:10px 0 6px}
+.result-winner{font-size:1.2rem;color:#4ade80;margin-bottom:16px}
+.result-stats{background:rgba(0,0,0,.35);border-radius:14px;padding:12px;margin-bottom:18px}
+.result-row{display:flex;justify-content:space-between;font-size:.88rem;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.result-row:last-child{border-bottom:none}
+.stars-earned{font-size:2rem;color:#fbbf24;margin-bottom:8px;animation:bounce .6s ease}
+.replay-btn{background:linear-gradient(135deg,#14532d,#4ade80);border:none;border-radius:99px;padding:16px 32px;font-family:'Fredoka One',Arial,sans-serif;font-size:1.1rem;color:#fff;cursor:pointer;box-shadow:0 6px 24px rgba(74,222,128,.4);margin-right:10px}
+.home-btn{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);border-radius:99px;padding:16px 24px;font-family:'Fredoka One',Arial,sans-serif;font-size:1rem;color:#fff;cursor:pointer;text-decoration:none;display:inline-block}
+
+/* ── toast ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);border:1.5px solid rgba(74,222,128,.4);border-radius:99px;padding:10px 22px;font-size:.88rem;color:#4ade80;z-index:999;white-space:nowrap;animation:fadeIn .25s ease;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<!-- falling leaves -->
+<script>
+(function(){
+  const icons=['🌿','🍃','🌱','🦕','🦖'];
+  for(let i=0;i<12;i++){
+    const d=document.createElement('div');
+    d.className='leaf';
+    d.textContent=icons[i%icons.length];
+    d.style.left=Math.random()*100+'vw';
+    d.style.animationDuration=(6+Math.random()*8)+'s';
+    d.style.animationDelay=(-Math.random()*14)+'s';
+    document.body.appendChild(d);
+  }
+})();
+</script>
+
+<div class="wrap">
+  <a href="dino-abc-final.html" class="back-btn">← 返回</a>
+
+  <div class="hdr">
+    <div style="font-size:3rem;animation:bob 2s ease-in-out infinite">🦕</div>
+    <h1>恐龍島大冒險<br>聽音辨蹤跡！</h1>
+    <p>錄下你的聲音，讓家人聽音做動作！</p>
+  </div>
+
+  <!-- ── STEP 1: player count ── -->
+  <div class="card" id="step1">
+    <div class="step-badge">👥 步驟 1</div>
+    <div style="font-size:1rem;color:#e2e8f0;margin-bottom:4px">召集探險隊</div>
+    <div style="font-size:.8rem;color:#86efac;margin-bottom:4px">這次出發有幾位探險家？</div>
+    <div class="cnt-row">
+      <button class="cnt-btn" onclick="setPlayers(2)" id="cnt2">👨‍👧<span>2 人</span></button>
+      <button class="cnt-btn" onclick="setPlayers(3)" id="cnt3">👨‍👩‍👧<span>3 人</span></button>
+      <button class="cnt-btn" onclick="setPlayers(4)" id="cnt4">👨‍👩‍👧‍👦<span>4 人</span></button>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: recording ── -->
+  <div class="card" id="step2" style="display:none">
+    <div class="step-badge">🎙️ 步驟 2</div>
+    <div style="font-size:1rem;color:#e2e8f0;margin-bottom:12px">錄製恐龍警報暗號</div>
+    <div id="recList"></div>
+    <button class="start-btn" id="startBtn" onclick="startGame()" disabled>🎮 開始遊戲！</button>
+  </div>
+
+  <!-- ── STEP 3: game ── -->
+  <div id="step3" style="display:none">
+    <div class="round-bar">
+      <span>第 <strong id="roundNum">1</strong> 回合</span>
+      <span>存活：<strong id="aliveCount">-</strong> 人</span>
+    </div>
+
+    <!-- action hint -->
+    <div class="action-box" id="actionBox">
+      <div class="action-icon" id="actionIcon">🦕</div>
+      <div class="action-text" id="actionText">準備好了嗎？</div>
+      <div class="action-sub" id="actionSub">點下方按鈕播放聲音</div>
+    </div>
+
+    <!-- play button -->
+    <button class="play-btn" id="playBtn" onclick="playRandom()">🔊 播放暗號！</button>
+
+    <!-- player cards -->
+    <div class="players-grid" id="playersGrid"></div>
+  </div>
+
+  <!-- ── RESULT ── -->
+  <div class="card" id="resultScreen" style="display:none">
+    <div class="result-screen">
+      <div class="result-trophy">🏆</div>
+      <div class="result-title">探險隊勝利！</div>
+      <div class="result-winner" id="resultWinner"></div>
+      <div class="stars-earned" id="starsEarned"></div>
+      <div class="result-stats" id="resultStats"></div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="replay-btn" onclick="resetGame()">🔄 再玩一次</button>
+        <a href="dino-abc-final.html" class="home-btn">🏠 回首頁</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── player definitions per count ──
+const DEFS = {
+  2: [
+    {who:'探險家 A（爸爸／媽媽）', line:'🎤「暴龍來了：定住變成石頭！🦖」', icon:'🗿', action:'定住！別動！', color:'#ef4444'},
+    {who:'探險家 B（孩子）',       line:'🎤「翼龍飛飛：快快飛走！🦅」',       icon:'🦅', action:'原地飛跳！', color:'#60a5fa'},
+  ],
+  3: [
+    {who:'探險家 A（爸爸／媽媽）', line:'🎤「暴龍來了：定住變成石頭！🦖」',       icon:'🗿', action:'定住！別動！', color:'#ef4444'},
+    {who:'探險家 B（孩子）',       line:'🎤「翼龍飛飛：快快飛走！🦅」',           icon:'🦅', action:'原地飛跳！', color:'#60a5fa'},
+    {who:'探險家 C（隊員）',       line:'🎤「迅猛龍追來：蹲下躲進草叢！🌿」',     icon:'🌿', action:'快蹲下！', color:'#4ade80'},
+  ],
+  4: [
+    {who:'探險家 A（爸爸／媽媽）', line:'🎤「暴龍來了：定住變成石頭！🦖」',       icon:'🗿', action:'定住！別動！', color:'#ef4444'},
+    {who:'探險家 B（孩子）',       line:'🎤「翼龍飛飛：快快飛走！🦅」',           icon:'🦅', action:'原地飛跳！', color:'#60a5fa'},
+    {who:'探險家 C（隊員）',       line:'🎤「迅猛龍追來：蹲下躲進草叢！🌿」',     icon:'🌿', action:'快蹲下！', color:'#4ade80'},
+    {who:'探險家 D（隊員）',       line:'🎤「三角龍衝來：快閃到旁邊！🦕」',       icon:'💨', action:'向旁閃開！', color:'#fbbf24'},
+  ],
+};
+
+// ── state ──
+let playerCount = 0;
+let recordings  = [];   // Array of Blob | null
+let recorders   = [];   // MediaRecorder instances
+let streams     = [];   // MediaStream instances
+let recChunks   = [];   // chunks per recorder slot
+let players     = [];   // {name, icon, action, color, lives, rounds, eliminated}
+let round       = 0;
+let lastPlayed  = -1;
+let totalStars  = 0;
+
+// ── step 1: set player count ──
+function setPlayers(n) {
+  playerCount = n;
+  [2,3,4].forEach(x => document.getElementById('cnt'+x).classList.toggle('active', x===n));
+  buildRecList(n);
+  document.getElementById('step2').style.display = 'block';
+  document.getElementById('step2').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function buildRecList(n) {
+  const defs = DEFS[n];
+  recordings = new Array(n).fill(null);
+  recChunks  = defs.map(()=>[]);
+  const el   = document.getElementById('recList');
+  el.innerHTML = defs.map((d,i)=>`
+    <div class="rec-task" id="task${i}">
+      <div class="rec-who">${d.who}</div>
+      <div class="rec-line">${d.line}</div>
+      <div class="rec-actions">
+        <button class="rec-btn" id="recBtn${i}" onclick="toggleRec(${i})">⏺ 開始錄音</button>
+        <button class="play-preview" id="prevBtn${i}" onclick="previewRec(${i})" disabled>▶ 試聽</button>
+      </div>
+      <div class="rec-status" id="recStatus${i}">尚未錄音</div>
+    </div>
+  `).join('');
+}
+
+// ── recording logic ──
+async function toggleRec(idx) {
+  const btn = document.getElementById('recBtn'+idx);
+  if(btn.classList.contains('recording')) {
+    stopRec(idx);
+  } else {
+    await startRec(idx);
+  }
+}
+
+async function startRec(idx) {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    streams[idx] = stream;
+    recChunks[idx] = [];
+    const mr = new MediaRecorder(stream);
+    recorders[idx] = mr;
+    mr.ondataavailable = e => { if(e.data.size>0) recChunks[idx].push(e.data); };
+    mr.onstop = () => finishRec(idx);
+    mr.start();
+    const btn = document.getElementById('recBtn'+idx);
+    btn.textContent = '⏹ 停止錄音';
+    btn.classList.add('recording');
+    document.getElementById('recStatus'+idx).textContent = '錄音中…🔴';
+  } catch(e) {
+    showToast('無法使用麥克風，請允許權限！');
+  }
+}
+
+function stopRec(idx) {
+  if(recorders[idx] && recorders[idx].state !== 'inactive') {
+    recorders[idx].stop();
+    streams[idx]?.getTracks().forEach(t=>t.stop());
+  }
+}
+
+function finishRec(idx) {
+  const blob = new Blob(recChunks[idx], {type:'audio/webm'});
+  recordings[idx] = blob;
+  const btn = document.getElementById('recBtn'+idx);
+  btn.textContent = '🔄 重新錄音';
+  btn.classList.remove('recording');
+  btn.classList.add('done');
+  document.getElementById('recStatus'+idx).textContent = '✅ 錄音完成！';
+  document.getElementById('prevBtn'+idx).disabled = false;
+  checkAllRecorded();
+}
+
+function previewRec(idx) {
+  if(!recordings[idx]) return;
+  const url = URL.createObjectURL(recordings[idx]);
+  const audio = new Audio(url);
+  audio.play();
+  audio.onended = () => URL.revokeObjectURL(url);
+}
+
+function checkAllRecorded() {
+  const ok = recordings.slice(0, playerCount).every(r=>r!==null);
+  document.getElementById('startBtn').disabled = !ok;
+}
+
+// ── step 3: start game ──
+function startGame() {
+  const defs = DEFS[playerCount];
+  players = defs.map((d,i)=>({
+    name:  d.who.split('（')[0].replace('探險家 ','探險家'),
+    icon:  d.icon,
+    action:d.action,
+    color: d.color,
+    lives: 3,
+    rounds:0,
+    eliminated: false,
+  }));
+  round = 0;
+
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step3').style.display  = 'block';
+  document.getElementById('step3').scrollIntoView({behavior:'smooth',block:'start'});
+
+  renderPlayers();
+  updateAliveCount();
+  resetActionBox();
+}
+
+function renderPlayers() {
+  const grid = document.getElementById('playersGrid');
+  grid.innerHTML = players.map((p,i)=>`
+    <div class="player-card ${p.eliminated?'eliminated':'alive'}" id="pcard${i}">
+      <div class="player-name">${p.name}</div>
+      <div class="hearts" id="hearts${i}">${renderHearts(p.lives)}</div>
+      <button class="wrong-btn" id="wrongBtn${i}" onclick="markWrong(${i})"
+        ${p.eliminated?'disabled':''}>✕ 做錯了！</button>
+    </div>
+  `).join('');
+}
+
+function renderHearts(n){
+  return '❤️'.repeat(Math.max(0,n)) + '🖤'.repeat(Math.max(0,3-n));
+}
+
+// ── play random recording ──
+let currentAudio = null;
+function playRandom() {
+  const alive = players.map((p,i)=>i).filter(i=>!players[i].eliminated);
+  if(alive.length <= 1){ endGame(); return; }
+
+  // pick random (avoid same twice in a row if possible)
+  let choices = alive.filter(i=>i!==lastPlayed);
+  if(!choices.length) choices = alive;
+  const idx = choices[Math.floor(Math.random()*choices.length)];
+  lastPlayed = idx;
+
+  round++;
+  document.getElementById('roundNum').textContent = round;
+
+  // update rounds survived for all alive players
+  alive.forEach(i=>{ players[i].rounds++; });
+
+  const btn = document.getElementById('playBtn');
+  btn.disabled = true;
+  btn.classList.add('playing');
+  btn.textContent = '🔊 播放中…';
+
+  // show suspense first
+  showAction('❓', '聽好囉…', '', '#fbbf24');
+
+  if(currentAudio){ currentAudio.pause(); currentAudio=null; }
+  const url = URL.createObjectURL(recordings[idx]);
+  currentAudio = new Audio(url);
+  currentAudio.play();
+  currentAudio.onended = () => {
+    URL.revokeObjectURL(url);
+    const p = players[idx];
+    showAction(p.icon, p.action, '做出正確動作！', p.color);
+    btn.disabled = false;
+    btn.classList.remove('playing');
+    btn.textContent = '🔊 再播一次！';
+    // enable wrong buttons for alive players
+    players.forEach((_,i)=>{
+      const wb = document.getElementById('wrongBtn'+i);
+      if(wb) wb.disabled = players[i].eliminated;
+    });
+  };
+}
+
+function showAction(icon, text, sub, color) {
+  document.getElementById('actionIcon').textContent = icon;
+  document.getElementById('actionText').textContent = text;
+  document.getElementById('actionText').style.color  = color || '#fbbf24';
+  document.getElementById('actionSub').textContent  = sub;
+  const box = document.getElementById('actionBox');
+  box.style.borderColor = (color||'#fbbf24')+'88';
+  // re-trigger bounce
+  const el = document.getElementById('actionIcon');
+  el.style.animation='none';
+  el.offsetHeight; // reflow
+  el.style.animation='bounce .5s ease';
+}
+
+function resetActionBox() {
+  showAction('🦕','準備好了嗎？','點下方按鈕播放聲音','#4ade80');
+  document.getElementById('playBtn').textContent='🔊 播放暗號！';
+  document.getElementById('playBtn').disabled=false;
+}
+
+// ── mark wrong ──
+function markWrong(idx) {
+  if(players[idx].eliminated) return;
+  players[idx].lives--;
+
+  // update hearts display
+  document.getElementById('hearts'+idx).textContent = renderHearts(players[idx].lives);
+
+  if(players[idx].lives <= 0) {
+    players[idx].eliminated = true;
+    const card = document.getElementById('pcard'+idx);
+    card.classList.remove('alive');
+    card.classList.add('eliminated');
+    document.getElementById('wrongBtn'+idx).disabled = true;
+    showToast(`${players[idx].name} 被恐龍發現了！🦖`);
+    updateAliveCount();
+    checkGameOver();
+  } else {
+    showToast(`${players[idx].name} 少一條命！還剩 ${players[idx].lives} ❤️`);
+  }
+}
+
+function updateAliveCount() {
+  const n = players.filter(p=>!p.eliminated).length;
+  document.getElementById('aliveCount').textContent = n;
+}
+
+function checkGameOver() {
+  const alive = players.filter(p=>!p.eliminated);
+  if(alive.length <= 1) endGame();
+}
+
+// ── end game ──
+function endGame() {
+  document.getElementById('step3').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'block';
+  document.getElementById('resultScreen').scrollIntoView({behavior:'smooth',block:'start'});
+
+  const alive = players.filter(p=>!p.eliminated);
+  const winner = alive.length===1 ? alive[0] : players.reduce((a,b)=>a.rounds>=b.rounds?a:b);
+
+  const starsVal = Math.max(1, Math.floor(round / 3));
+  totalStars = starsVal;
+  saveStars(starsVal);
+
+  document.getElementById('resultWinner').textContent =
+    alive.length===1
+      ? `🎉 ${winner.name} 是最後的存活者！`
+      : `🎉 全員英勇存活！`;
+
+  document.getElementById('starsEarned').textContent = `獲得 ⭐ × ${starsVal}`;
+
+  const stats = players.map(p=>`
+    <div class="result-row">
+      <span>${p.icon} ${p.name}</span>
+      <span>${p.eliminated?'淘汰':'🏅 存活'} · ${p.rounds} 回合 · ${'❤️'.repeat(p.lives)}${'🖤'.repeat(3-p.lives)}</span>
+    </div>
+  `).join('');
+  document.getElementById('resultStats').innerHTML = stats;
+}
+
+// ── save stars ──
+function saveStars(n) {
+  const cur = parseInt(localStorage.getItem('stars')||'0');
+  localStorage.setItem('stars', cur + n);
+}
+
+// ── reset ──
+function resetGame() {
+  recordings = [];
+  recorders  = [];
+  streams    = [];
+  recChunks  = [];
+  players    = [];
+  round      = 0;
+  lastPlayed = -1;
+  if(currentAudio){ currentAudio.pause(); currentAudio=null; }
+
+  document.getElementById('step1').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step3').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'none';
+  [2,3,4].forEach(x=>document.getElementById('cnt'+x).classList.remove('active'));
+
+  playerCount = 0;
+  document.getElementById('recList').innerHTML = '';
+  document.getElementById('startBtn').disabled = true;
+}
+
+// ── toast ──
+let toastTimer;
+function showToast(msg) {
+  const old = document.querySelector('.toast');
+  if(old) old.remove();
+  clearTimeout(toastTimer);
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  toastTimer = setTimeout(()=>t.remove(), 2800);
+}
+</script>
+</body>
+</html>
