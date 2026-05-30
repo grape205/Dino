@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>🦖 恐龍華容道</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:none}
+body{background:#1a3a1a;font-family:'Fredoka One',cursive;overflow:hidden;width:100vw;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
+
+/* BG */
+.bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 50% 0%,#2d5a27 0%,#1a3a1a 60%,#0d1f0d 100%)}
+.bg-deco{position:fixed;z-index:0;pointer-events:none;user-select:none}
+.sun{top:18px;right:18px;font-size:2.8rem;animation:sunPulse 3s ease-in-out infinite}
+.volcano{bottom:0;left:4%;font-size:5rem;opacity:.35}
+.volcano2{bottom:0;right:6%;font-size:4rem;opacity:.28}
+.tree1{bottom:0;left:18%;font-size:3.5rem;opacity:.45}
+.tree2{bottom:0;right:22%;font-size:3rem;opacity:.4}
+.cloud1{top:12px;left:10%;font-size:2.2rem;opacity:.6;animation:cloudDrift 8s ease-in-out infinite}
+.cloud2{top:28px;left:40%;font-size:1.6rem;opacity:.45;animation:cloudDrift 11s ease-in-out infinite reverse}
+.footprint{position:fixed;bottom:20px;font-size:1rem;opacity:.18;letter-spacing:24px}
+@keyframes sunPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@keyframes cloudDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(18px)}}
+
+/* Header */
+.header{position:relative;z-index:10;width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 14px 0;max-width:480px}
+.back-btn{background:rgba(0,0,0,.55);border:1.5px solid rgba(255,255,255,.25);border-radius:99px;padding:7px 15px;color:#fff;font-family:'Fredoka One',cursive;font-size:.82rem;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:5px}
+.level-pill{background:rgba(255,200,50,.18);border:1.5px solid #f59e0b;border-radius:99px;padding:5px 14px;color:#fde68a;font-size:.8rem}
+.stars-pill{background:rgba(255,255,100,.15);border:1.5px solid #fbbf24;border-radius:99px;padding:5px 12px;color:#fde68a;font-size:.85rem}
+
+/* Title */
+.game-title{position:relative;z-index:10;color:#fde68a;font-size:1.4rem;text-align:center;margin:4px 0 2px;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+
+/* Objective bar */
+.obj-bar{position:relative;z-index:10;background:rgba(0,0,0,.4);border:1.5px solid rgba(255,200,50,.3);border-radius:12px;padding:5px 14px;color:#86efac;font-size:.75rem;text-align:center;margin:2px auto 6px;max-width:320px}
+
+/* Board wrapper */
+.board-wrap{position:relative;z-index:10;display:flex;align-items:center;justify-content:center;margin:0 auto}
+.board{position:relative;border-radius:16px;border:3px solid rgba(255,255,255,.15);background:rgba(0,0,0,.35);overflow:visible;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+
+/* Exit arrow */
+.exit-arrow{position:absolute;right:-28px;display:flex;align-items:center;color:#4ade80;font-size:1.6rem;animation:exitPulse 1.2s ease-in-out infinite;pointer-events:none}
+@keyframes exitPulse{0%,100%{transform:translateX(0);opacity:1}50%{transform:translateX(5px);opacity:.7}}
+
+/* Grid lines */
+.grid-line{position:absolute;background:rgba(255,255,255,.06);pointer-events:none}
+
+/* Pieces */
+.piece{position:absolute;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:grab;user-select:none;transition:box-shadow .1s;font-size:.68rem;text-align:center;line-height:1.2;font-family:'Fredoka One',cursive;border:3px solid rgba(255,255,255,.35);box-shadow:0 4px 12px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.4)}
+.piece:active{cursor:grabbing;box-shadow:0 8px 24px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.4)}
+.piece-trex{background:linear-gradient(145deg,#4ade80,#16a34a);color:#fff}
+.piece-tricera{background:linear-gradient(145deg,#fb923c,#ea580c);color:#fff}
+.piece-bronto{background:linear-gradient(145deg,#a78bfa,#7c3aed);color:#fff}
+.piece-raptor{background:linear-gradient(145deg,#f472b6,#db2777);color:#fff}
+.piece-egg{background:linear-gradient(145deg,#94a3b8,#64748b);color:#fff;cursor:not-allowed;border-color:rgba(255,255,255,.2)}
+.piece-label{font-size:1.9rem;line-height:1;margin-bottom:2px}
+.piece-name{font-size:.58rem;opacity:.9;letter-spacing:.5px}
+
+/* Win overlay */
+.win-ov{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);opacity:0;pointer-events:none;transition:opacity .4s}
+.win-ov.show{opacity:1;pointer-events:all}
+.win-box{background:linear-gradient(145deg,#14532d,#166534);border:3px solid #4ade80;border-radius:24px;padding:28px 32px;text-align:center;max-width:320px;width:90%;animation:winPop .5s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes winPop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.win-dino{font-size:4.5rem;animation:winDance .5s ease-in-out infinite alternate}
+@keyframes winDance{from{transform:rotate(-8deg) scale(1)}to{transform:rotate(8deg) scale(1.1)}}
+.win-title{color:#bbf7d0;font-size:1.5rem;margin:8px 0 4px}
+.win-sub{color:#86efac;font-size:.9rem;margin-bottom:14px}
+.stars-row{font-size:2rem;letter-spacing:4px;margin-bottom:16px}
+.win-btn{background:linear-gradient(135deg,#4ade80,#16a34a);border:none;border-radius:99px;padding:12px 28px;color:#fff;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer;margin:4px 6px;transition:transform .15s}
+.win-btn:active{transform:scale(.95)}
+.win-btn.next{background:linear-gradient(135deg,#fbbf24,#f59e0b)}
+
+/* Level select */
+.lvl-ov{position:fixed;inset:0;z-index:150;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75)}
+.lvl-box{background:linear-gradient(145deg,#1e3a5f,#1e3a8a);border:3px solid #60a5fa;border-radius:24px;padding:24px 20px;text-align:center;max-width:340px;width:92%}
+.lvl-title{color:#bfdbfe;font-size:1.3rem;margin-bottom:16px}
+.lvl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lvl-btn{background:rgba(255,255,255,.1);border:2px solid rgba(100,180,255,.4);border-radius:14px;padding:14px 8px;cursor:pointer;color:#e0f2fe;font-family:'Fredoka One',cursive;transition:transform .15s,background .15s}
+.lvl-btn:hover,.lvl-btn:active{background:rgba(96,165,250,.25);transform:scale(.97)}
+.lvl-btn.unlocked{border-color:#4ade80}
+.lvl-btn.locked{opacity:.45;cursor:default}
+.lvl-icon{font-size:1.8rem;margin-bottom:4px}
+.lvl-name{font-size:.72rem}
+.lvl-stars{font-size:.85rem;letter-spacing:2px;min-height:1em}
+
+/* Move counter */
+.move-bar{position:relative;z-index:10;display:flex;gap:16px;align-items:center;justify-content:center;margin:4px 0;color:#d1fae5;font-size:.82rem}
+.move-count{background:rgba(0,0,0,.4);border:1.5px solid rgba(74,222,128,.3);border-radius:99px;padding:3px 14px}
+
+/* Confetti */
+.confetti{position:fixed;top:0;left:0;pointer-events:none;z-index:300;width:100vw;height:100vh}
+</style>
+</head>
+<body>
+
+<!-- BG -->
+<div class="bg"></div>
+<div class="bg-deco sun">☀️</div>
+<div class="bg-deco volcano">🌋</div>
+<div class="bg-deco volcano2">🌋</div>
+<div class="bg-deco tree1">🌴</div>
+<div class="bg-deco tree2">🌿</div>
+<div class="bg-deco cloud1">☁️</div>
+<div class="bg-deco cloud2">☁️</div>
+<div class="bg-deco footprint" style="bottom:16px;left:0;right:0;text-align:center">🦕🦕🦕🦕🦕🦕</div>
+
+<!-- Header -->
+<div class="header">
+  <a href="dino-abc-final.html" class="back-btn">⬅️ 返回</a>
+  <span class="level-pill" id="levelPill">第 1 關</span>
+  <span class="stars-pill" id="starsPill">⭐ 0</span>
+</div>
+
+<div class="game-title">🦖 恐龍華容道</div>
+<div class="obj-bar" id="objBar">幫助小暴龍 🦖 往右滑出去！</div>
+<div class="move-bar"><span class="move-count">步數：<b id="moveNum">0</b></span><span id="parSpan" style="opacity:.7"></span></div>
+
+<!-- Board -->
+<div class="board-wrap">
+  <div class="board" id="board">
+    <div class="exit-arrow" id="exitArrow">➤</div>
+  </div>
+</div>
+
+<!-- Win overlay -->
+<div class="win-ov" id="winOv">
+  <div class="win-box">
+    <div class="win-dino" id="winDino">🦖</div>
+    <div class="win-title">你好棒！</div>
+    <div class="win-sub">恐龍成功回家了！🏠</div>
+    <div class="stars-row" id="winStars">⭐⭐⭐</div>
+    <div>
+      <button class="win-btn" onclick="restartLevel()">🔄 再玩一次</button>
+      <button class="win-btn next" id="nextBtn" onclick="nextLevel()">下一關 ➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- Level select overlay -->
+<div class="lvl-ov" id="lvlOv">
+  <div class="lvl-box">
+    <div class="lvl-title">🦕 選擇關卡</div>
+    <div class="lvl-grid" id="lvlGrid"></div>
+    <button class="win-btn" style="margin-top:14px;font-size:.85rem" onclick="closeLvlSelect()">關閉</button>
+  </div>
+</div>
+
+<canvas class="confetti" id="confettiCanvas"></canvas>
+
+<script>
+// ── Audio ──
+const AC=new (window.AudioContext||window.webkitAudioContext)();
+function beep(freq,dur,type='sine',vol=0.18){
+  const o=AC.createOscillator(),g=AC.createGain();
+  o.connect(g);g.connect(AC.destination);
+  o.frequency.value=freq;o.type=type;
+  g.gain.setValueAtTime(vol,AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+dur);
+  o.start();o.stop(AC.currentTime+dur);
+}
+function sndMove(){beep(320,.08,'sine',.12);setTimeout(()=>beep(420,.08,'sine',.1),60)}
+function sndWin(){
+  [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.18,'sine',.22),i*120));
+  setTimeout(()=>{[1047,1319,1568].forEach((f,i)=>setTimeout(()=>beep(f,.22,'sine',.25),i*100))},600);
+}
+function sndBlock(){beep(160,.1,'sawtooth',.08)}
+
+// ── Level definitions ──
+// Each piece: {id, type, row, col, len, dir:'H'|'V', emoji, name, cls}
+// dir H = moves left/right, V = moves up/down
+// Grid is COLS x ROWS (cols wide, rows tall)
+// trex: must reach col==COLS (exit right side), always H, row==exitRow
+const LEVELS=[
+  // Lv1: 4x4, 2 moves
+  {cols:4,rows:4,exitRow:1,par:2,name:'小試身手',icon:'🥚',
+   pieces:[
+    {id:'trex',type:'trex',row:1,col:0,len:2,dir:'H',emoji:'🦖',name:'小暴龍',cls:'piece-trex'},
+    {id:'b1',type:'bronto',row:0,col:2,len:2,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
+    {id:'r1',type:'raptor',row:2,col:2,len:1,dir:'V',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
+    {id:'e1',type:'egg',row:3,col:0,len:1,dir:'H',emoji:'🥚',name:'恐龍蛋',cls:'piece-egg'},
+   ]},
+  // Lv2: 4x4, 3 moves
+  {cols:4,rows:4,exitRow:2,par:3,name:'暖身一下',icon:'🦎',
+   pieces:[
+    {id:'trex',type:'trex',row:2,col:0,len:2,dir:'H',emoji:'🦖',name:'小暴龍',cls:'piece-trex'},
+    {id:'b1',type:'bronto',row:0,col:2,len:3,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
+    {id:'r1',type:'raptor',row:2,col:3,len:2,dir:'V',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
+    {id:'t1',type:'tricera',row:0,col:0,len:2,dir:'H',emoji:'🐊',name:'三角龍',cls:'piece-tricera'},
+   ]},
+  // Lv3: 5x5, 4 moves
+  {cols:5,rows:5,exitRow:2,par:4,name:'加油前進',icon:'🦕',
+   pieces:[
+    {id:'trex',type:'trex',row:2,col:0,len:2,dir:'H',emoji:'🦖',name:'小暴龍',cls:'piece-trex'},
+    {id:'b1',type:'bronto',row:0,col:2,len:3,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
+    {id:'t1',type:'tricera',row:2,col:3,len:2,dir:'H',emoji:'🐊',name:'三角龍',cls:'piece-tricera'},
+    {id:'r1',type:'raptor',row:0,col:3,len:2,dir:'V',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
+    {id:'e1',type:'egg',row:4,col:1,len:1,dir:'H',emoji:'🥚',name:'恐龍蛋',cls:'piece-egg'},
+   ]},
+  // Lv4: 5x5, 5 moves
+  {cols:5,rows:5,exitRow:1,par:5,name:'勇敢挑戰',icon:'🐊',
+   pieces:[
+    {id:'trex',type:'trex',row:1,col:0,len:2,dir:'H',emoji:'🦖',name:'小暴龍',cls:'piece-trex'},
+    {id:'b1',type:'bronto',row:0,col:2,len:3,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
+    {id:'t1',type:'tricera',row:1,col:3,len:2,dir:'V',emoji:'🐊',name:'三角龍',cls:'piece-tricera'},
+    {id:'r1',type:'raptor',row:3,col:0,len:2,dir:'H',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
+    {id:'r2',type:'raptor',row:4,col:2,len:2,dir:'H',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
+    {id:'e1',type:'egg',row:0,col:0,len:1,dir:'H',emoji:'🥚',name:'恐龍蛋',cls:'piece-egg'},
+   ]},
+  // Lv5: 5x5, 6 moves
+  {cols:5,rows:5,exitRow:2,par:6,name:'超級高手',icon:'🦖',
+   pieces:[
+    {id:'trex',type:'trex',row:2,col:0,len:2,dir:'H',emoji:'🦖',name:'小暴龍',cls:'piece-trex'},
+    {id:'b1',type:'bronto',row:0,col:2,len:2,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
+    {id:'b2',type:'bronto',row:2,col:3,len:3,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
+    {id:'t1',type:'tricera',row:0,col:3,len:2,dir:'H',emoji:'🐊',name:'三角龍',cls:'piece-tricera'},
+    {id:'r1',type:'raptor',row:3,col:0,len:2,dir:'H',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
+    {id:'r2',type:'raptor',row:4,col:1,len:2,dir:'H',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
+   ]},
+  // Lv6: 6x6, 7 moves
+  {cols:6,rows:6,exitRow:2,par:7,name:'恐龍勇士',icon:'⭐',
+   pieces:[
+    {id:'trex',type:'trex',row:2,col:0,len:2,dir:'H',emoji:'🦖',name:'小暴龍',cls:'piece-trex'},
+    {id:'b1',type:'bronto',row:0,col:2,len:3,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
+    {id:'b2',type:'bronto',row:2,col:4,len:3,dir:'V',emoji:'🦕',name:'腕龍',cls:'piece-bronto'},
+    {id:'t1',type:'tricera',row:0,col:3,len:2,dir:'H',emoji:'🐊',name:'三角龍',cls:'piece-tricera'},
+    {id:'t2',type:'tricera',row:2,col:2,len:2,dir:'H',emoji:'🐊',name:'三角龍',cls:'piece-tricera'},
+    {id:'r1',type:'raptor',row:4,col:0,len:2,dir:'H',emoji:'🦎',name:'迅猛龍',cls:'piece-raptor'},
+    {id:'e1',type:'egg',row:5,col:3,len:1,dir:'H',emoji:'🥚',name:'恐龍蛋',cls:'piece-egg'},
+   ]},
+];
+
+let currentLevel=0;
+let pieces=[];// deep copy of level pieces (mutable state)
+let moves=0;
+let totalStars=JSON.parse(localStorage.getItem('huarong_stars')||'[]');// array of stars per level
+
+const CELL=Math.min(Math.floor((window.innerWidth*.92)/6),72);// cell px, max 72
+
+// ── Render board ──
+function renderBoard(){
+  const lv=LEVELS[currentLevel];
+  const board=document.getElementById('board');
+  const bw=lv.cols*CELL, bh=lv.rows*CELL;
+  board.style.width=bw+'px';board.style.height=bh+'px';
+
+  // Exit arrow position
+  const ea=document.getElementById('exitArrow');
+  ea.style.top=(lv.exitRow*CELL+(CELL-32)/2)+'px';
+
+  // Clear pieces (keep exit arrow)
+  [...board.querySelectorAll('.piece,.grid-line')].forEach(e=>e.remove());
+
+  // Grid lines
+  for(let r=1;r<lv.rows;r++){
+    const l=document.createElement('div');
+    l.className='grid-line';l.style.cssText=`left:0;right:0;top:${r*CELL}px;height:1px`;
+    board.appendChild(l);
+  }
+  for(let c=1;c<lv.cols;c++){
+    const l=document.createElement('div');
+    l.className='grid-line';l.style.cssText=`top:0;bottom:0;left:${c*CELL}px;width:1px`;
+    board.appendChild(l);
+  }
+
+  // Pieces
+  pieces.forEach(p=>renderPiece(p));
+}
+
+function renderPiece(p){
+  const board=document.getElementById('board');
+  let el=document.getElementById('piece-'+p.id);
+  if(!el){
+    el=document.createElement('div');
+    el.className='piece '+p.cls;
+    el.id='piece-'+p.id;
+    el.innerHTML=`<div class="piece-label">${p.emoji}</div><div class="piece-name">${p.name}</div>`;
+    board.appendChild(el);
+    if(p.type!=='egg') setupDrag(el,p);
+  }
+  const pw=p.dir==='H'?p.len*CELL-6:CELL-6;
+  const ph=p.dir==='V'?p.len*CELL-6:CELL-6;
+  el.style.cssText=`left:${p.col*CELL+3}px;top:${p.row*CELL+3}px;width:${pw}px;height:${ph}px;${el.style.cssText.includes('transition')?'':''}`;
+  // emoji size by piece size
+  el.querySelector('.piece-label').style.fontSize=p.len>=3?'2.4rem':p.len===2?'1.9rem':'1.4rem';
+}
+
+// ── Grid occupancy ──
+function buildGrid(){
+  const lv=LEVELS[currentLevel];
+  const grid=Array.from({length:lv.rows},()=>Array(lv.cols).fill(null));
+  pieces.forEach(p=>{
+    for(let i=0;i<p.len;i++){
+      const r=p.dir==='V'?p.row+i:p.row;
+      const c=p.dir==='H'?p.col+i:p.col;
+      if(r>=0&&r<lv.rows&&c>=0&&c<lv.cols) grid[r][c]=p.id;
+    }
+  });
+  return grid;
+}
+
+function maxMove(p,dir){// dir: -1 or +1
+  const grid=buildGrid();
+  const lv=LEVELS[currentLevel];
+  let steps=0;
+  if(p.dir==='H'){
+    if(dir<0){// left
+      let c=p.col-1;
+      while(c>=0&&!grid[p.row][c]){steps++;c--;}
+    }else{// right
+      let c=p.col+p.len;
+      while(c<lv.cols&&!grid[p.row][c]){steps++;c++;}
+      // trex: can exit
+      if(p.type==='trex'&&c>=lv.cols) steps++;
+    }
+  }else{
+    if(dir<0){// up
+      let r=p.row-1;
+      while(r>=0&&!grid[r][p.col]){steps++;r--;}
+    }else{// down
+      let r=p.row+p.len;
+      while(r<lv.rows&&!grid[r][p.col]){steps++;r++;}
+    }
+  }
+  return steps;
+}
+
+function moveBy(p,steps){
+  if(steps===0)return false;
+  if(p.dir==='H') p.col+=steps;
+  else p.row+=steps;
+  moves++;
+  document.getElementById('moveNum').textContent=moves;
+  sndMove();
+  renderPiece(p);
+  // Check win
+  const lv=LEVELS[currentLevel];
+  if(p.type==='trex'&&p.col>=lv.cols){
+    setTimeout(triggerWin,250);
+  }
+  return true;
+}
+
+// ── Drag ──
+function setupDrag(el,p){
+  let startX,startY,startCol,startRow,dragging=false,moved=false;
+
+  function onDown(ex,ey){
+    if(AC.state==='suspended')AC.resume();
+    startX=ex;startY=ey;startCol=p.col;startRow=p.row;dragging=true;moved=false;
+  }
+  function onMove(ex,ey){
+    if(!dragging)return;
+    const dx=ex-startX,dy=ey-startY;
+    const lv=LEVELS[currentLevel];
+    if(p.dir==='H'){
+      const raw=dx/CELL;
+      const dir=raw>0?1:-1;
+      const maxS=maxMove(p,dir);
+      const clampedSteps=Math.max(0,Math.min(Math.abs(raw),maxS));
+      const newCol=startCol+Math.round(raw<0?-clampedSteps:clampedSteps);
+      const pw=p.len*CELL-6;
+      const bw=lv.cols*CELL;
+      // visual: allow sliding beyond right for trex exit
+      const visualLeft=Math.min(newCol*CELL+3,p.type==='trex'?bw:bw-pw-3);
+      el.style.left=Math.max(3,visualLeft)+'px';
+    }else{
+      const raw=dy/CELL;
+      const dir=raw>0?1:-1;
+      const maxS=maxMove(p,dir);
+      const clampedSteps=Math.max(0,Math.min(Math.abs(raw),maxS));
+      const newRow=startRow+Math.round(raw<0?-clampedSteps:clampedSteps);
+      const ph=p.len*CELL-6;
+      const bh=lv.rows*CELL;
+      el.style.top=Math.max(3,Math.min(newRow*CELL+3,bh-ph-3))+'px';
+    }
+    moved=true;
+  }
+  function onUp(ex,ey){
+    if(!dragging)return;dragging=false;
+    if(!moved){sndBlock();return;}
+    const dx=ex-startX,dy=ey-startY;
+    if(p.dir==='H'){
+      const raw=dx/CELL;
+      const dir=raw>0?1:-1;
+      const maxS=maxMove(p,dir);
+      const steps=Math.min(Math.round(Math.abs(raw)),maxS)*(raw<0?-1:1);
+      p.col=startCol;// reset, moveBy will update
+      if(steps!==0){
+        p.col=startCol;
+        moveBy(p,steps);
+      }else{
+        p.col=startCol;
+        renderPiece(p);
+        sndBlock();
+      }
+    }else{
+      const raw=dy/CELL;
+      const dir=raw>0?1:-1;
+      const maxS=maxMove(p,dir);
+      const steps=Math.min(Math.round(Math.abs(raw)),maxS)*(raw<0?-1:1);
+      p.row=startRow;
+      if(steps!==0){
+        moveBy(p,steps);
+      }else{
+        p.row=startRow;
+        renderPiece(p);
+        sndBlock();
+      }
+    }
+  }
+
+  el.addEventListener('mousedown',e=>{e.preventDefault();onDown(e.clientX,e.clientY)});
+  window.addEventListener('mousemove',e=>{if(dragging)onMove(e.clientX,e.clientY)});
+  window.addEventListener('mouseup',e=>{if(dragging)onUp(e.clientX,e.clientY)});
+  el.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];onDown(t.clientX,t.clientY)},{passive:false});
+  el.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];onMove(t.clientX,t.clientY)},{passive:false});
+  el.addEventListener('touchend',e=>{e.preventDefault();const t=e.changedTouches[0];onUp(t.clientX,t.clientY)},{passive:false});
+}
+
+// ── Win ──
+function triggerWin(){
+  sndWin();
+  const lv=LEVELS[currentLevel];
+  const stars=moves<=lv.par?3:moves<=lv.par+2?2:1;
+  if(!totalStars[currentLevel]||totalStars[currentLevel]<stars){
+    totalStars[currentLevel]=stars;
+    localStorage.setItem('huarong_stars',JSON.stringify(totalStars));
+  }
+  document.getElementById('winStars').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
+  document.getElementById('starsPill').textContent='⭐ '+totalStars.reduce((a,b)=>a+(b||0),0);
+  document.getElementById('winOv').classList.add('show');
+  document.getElementById('nextBtn').style.display=currentLevel<LEVELS.length-1?'':'none';
+  launchConfetti();
+  // Try save score to leaderboard
+  saveHuarongScore(stars*(10-currentLevel));
+}
+
+async function saveHuarongScore(sc){
+  try{
+    const sb=window._sb;
+    const user=window._currentUser;
+    if(!sb||!user)return;
+    await sb.from('leaderboard').insert({player_name:user.user_metadata?.full_name||user.email,game:'huarong',score:sc,user_id:user.id});
+  }catch(e){}
+}
+
+function restartLevel(){
+  document.getElementById('winOv').classList.remove('show');
+  loadLevel(currentLevel);
+}
+function nextLevel(){
+  document.getElementById('winOv').classList.remove('show');
+  if(currentLevel<LEVELS.length-1)loadLevel(currentLevel+1);
+}
+
+// ── Load level ──
+function loadLevel(idx){
+  currentLevel=idx;
+  moves=0;
+  document.getElementById('moveNum').textContent=0;
+  const lv=LEVELS[idx];
+  document.getElementById('levelPill').textContent='第 '+(idx+1)+' 關';
+  document.getElementById('parSpan').textContent='目標：'+lv.par+'步以內 ⭐⭐⭐';
+  document.getElementById('objBar').textContent='幫助小暴龍 🦖 往右滑出去！';
+  // deep copy pieces
+  pieces=lv.pieces.map(p=>({...p}));
+  renderBoard();
+}
+
+// ── Level select ──
+function openLvlSelect(){
+  const g=document.getElementById('lvlGrid');
+  g.innerHTML='';
+  LEVELS.forEach((lv,i)=>{
+    const s=totalStars[i]||0;
+    const unlocked=i===0||totalStars[i-1]>0;
+    const btn=document.createElement('div');
+    btn.className='lvl-btn'+(unlocked?' unlocked':' locked');
+    btn.innerHTML=`<div class="lvl-icon">${lv.icon}</div><div class="lvl-name">第${i+1}關<br>${lv.name}</div><div class="lvl-stars">${s?'⭐'.repeat(s)+'☆'.repeat(3-s):'☆☆☆'}</div>`;
+    if(unlocked) btn.onclick=()=>{closeLvlSelect();loadLevel(i)};
+    g.appendChild(btn);
+  });
+  document.getElementById('lvlOv').style.display='flex';
+}
+function closeLvlSelect(){document.getElementById('lvlOv').style.display='none'}
+
+// ── Confetti ──
+function launchConfetti(){
+  const cv=document.getElementById('confettiCanvas');
+  cv.width=window.innerWidth;cv.height=window.innerHeight;
+  const ctx=cv.getContext('2d');
+  const colors=['#4ade80','#fbbf24','#f472b6','#60a5fa','#a78bfa','#fb923c'];
+  const parts=Array.from({length:80},()=>({
+    x:Math.random()*cv.width,y:-20,
+    vx:(Math.random()-.5)*4,vy:Math.random()*4+2,
+    r:Math.random()*8+4,
+    color:colors[Math.floor(Math.random()*colors.length)],
+    rot:Math.random()*360,vrot:(Math.random()-.5)*8
+  }));
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    parts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.vrot;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color;ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r);
+      ctx.restore();
+    });
+    frame++;
+    if(frame<90)requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,cv.width,cv.height);
+  }
+  draw();
+}
+
+// ── Supabase bridge (use parent page's sb if available) ──
+// Injected by dino-abc-final when opening via iframe or same session
+// Standalone: try to get from localStorage user
+try{
+  const u=JSON.parse(localStorage.getItem('sb_user')||'null');
+  if(u){window._currentUser=u;}
+}catch(e){}
+
+// ── Init ──
+document.getElementById('starsPill').textContent='⭐ '+totalStars.reduce((a,b)=>a+(b||0),0);
+document.getElementById('levelPill').addEventListener('click',openLvlSelect);
+loadLevel(0);
+</script>
+</body>
+</html>
