@@ -91,8 +91,7 @@ body{font-family:'Fredoka One','Noto Sans TC',Arial,sans-serif;background:#0d1f0
 .player-card.eliminated{opacity:.45;filter:grayscale(.8);border-color:rgba(255,255,255,.1)}
 .player-card.eliminated::after{content:'淘汰';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#ef4444;background:rgba(0,0,0,.4);border-radius:16px}
 .player-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;margin:0 auto 6px;display:block;background:rgba(255,255,255,.1);font-size:1.6rem;line-height:44px}
-.player-name{font-size:.88rem;color:#fbbf24;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hearts{font-size:1.2rem;letter-spacing:2px;margin-bottom:10px;min-height:26px}
+.player-name{font-size:.88rem;color:#fbbf24;margin-bottom:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wrong-btn{background:rgba(239,68,68,.18);border:1.5px solid rgba(239,68,68,.4);border-radius:99px;padding:7px 12px;font-family:'Fredoka One',Arial,sans-serif;font-size:.78rem;color:#fca5a5;cursor:pointer;transition:.2s;width:100%}
 .wrong-btn:hover:not(:disabled){background:rgba(239,68,68,.35);border-color:#ef4444}
 .wrong-btn:disabled{opacity:.3;cursor:default}
@@ -399,7 +398,6 @@ function startGame() {
     icon:   d.icon,
     action: d.action,
     color:  d.color,
-    lives:  3,
     rounds: 0,
     eliminated:false,
   }));
@@ -423,14 +421,11 @@ function renderPlayers() {
         : `<div class="player-avatar" style="display:flex;align-items:center;justify-content:center;font-size:1.4rem">${p.icon}</div>`
       }
       <div class="player-name" title="${escHtml(p.name)}">${escHtml(p.name)}</div>
-      <div class="hearts" id="hearts${i}">${hearts(p.lives)}</div>
       <button class="wrong-btn" id="wrongBtn${i}" onclick="markWrong(${i})"
-        ${p.eliminated?'disabled':''}>✕ 做錯了！</button>
+        ${p.eliminated?'disabled':''}>🦖 做錯淘汰！</button>
     </div>
   `).join('');
 }
-
-function hearts(n){ return '❤️'.repeat(Math.max(0,n))+'🖤'.repeat(Math.max(0,3-n)); }
 
 function playRandom() {
   if(document.getElementById('resultScreen').style.display!=='none') return;
@@ -489,20 +484,14 @@ function resetActionBox(){
 
 function markWrong(i) {
   if(players[i].eliminated) return;
-  players[i].lives--;
-  document.getElementById('hearts'+i).textContent=hearts(players[i].lives);
-  if(players[i].lives<=0){
-    players[i].eliminated=true;
-    const card=document.getElementById('pcard'+i);
-    card.classList.remove('alive');
-    card.classList.add('eliminated');
-    document.getElementById('wrongBtn'+i).disabled=true;
-    showToast(`${players[i].name} 被恐龍發現了！🦖`);
-    updateAliveCount();
-    checkGameOver();
-  } else {
-    showToast(`${players[i].name} 少一條命！還剩 ${players[i].lives} ❤️`);
-  }
+  players[i].eliminated=true;
+  const card=document.getElementById('pcard'+i);
+  card.classList.remove('alive');
+  card.classList.add('eliminated');
+  document.getElementById('wrongBtn'+i).disabled=true;
+  showToast(`${players[i].name} 被恐龍發現淘汰！🦖`);
+  updateAliveCount();
+  checkGameOver();
 }
 
 function updateAliveCount(){
@@ -535,7 +524,7 @@ function endGame(){
         ${p.avatar?`<img src="${p.avatar}" onerror="this.style.display='none'">`:`<span>${p.icon}</span>`}
         <span>${escHtml(p.name)}</span>
       </div>
-      <span>${p.eliminated?'淘汰':'🏅 存活'} · ${p.rounds} 回合 · ${hearts(p.lives)}</span>
+      <span>${p.eliminated?'💀 淘汰':'🏅 存活'} · ${p.rounds} 回合</span>
     </div>
   `).join('');
 }
