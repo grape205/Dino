@@ -210,31 +210,38 @@ const LEVELS=[
   //        T T A . H  →出口  H=迅猛龍(V,r2,c4,len2)
   //        . . E2 . H  E2=蛋固定
   //        . . . . .
+  // Lv5: 5×5 (exitRow=2, par=5)
+  // 解法: r2下3 → r3下3 → c1右2 → r1上1 → 小暴龍出關
+  // 格局: E C C r2 r3
+  //       . . r1 r2 r3
+  //       T T r1 .  .  →出口
+  //       . . E2 .  .
+  //       . . .  .  .
   {cols:5,rows:5,exitRow:2,par:5,name:'超級高手',icon:'🦖',
    pieces:[
     {id:'tx',type:'t',row:2,col:0,len:2,dir:'H',em:'🦖',nm:'小暴龍',cs:'pt'},
     {id:'r1',type:'r',row:1,col:2,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
-    {id:'c1',type:'c',row:0,col:2,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
-    {id:'r2',type:'r',row:0,col:4,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
-    {id:'r3',type:'r',row:2,col:4,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'c1',type:'c',row:0,col:1,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
+    {id:'r2',type:'r',row:0,col:3,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'r3',type:'r',row:0,col:4,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
     {id:'e1',type:'e',row:0,col:0,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
     {id:'e2',type:'e',row:3,col:2,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
    ]},
   // Lv6: 6×6 (exitRow=2, par=6)
-  // 解法: H下1 → F下1 → C右1 → A上1 → B上2 → 小暴龍出關
-  // 格局:  E . C C F .   E=蛋固定; C=三角龍(H,r0,c2,len2); F=迅猛龍(V,r0,c4,len2)
-  //        . . A . F .   A=迅猛龍(V,r1,c2,len2)
-  //        T T A . . B  →出口  B=迅猛龍(V,r2,c5,len2) 擋出口
-  //        . . E2 . H B  E2=蛋固定; H=迅猛龍(V,r3,c4,len2)
-  //        . . . . H .
-  //        . . . . . .
+  // 解法: r2下3 → r3下3 → c1右2 → r1上1 → r4上2 → 小暴龍出關
+  // 格局: E  C  C  r2 r3 .
+  //       .  .  r1 r2 r3 .
+  //       T  T  r1 .  .  r4 →出口
+  //       .  .  E2 .  .  r4
+  //       .  .  .  .  .  .
+  //       .  .  .  .  .  .
   {cols:6,rows:6,exitRow:2,par:6,name:'恐龍勇士',icon:'⭐',
    pieces:[
     {id:'tx',type:'t',row:2,col:0,len:2,dir:'H',em:'🦖',nm:'小暴龍',cs:'pt'},
     {id:'r1',type:'r',row:1,col:2,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
-    {id:'c1',type:'c',row:0,col:2,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
-    {id:'r2',type:'r',row:0,col:4,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
-    {id:'r3',type:'r',row:3,col:4,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'c1',type:'c',row:0,col:1,len:2,dir:'H',em:'🐊',nm:'三角龍',cs:'pc'},
+    {id:'r2',type:'r',row:0,col:3,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
+    {id:'r3',type:'r',row:0,col:4,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
     {id:'r4',type:'r',row:2,col:5,len:2,dir:'V',em:'🦎',nm:'迅猛龍',cs:'pr'},
     {id:'e1',type:'e',row:0,col:0,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
     {id:'e2',type:'e',row:3,col:2,len:1,dir:'H',em:'🥚',nm:'恐龍蛋',cs:'pe'},
