@@ -678,6 +678,12 @@ function setUser(u){
   currentUser=u;
   const name=u.user_metadata?.full_name||u.email||'玩家';
   const avatar=u.user_metadata?.avatar_url||'';
+  // persist to known-users list used by multi-player games
+  const known=JSON.parse(localStorage.getItem('knownUsers')||'[]');
+  const idx=known.findIndex(k=>k.id===u.id);
+  const entry={id:u.id,name,avatar,email:u.email||''};
+  if(idx>=0)known[idx]=entry;else known.unshift(entry);
+  localStorage.setItem('knownUsers',JSON.stringify(known.slice(0,8)));
   document.getElementById('loginPill').style.display='none';
   document.getElementById('userPill').style.display='flex';
   document.getElementById('userName').textContent=name.split(' ')[0];
