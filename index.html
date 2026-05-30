@@ -132,14 +132,18 @@ const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 })();
 
 async function init(){
-  // 處理 OAuth 回來的 token
   const hash=location.hash;
-  if(hash&&hash.includes('access_token')){
-    // 等 supabase 處理完 session
-    await new Promise(r=>setTimeout(r,500));
+  const params=new URLSearchParams(location.search);
+  // 同時支援 implicit flow (#access_token) 和 PKCE flow (?code=)
+  const isOAuthCallback=(hash&&hash.includes('access_token'))||params.has('code');
+  if(isOAuthCallback){
+    document.getElementById('loginBtn').style.display='none';
+    document.getElementById('skipBtn').style.display='none';
+    document.getElementById('loading').style.display='block';
+    // 等 Supabase 處理完 session（PKCE 需要稍等）
+    await new Promise(r=>setTimeout(r,1200));
     const {data:{session}}=await sb.auth.getSession();
     if(session){
-      // 清掉 hash 再跳轉
       history.replaceState(null,'',location.pathname);
       location.replace(MAIN);
       return;
