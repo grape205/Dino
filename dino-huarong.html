@@ -492,5 +492,16 @@ function confetti(){
 document.getElementById('stPill').textContent='⭐ '+totalStars.reduce((a,b)=>a+(b||0),0);
 loadLevel(0);
 </script>
+<!-- AADS bottom banner -->
+<div style="position:fixed;bottom:0;left:0;right:0;z-index:900;pointer-events:none" id="aadsBannerHuarong">
+  <input autocomplete="off" type="checkbox" id="aadsCloseHuarong" hidden>
+  <div style="pointer-events:auto;position:relative">
+    <label for="aadsCloseHuarong" style="position:absolute;top:-22px;right:8px;background:rgba(10,26,10,.9);border:1px solid rgba(74,222,128,.35);border-radius:99px;padding:2px 9px;color:#86efac;font-size:.65rem;cursor:pointer;font-family:'Fredoka One',Arial,sans-serif">✕ 關閉</label>
+    <div style="width:100%;background:rgba(10,26,10,.97);border-top:1px solid rgba(74,222,128,.25);display:flex;justify-content:center;padding:3px 0">
+      <iframe data-aa="2437486" src="//ad.a-ads.com/2437486/?size=320x50&background_color=0d1f0d" style="border:0;padding:0;width:320px;height:50px;overflow:hidden;display:block"></iframe>
+    </div>
+  </div>
+  <style>#aadsCloseHuarong:checked+div{display:none}</style>
+</div>
 </body>
 </html>
