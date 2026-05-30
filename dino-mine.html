@@ -805,5 +805,16 @@ function stopConfetti() {
 // ─── Init ─────────────────────────────────────────────────────
 initGame(1);
 </script>
+<!-- AADS bottom banner -->
+<div style="position:fixed;bottom:0;left:0;right:0;z-index:900;pointer-events:none" id="aadsBannerMine">
+  <input autocomplete="off" type="checkbox" id="aadsCloseMine" hidden>
+  <div style="pointer-events:auto;position:relative">
+    <label for="aadsCloseMine" style="position:absolute;top:-22px;right:8px;background:rgba(10,10,26,.9);border:1px solid rgba(167,139,250,.35);border-radius:99px;padding:2px 9px;color:#c4b5fd;font-size:.65rem;cursor:pointer;font-family:'Fredoka One',Arial,sans-serif">✕ 關閉</label>
+    <div style="width:100%;background:rgba(10,10,26,.97);border-top:1px solid rgba(124,58,237,.25);display:flex;justify-content:center;padding:3px 0">
+      <iframe data-aa="2437486" src="//ad.a-ads.com/2437486/?size=320x50&background_color=0a0a1a" style="border:0;padding:0;width:320px;height:50px;overflow:hidden;display:block"></iframe>
+    </div>
+  </div>
+  <style>#aadsCloseMine:checked+div{display:none}</style>
+</div>
 </body>
 </html>
