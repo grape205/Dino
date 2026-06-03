@@ -187,7 +187,19 @@ body{font-family:'Fredoka One','Noto Sans TC',sans-serif;background:#1B5E20;min-
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPA_URL='https://iizaesirhmhfwrjgabnw.supabase.co';
+const SUPA_KEY='sb_publishable_e5libYdUvxTNKMnBscUvSw_8gj3QxyY';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+let currentUser=null;
+sb.auth.getSession().then(({data:{session}})=>{if(session)currentUser=session.user;});
+async function saveScoreToDB(game,sc){
+  if(!currentUser||sc<=0)return;
+  const name=currentUser.user_metadata?.full_name||currentUser.email||'玩家';
+  try{await sb.from('leaderboard').insert({player_name:name,game,score:sc,user_id:currentUser.id});}catch(e){}
+}
+
 const qBank=[
   // ── 原有20題 ──
   {emoji:'🍎',name:'蘋果',zhuyin:'ㄆㄧㄥˊ',initial:'ㄆ',syllable:'ㄆㄧㄥˊ',tone:'ˊ',toneWord:'ㄆㄧㄥ',wrongI:['ㄅ','ㄇ','ㄈ','ㄉ','ㄊ'],wrongS:['ㄅㄧㄥˊ','ㄇㄧㄥˊ','ㄉㄧㄥˊ','ㄆㄤˊ'],wrongT:['ˉ','ˇ','ˋ']},
@@ -478,6 +490,7 @@ function endGame(){
   document.getElementById('questionArea').style.display='none';
   document.getElementById('endScreen').classList.add('show');
   document.getElementById('finalScore').textContent=score;
+  if(score>0)saveScoreToDB('zhuyin',score);
   const acc=totalQ>0?Math.round((totalCorrect/totalQ)*100):0;
   const reachedLv=LEVELS[levelIdx].id;
   let stars='⭐',title='繼續加油！',dino='🦕';
