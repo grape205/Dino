@@ -298,6 +298,63 @@ body{
   text-align:center;
   letter-spacing:0.3px;
 }
+
+/* stars display in win panel */
+.win-stars{font-size:2.2rem;letter-spacing:6px;margin:4px 0;}
+.win-stars-msg{font-size:0.9rem;color:rgba(255,255,255,0.65);margin-top:2px;}
+
+/* puzzle popup */
+#puzzle-popup{
+  position:fixed;inset:0;z-index:500;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.88);
+  backdrop-filter:blur(8px);
+}
+#puzzle-popup.hidden{display:none;}
+.pz-box{
+  background:linear-gradient(145deg,#1a0a2e,#2d1060);
+  border:3px solid #a855f7;
+  border-radius:28px;
+  padding:28px 22px;
+  max-width:300px;width:90%;
+  text-align:center;
+  animation:pzPop .5s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes pzPop{from{transform:scale(.3) rotate(-10deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.pz-title{font-size:1.5rem;color:#e879f9;text-shadow:0 0 20px rgba(232,121,249,.8);margin-bottom:6px;}
+.pz-piece-big{font-size:4rem;margin:10px 0;display:block;animation:pzSpin .6s ease;}
+@keyframes pzSpin{from{transform:scale(.3) rotate(180deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.pz-count{font-size:1rem;color:#d8b4fe;margin-bottom:14px;}
+.pz-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:7px;
+  max-width:180px;margin:0 auto 14px;
+}
+.pz-cell{
+  aspect-ratio:1;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;border:2px solid rgba(168,85,247,.35);
+}
+.pz-cell.pz-locked{
+  background:rgba(0,0,0,.5);color:rgba(255,255,255,.18);
+  font-size:1.1rem;
+}
+.pz-cell.pz-done{background:rgba(168,85,247,.2);}
+.pz-cell.pz-new{
+  background:rgba(168,85,247,.45);border-color:#e879f9;
+  box-shadow:0 0 14px rgba(232,121,249,.7);
+  animation:pzGlow .8s ease .3s both;
+}
+@keyframes pzGlow{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.pz-complete-msg{font-size:1.1rem;color:#fbbf24;margin-bottom:10px;animation:pzGlow .7s ease infinite;}
+.pz-hint{font-size:.8rem;color:rgba(216,180,254,.65);margin-bottom:12px;}
+.pz-close-btn{
+  background:linear-gradient(135deg,#7c3aed,#a855f7);
+  border:none;border-radius:99px;
+  padding:12px 28px;color:#fff;
+  font-family:'Fredoka One',Arial,sans-serif;font-size:1.1rem;
+  cursor:pointer;box-shadow:0 4px 16px rgba(168,85,247,.5);
+}
+.pz-close-btn:active{transform:scale(.95);}
 </style>
 </head>
 <body>
@@ -337,8 +394,23 @@ body{
   <div class="panel">
     <div class="panel-emoji">🎉🦕🎉</div>
     <div class="panel-title" id="win-title">恭喜通關第 1 關！</div>
+    <div class="win-stars" id="win-stars">⭐⭐⭐</div>
+    <div class="win-stars-msg" id="win-stars-msg">+3⭐ 超快速！</div>
     <div class="panel-msg">太棒了！你找到了所有的恐龍蛋！<br>考古隊長誇你超厲害！</div>
     <button class="panel-btn btn-win" onclick="nextLevel()">挑戰下一關 →</button>
+  </div>
+</div>
+
+<!-- Puzzle Piece Reward popup -->
+<div id="puzzle-popup" class="hidden">
+  <div class="pz-box">
+    <div class="pz-title">🧩 獲得拼圖碎片！</div>
+    <span class="pz-piece-big" id="pz-piece-big">🌈</span>
+    <div class="pz-count" id="pz-count">已收集 1 / 9 塊</div>
+    <div class="pz-grid" id="pz-grid"></div>
+    <div class="pz-complete-msg" id="pz-complete-msg" style="display:none">🎊 全部收集完成！</div>
+    <div class="pz-hint" id="pz-hint">繼續玩收集所有拼圖！🦕</div>
+    <button class="pz-close-btn" onclick="closePuzzlePopup()">繼續冒險！</button>
   </div>
 </div>
 
@@ -353,6 +425,61 @@ body{
 </div>
 
 <script>
+// ─── Puzzle System ────────────────────────────────────────────
+const PUZZLE_KEY = 'dino_puzzle_pieces';
+const PUZZLE_EMOJIS = ['🌈','☁️','🌟','🌴','🦕','🌸','🌺','🥚','🌿'];
+const PUZZLE_COLORS = [
+  '#4f46e5','#3b82f6','#f59e0b',
+  '#16a34a','#15803d','#be185d',
+  '#b45309','#78716c','#4d7c0f',
+];
+
+function loadPuzzle() {
+  return JSON.parse(localStorage.getItem(PUZZLE_KEY) || 'null') || Array(9).fill(false);
+}
+
+function awardPuzzlePiece() {
+  const pieces = loadPuzzle();
+  const available = pieces.map((v,i) => !v ? i : -1).filter(i => i >= 0);
+  if (available.length === 0) return -1;
+  const idx = available[Math.floor(Math.random() * available.length)];
+  pieces[idx] = true;
+  localStorage.setItem(PUZZLE_KEY, JSON.stringify(pieces));
+  return idx;
+}
+
+function showPuzzlePopup(newIdx) {
+  const pieces = loadPuzzle();
+  const collected = pieces.filter(Boolean).length;
+  const allDone = collected === 9;
+
+  document.getElementById('pz-piece-big').textContent = PUZZLE_EMOJIS[newIdx];
+  document.getElementById('pz-count').textContent = `已收集 ${collected} / 9 塊`;
+
+  const grid = document.getElementById('pz-grid');
+  grid.innerHTML = PUZZLE_EMOJIS.map((em, i) => {
+    if (!pieces[i]) return `<div class="pz-cell pz-locked">？</div>`;
+    const isNew = i === newIdx;
+    return `<div class="pz-cell ${isNew ? 'pz-new' : 'pz-done'}" style="background:${PUZZLE_COLORS[i]}40;border-color:${PUZZLE_COLORS[i]}">${em}</div>`;
+  }).join('');
+
+  const completeEl = document.getElementById('pz-complete-msg');
+  const hintEl = document.getElementById('pz-hint');
+  if (allDone) {
+    completeEl.style.display = 'block';
+    hintEl.textContent = '🎊 太厲害了！你是拼圖大師！';
+  } else {
+    completeEl.style.display = 'none';
+    hintEl.textContent = `繼續玩收集剩下 ${9 - collected} 塊！🦕`;
+  }
+
+  document.getElementById('puzzle-popup').classList.remove('hidden');
+}
+
+function closePuzzlePopup() {
+  document.getElementById('puzzle-popup').classList.add('hidden');
+}
+
 // ─── Game State ───────────────────────────────────────────────
 let level = 1;
 let rows, cols, numEggs;
@@ -362,6 +489,7 @@ let gameOver = false;
 let mode = 'dig';     // 'dig' | 'flag'
 let flagCount = 0;
 let revealedCount = 0;
+let startTime = 0;
 
 // ─── Level Config ─────────────────────────────────────────────
 function getLevelConfig(lv) {
@@ -370,6 +498,13 @@ function getLevelConfig(lv) {
   if (lv === 3) return { rows: 5, cols: 5, eggs: 4 };
   // Level 4+: 6x6, eggs = 4 + (lv-3), max 8
   return { rows: 6, cols: 6, eggs: Math.min(4 + (lv - 3), 8) };
+}
+
+function getParTime(lv) {
+  if (lv === 1) return 25;
+  if (lv === 2) return 50;
+  if (lv === 3) return 90;
+  return 120;
 }
 
 // ─── Sound Effects ────────────────────────────────────────────
@@ -432,6 +567,7 @@ function initGame(lv) {
   flagCount = 0;
   revealedCount = 0;
   mode = 'dig';
+  startTime = 0;
 
   board = [];
   for (let r = 0; r < rows; r++) {
@@ -624,6 +760,7 @@ function digCell(r, c) {
   // place eggs after first click
   if (firstClick) {
     firstClick = false;
+    startTime = Date.now();
     placeEggs(r, c);
   }
 
@@ -703,10 +840,35 @@ function checkWin() {
 function triggerWin() {
   gameOver = true;
   soundWin();
+
+  const elapsed = startTime ? Math.round((Date.now() - startTime) / 1000) : 999;
+  const par = getParTime(level);
+  const stars = elapsed <= par ? 3 : elapsed <= par * 2 ? 2 : 1;
+  const starEmoji = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+  const msgs = ['不錯哦！繼續加油！', '做得好！好厲害！', '超快速！完美通關！'];
+  const starsMsg = `+${stars}⭐ ${msgs[stars - 1]}`;
+
+  // save stars to global star system
+  const globalStars = parseInt(localStorage.getItem('stars') || '0');
+  localStorage.setItem('stars', globalStars + stars);
+
   setTimeout(() => {
     document.getElementById('win-title').textContent = `🦕 恭喜通關第 ${level} 關！`;
+    document.getElementById('win-stars').textContent = starEmoji;
+    document.getElementById('win-stars-msg').textContent = starsMsg;
     document.getElementById('win-overlay').classList.remove('hidden');
     startConfetti();
+
+    // award puzzle piece only on level 1
+    if (level === 1) {
+      setTimeout(() => {
+        const newPiece = awardPuzzlePiece();
+        if (newPiece >= 0) {
+          document.getElementById('win-overlay').classList.add('hidden');
+          showPuzzlePopup(newPiece);
+        }
+      }, 1800);
+    }
   }, 300);
 }
 

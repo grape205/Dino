@@ -92,6 +92,19 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
 .rcard-t{font-size:.82rem;color:#ffcc02}
 .rcard-c{font-size:.7rem;color:#ffb300;margin-top:3px}
 .rdmbtn{display:block;width:100%;margin-top:12px;background:linear-gradient(135deg,#ffb300,#e65100);border:none;border-radius:99px;padding:12px;color:#fff;font-family:'Fredoka One',Arial,sans-serif;font-size:1rem;cursor:pointer}
+/* puzzle gallery */
+.pz-section{background:linear-gradient(145deg,rgba(168,85,247,.12),rgba(126,34,206,.08));border:2px solid rgba(168,85,247,.3);border-radius:18px;padding:14px 12px;margin-top:14px}
+.pz-sec-title{font-size:.9rem;color:#d8b4fe;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.pz-sec-count{font-size:.75rem;color:#a855f7;background:rgba(168,85,247,.15);border-radius:99px;padding:2px 10px}
+.pz-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:210px;margin:0 auto 10px}
+.pz-gcard{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:2px solid rgba(168,85,247,.25);font-size:1.6rem;transition:transform .15s}
+.pz-gcard.pz-unlocked{cursor:default}
+.pz-gcard.pz-locked-card{background:rgba(0,0,0,.45);color:rgba(255,255,255,.15);font-size:1.1rem}
+.pz-gcard-label{font-size:.6rem;color:rgba(255,255,255,.75);letter-spacing:.3px}
+.pz-all-done{text-align:center;color:#fbbf24;font-size:1rem;padding:8px;animation:pglow .8s ease infinite}
+@keyframes pglow{0%,100%{text-shadow:0 0 8px rgba(251,191,36,.5)}50%{text-shadow:0 0 22px rgba(251,191,36,.9)}}
+.pz-progress-bar{height:6px;background:rgba(168,85,247,.18);border-radius:99px;overflow:hidden;margin-bottom:4px}
+.pz-progress-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#e879f9);border-radius:99px;transition:width .5s ease}
 #panel-math,#panel-zhuyin{padding:0}
 .game-frame{width:100%;height:calc(100vh - 160px);border:none;display:block;border-radius:12px}
 .frame-loading{text-align:center;padding:60px 20px;color:#81c784;font-size:1.2rem}
@@ -279,6 +292,15 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
     <div class="rsec">🏆 換獎勵！你有 <span id="rStars" style="color:#ffb300">0</span> 顆⭐</div>
     <div class="rgrid" id="rGrid"></div>
     <button class="rdmbtn" onclick="confirmRedeem()">🎉 換這個獎勵！</button>
+
+    <!-- Puzzle Gallery -->
+    <div class="pz-section">
+      <div class="pz-sec-title">🧩 恐龍拼圖收集 <span class="pz-sec-count" id="pzSecCount">0 / 9</span></div>
+      <div class="pz-progress-bar"><div class="pz-progress-fill" id="pzProgressFill" style="width:0%"></div></div>
+      <div class="pz-gallery" id="pzGallery"></div>
+      <div class="pz-all-done" id="pzAllDone" style="display:none">🎊 全部收集完成！你是拼圖大師！</div>
+      <div style="font-size:.72rem;color:rgba(216,180,254,.55);text-align:center">玩考古挖掘或華容道第1關就能獲得拼圖！</div>
+    </div>
   </div>
 
   <!-- 日記 -->
@@ -1117,8 +1139,25 @@ function selectHabitEmoji(e){
 initEmojiPicker();
 function deleteHabit(i){HABITS.splice(i,1);saveHabitsList();const newLog={};Object.keys(habitLog).forEach(k=>{const ki=parseInt(k);if(ki<i)newLog[k]=habitLog[k];else if(ki>i)newLog[ki-1]=habitLog[k];});habitLog=newLog;saveHabits();renderHabits();}
 
+// PUZZLE GALLERY
+const PZ_KEY='dino_puzzle_pieces';
+const PZ_EMOJIS=['🌈','☁️','🌟','🌴','🦕','🌸','🌺','🥚','🌿'];
+const PZ_LABELS=['彩虹','白雲','星星','椰樹','恐龍','花朵','花朵','龍蛋','小草'];
+const PZ_COLORS=['#4f46e5','#3b82f6','#f59e0b','#16a34a','#15803d','#be185d','#b45309','#78716c','#4d7c0f'];
+function renderPuzzleGallery(){
+  const pieces=JSON.parse(localStorage.getItem(PZ_KEY)||'null')||Array(9).fill(false);
+  const col=pieces.filter(Boolean).length;
+  document.getElementById('pzSecCount').textContent=col+' / 9';
+  document.getElementById('pzProgressFill').style.width=(col/9*100)+'%';
+  document.getElementById('pzAllDone').style.display=col===9?'block':'none';
+  document.getElementById('pzGallery').innerHTML=PZ_EMOJIS.map((em,i)=>{
+    if(!pieces[i])return`<div class="pz-gcard pz-locked-card">？</div>`;
+    return`<div class="pz-gcard pz-unlocked" style="background:${PZ_COLORS[i]}30;border-color:${PZ_COLORS[i]}">${em}<span class="pz-gcard-label">${PZ_LABELS[i]}</span></div>`;
+  }).join('');
+}
+
 // REWARDS
-function renderRewards(){document.getElementById('rStars').textContent=stars;document.getElementById('rGrid').innerHTML=REWARDS.map((r,i)=>{const locked=stars<r.c;const cls='rcard'+(locked?' locked':selectedReward===i?' picked':'');return '<div class="'+cls+'" onclick="pickReward('+i+')">'+'<div class="rcard-e">'+r.e+'</div><div class="rcard-t">'+r.t+'</div><div class="rcard-c">'+r.c+'⭐</div></div>';}).join('');}
+function renderRewards(){document.getElementById('rStars').textContent=stars;document.getElementById('rGrid').innerHTML=REWARDS.map((r,i)=>{const locked=stars<r.c;const cls='rcard'+(locked?' locked':selectedReward===i?' picked':'');return '<div class="'+cls+'" onclick="pickReward('+i+')">'+'<div class="rcard-e">'+r.e+'</div><div class="rcard-t">'+r.t+'</div><div class="rcard-c">'+r.c+'⭐</div></div>';}).join('');renderPuzzleGallery();}
 function pickReward(i){if(stars<REWARDS[i].c){showToast('星星不夠哦！');return;}selectedReward=i;renderRewards();}
 function confirmRedeem(){if(selectedReward===null){showToast('請先選一個獎勵！');return;}const r=REWARDS[selectedReward];if(stars<r.c){showToast('星星不夠！');return;}stars-=r.c;saveStars();showToast('🎉 換到了 '+r.e+' '+r.t+'！');selectedReward=null;renderRewards();}
 
