@@ -134,20 +134,33 @@ const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 async function init(){
   const hash=location.hash;
   const params=new URLSearchParams(location.search);
-  // 同時支援 implicit flow (#access_token) 和 PKCE flow (?code=)
   const isOAuthCallback=(hash&&hash.includes('access_token'))||params.has('code');
   if(isOAuthCallback){
     document.getElementById('loginBtn').style.display='none';
     document.getElementById('skipBtn').style.display='none';
     document.getElementById('loading').style.display='block';
-    // 等 Supabase 處理完 session（PKCE 需要稍等）
-    await new Promise(r=>setTimeout(r,1200));
-    const {data:{session}}=await sb.auth.getSession();
-    if(session){
-      history.replaceState(null,'',location.pathname);
-      location.replace(MAIN);
-      return;
+    try{
+      if(params.has('code')){
+        // PKCE flow：主動交換 code → session
+        await sb.auth.exchangeCodeForSession(location.search);
+      } else {
+        // Implicit flow：等 supabase 解析 hash
+        await new Promise(r=>setTimeout(r,800));
+      }
+      const {data:{session}}=await sb.auth.getSession();
+      if(session){
+        history.replaceState(null,'',location.pathname);
+        location.replace(MAIN);
+        return;
+      }
+    }catch(e){
+      console.error('login callback error',e);
     }
+    // 若到這裡表示 auth 失敗，恢復登入介面
+    document.getElementById('loginBtn').style.display='';
+    document.getElementById('skipBtn').style.display='';
+    document.getElementById('loading').style.display='none';
+    return;
   }
   // 已有 session 直接跳
   const {data:{session}}=await sb.auth.getSession();
