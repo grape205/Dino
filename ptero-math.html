@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>🦕 翼龍加法大冒險 v12</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -397,8 +398,24 @@ const canvas = document.getElementById('gc');
 const ctx = canvas.getContext('2d');
 const DW = 80, DH = 80;
 
+// ══ 排行榜連線（與主頁共用 Google 登入，session 存在同網域 localStorage）══
+const SUPA_URL='https://iizaesirhmhfwrjgabnw.supabase.co';
+const SUPA_KEY='sb_publishable_e5libYdUvxTNKMnBscUvSw_8gj3QxyY';
+const sbLB=window.supabase?window.supabase.createClient(SUPA_URL,SUPA_KEY):null;
+async function submitScore(game,sc){
+  try{
+    if(!sbLB||sc<=0)return;
+    const {data:{session}}=await sbLB.auth.getSession();
+    const u=session&&session.user;
+    if(!u){showToast('🏆 到主頁登入後，分數才能上排行榜喔！');return;}
+    const {error}=await sbLB.from('leaderboard').insert({player_name:u.user_metadata?.full_name||u.email||'玩家',game,score:sc,user_id:u.id});
+    if(!error)showToast('🏆 分數已上傳排行榜！');
+  }catch(e){}
+}
+
 // ══ GAME STATE ══
 let score = 0, lives = 3, streakCount = 0, gameLevel = 1, frame = 0;
+let lbPts = 0; // 排行榜分數：答對一題 +10×等級
 let gameActive = false, gameRaf = null, idleRafId = null;
 let letters = [], parts = [];
 let dinoX = 200, prevDX = 200;
@@ -415,7 +432,7 @@ function resize() {
 window.addEventListener('resize', resize);
 
 function resetGame() {
-  score = 0; lives = 3; streakCount = 0; gameLevel = 1; frame = 0;
+  score = 0; lbPts = 0; lives = 3; streakCount = 0; gameLevel = 1; frame = 0;
   letters = []; parts = [];
   chomping = false; chompT = 0; mouthA = 0; mouthDir = 1;
   fallSpd = 1.75; spawnInt = 84;
@@ -526,7 +543,7 @@ function gameLoop(){
         continue;
       }
       if(f.isAns){
-        score++;totalScore++;stars+=3;streakCount++;saveData();updateStarUI();
+        score++;lbPts+=10*gameLevel;totalScore++;stars+=3;streakCount++;saveData();updateStarUI();
         sndCorrect();chomping=true;chompT=0;sndChomp();
         burst(fx,f.y,true);
         letters.splice(0); // clear screen
@@ -771,8 +788,10 @@ function doEndGame(){
   const ov=document.getElementById('gOver');
   ov.style.display='flex';
   document.getElementById('gMsg').innerHTML=
-    `得了 <span style="color:#fbbf24;font-size:1.4em">${score}</span> 分！<br>`+
-    `獲得 <span style="color:#fbbf24">${score*3}</span> 顆⭐`;
+    `答對 <span style="color:#fbbf24;font-size:1.4em">${score}</span> 題！<br>`+
+    `獲得 <span style="color:#fbbf24">${score*3}</span> 顆⭐<br>`+
+    `🏆 排行榜分數 <span style="color:#fbbf24">${lbPts}</span> 分`;
+  submitScore('math',lbPts);
   document.getElementById('kofiBtn').style.display='block';
   const rb=document.getElementById('mathStartBtn');
   if(rb){rb.style.display='block';rb.textContent='🔄 再玩一次！';}

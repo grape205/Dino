@@ -662,10 +662,11 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
 const SUPA_URL='https://iizaesirhmhfwrjgabnw.supabase.co';
 const SUPA_KEY='sb_publishable_e5libYdUvxTNKMnBscUvSw_8gj3QxyY';
 const SITE_URL='https://grape205.github.io/Dino/dino-abc-final.html';
-const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+let sb=null;try{sb=supabase.createClient(SUPA_URL,SUPA_KEY);}catch(e){/* CDN 載入失敗時，遊戲本體仍可離線遊玩 */}
 
 let currentUser=null;
 async function initAuth(){
+  if(!sb)return;
   const {data:{session}}=await sb.auth.getSession();
   if(session)setUser(session.user);
   sb.auth.onAuthStateChange((_,s)=>{if(s)setUser(s.user);else clearUser();});
@@ -693,7 +694,21 @@ function setUser(u){
   loadVocabFromDB();
 }
 function clearUser(){currentUser=null;document.getElementById('loginPill').style.display='flex';document.getElementById('userPill').style.display='none';}
-async function loginGoogle(){await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:SITE_URL}});}
+async function loginGoogle(){
+  showToast('⏳ 前往 Google 登入...');
+  // 先確認伺服器活著（Supabase 免費方案閒置會被暫停，暫停後網址會完全連不上）
+  try{
+    const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),6000);
+    const res=await fetch(SUPA_URL+'/auth/v1/health',{signal:ctrl.signal,headers:{apikey:SUPA_KEY}});
+    clearTimeout(t);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+  }catch(e){
+    showToast('⚠️ 連不上伺服器！Supabase 專案可能被暫停，請到 supabase.com 恢復專案');
+    return;
+  }
+  const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:SITE_URL}});
+  if(error)showToast('⚠️ 登入失敗：'+error.message);
+}
 function showLogin(){if(currentUser){showToast('已登入：'+(currentUser.user_metadata?.full_name||currentUser.email));return;}document.getElementById('loginOv').classList.add('open');}
 
 function showUserMenu(){
@@ -843,7 +858,7 @@ const todayKey='dino_'+new Date().toISOString().slice(0,10);
 let stars=parseInt(localStorage.getItem('stars')||'0');
 let HABITS=JSON.parse(localStorage.getItem('habits')||JSON.stringify(DEFAULT_HABITS));
 let habitLog=JSON.parse(localStorage.getItem('hlog_'+todayKey)||'{}');
-let score=0,lives=3,level=1,gameActive=false;
+let score=0,catches=0,lives=3,level=1,gameActive=false;
 let fallers=[],fallerTimer=null,dinoX=160;
 let drag=false,dragStartX=0,dinoStartX=0;
 let growScore=0,growIdx=0,currentTarget=null,idleRafId=null;
@@ -969,7 +984,7 @@ function gameLoop(){
     if(f.y>aH||caught){
       if(caught){
         if(f.el.dataset.heart==='1'){lives=Math.min(lives+1,5);updateLivesUI();sndCorrect();showToast('❤️ 補血！');f.el.remove();fallers.splice(i,1);return;}
-        if(f.el.dataset.correct==='1'){score++;document.getElementById('sScore').textContent=score;checkGrow();sndCorrect();f.el.classList.add('correct');if(score%10===0&&score>0){level++;document.getElementById('sLevel').textContent=level;showToast('⚡ 升級！Level '+level);}pickTarget();}
+        if(f.el.dataset.correct==='1'){catches++;score+=10*level;document.getElementById('sScore').textContent=score;checkGrow();sndCorrect();f.el.classList.add('correct');if(catches%10===0&&catches>0){level++;document.getElementById('sLevel').textContent=level;showToast('⚡ 升級！Level '+level+'，答對一題 +'+(10*level)+'分！');}pickTarget();}
         else{lives--;updateLivesUI();sndWrong();f.el.classList.add('wrong');if(lives<=0){f.el.remove();fallers.splice(i,1);endGame();return;}}
       }
       if(!caught&&f.el.dataset.correct==='1')sndMiss();
@@ -980,7 +995,7 @@ function gameLoop(){
 }
 function startGame(){
   if(gameActive)return;gameActive=true;
-  score=0;lives=3;level=1;fallers=[];growScore=0;growIdx=0;
+  score=0;catches=0;lives=3;level=1;fallers=[];growScore=0;growIdx=0;
   document.getElementById('sScore').textContent=0;document.getElementById('sLevel').textContent=1;
   document.getElementById('growBar').style.width='0%';document.getElementById('growLabel').textContent=GROW[0].label;document.getElementById('growNext').textContent='+'+GROW[0].next+'分長大';
   updateLivesUI();
@@ -1018,16 +1033,20 @@ function endGame(){
   sb.textContent='🔄 再玩一次！';
   const msg=document.getElementById('gameOverMsg');
   if(msg){msg.style.display='block';msg.textContent='得了 '+score+' 分 🎉';}
-  const earned=Math.floor(score/5);
+  const earned=Math.floor(score/50);
   if(earned>0){stars+=earned;saveStars();updateStarUI();}
   showToast('🎮 遊戲結束！得了 '+score+' 分！');
   if(score>0)saveScoreToDB('abc',score);
   startIdle();
 }
 async function saveScoreToDB(game,sc){
-  if(!currentUser)return;
-  const name=currentUser.user_metadata?.full_name||currentUser.email||'玩家';
-  await sb.from('leaderboard').insert({player_name:name,game,score:sc,user_id:currentUser.id});
+  if(!currentUser){showToast('🏆 登入後分數才能上排行榜喔！');return;}
+  try{
+    const name=currentUser.user_metadata?.full_name||currentUser.email||'玩家';
+    const {error}=await sb.from('leaderboard').insert({player_name:name,game,score:sc,user_id:currentUser.id});
+    if(error)showToast('⚠️ 分數上傳失敗：'+error.message);
+    else showToast('🏆 分數已上傳排行榜！');
+  }catch(e){showToast('⚠️ 分數上傳失敗，請檢查網路');}
 }
 function checkGrow(){growScore++;const g=GROW[growIdx];document.getElementById('growBar').style.width=Math.min(growScore/g.next,1)*100+'%';if(growScore>=g.next&&growIdx<GROW.length-1){growScore=0;growIdx++;document.getElementById('growLabel').textContent=GROW[growIdx].label;document.getElementById('growNext').textContent='+'+GROW[growIdx].next+'分長大';showToast('🦕 '+GROW[growIdx].label+'！');}}
 
@@ -1050,7 +1069,7 @@ async function loadLbData(game){
   const listEl=document.getElementById('lbList');
   listEl.innerHTML='<div style="text-align:center;color:#81c784;padding:20px">載入中...</div>';
   document.getElementById('myLbRank').textContent='';
-  const {data}=await sb.from('leaderboard').select('player_name,score,user_id').eq('game',game).order('score',{ascending:false}).limit(50);
+  const {data}=await sb.from('leaderboard').select('player_name,score,user_id').eq('game',game).order('score',{ascending:false}).limit(200);
   if(!data||data.length===0){listEl.innerHTML='<div style="text-align:center;color:#81c784;padding:20px">還沒有紀錄！快去玩！</div>';return;}
   const best={};
   data.forEach(r=>{if(!best[r.user_id]||r.score>best[r.user_id].score)best[r.user_id]={...r};});

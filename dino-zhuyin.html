@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>🦕 恐龍注音大冒險</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+TC:wght@700;900&display=swap');
 :root{--g1:#4CAF50;--g2:#2E7D32;--g3:#A5D6A7;--g4:#E8F5E9;--sun:#FFD600;--orange:#FF9800;--red:#FF1744;--blue:#42A5F5;--purple:#AB47BC;}
@@ -265,6 +266,21 @@ const LEVELS=[
     desc:'⏰ 限時 6 秒！又快又準才能逃出火山！'},
 ];
 
+// ══ 排行榜連線（與主頁共用 Google 登入，session 存在同網域 localStorage）══
+const SUPA_URL='https://iizaesirhmhfwrjgabnw.supabase.co';
+const SUPA_KEY='sb_publishable_e5libYdUvxTNKMnBscUvSw_8gj3QxyY';
+const sbLB=window.supabase?window.supabase.createClient(SUPA_URL,SUPA_KEY):null;
+async function submitScore(game,sc){
+  try{
+    if(!sbLB||sc<=0)return '';
+    const {data:{session}}=await sbLB.auth.getSession();
+    const u=session&&session.user;
+    if(!u)return '🏆 到主頁登入後，分數才能上排行榜喔！';
+    const {error}=await sbLB.from('leaderboard').insert({player_name:u.user_metadata?.full_name||u.email||'玩家',game,score:sc,user_id:u.id});
+    return error?'⚠️ 分數上傳失敗':'🏆 分數已上傳排行榜！';
+  }catch(e){return '⚠️ 分數上傳失敗';}
+}
+
 let queue=[],current=null,score=0,lives=3,qNum=0,levelIdx=0;
 let answering=false,timerInt=null,timerLeft=0;
 let totalCorrect=0,totalQ=0;
@@ -477,8 +493,9 @@ function endGame(){
   document.getElementById('timerWrap').classList.remove('show');
   document.getElementById('questionArea').style.display='none';
   document.getElementById('endScreen').classList.add('show');
-  document.getElementById('finalScore').textContent=score;
   const acc=totalQ>0?Math.round((totalCorrect/totalQ)*100):0;
+  if(totalQ>0&&totalCorrect===totalQ)score+=50; // 全對加碼 50 分！
+  document.getElementById('finalScore').textContent=score;
   const reachedLv=LEVELS[levelIdx].id;
   let stars='⭐',title='繼續加油！',dino='🦕';
   if(acc>=90&&reachedLv>=4){stars='⭐⭐⭐';title='注音小天才！恐龍最愛你！';dino='🦖';}
@@ -486,7 +503,8 @@ function endGame(){
   document.getElementById('starsRow').textContent=stars;
   document.getElementById('endTitle').textContent=title;
   document.getElementById('endDino').textContent=dino;
-  document.getElementById('endStats').innerHTML=`答對 ${totalCorrect} / ${totalQ} 題&nbsp;&nbsp;正確率 ${acc}%<br>通關到第 ${reachedLv} 關`;
+  document.getElementById('endStats').innerHTML=`答對 ${totalCorrect} / ${totalQ} 題&nbsp;&nbsp;正確率 ${acc}%<br>通關到第 ${reachedLv} 關`+(totalQ>0&&totalCorrect===totalQ?'<br>💯 全對加碼 +50 分！':'');
+  submitScore('zhuyin',score).then(msg=>{if(msg)document.getElementById('endStats').innerHTML+='<br>'+msg;});
   setTimeout(()=>spawnParticles({getBoundingClientRect:()=>({left:window.innerWidth/2,top:window.innerHeight/2,width:0,height:0})},['🌟','⭐','🎉','🦕','🦖','🎊','✨']),250);
 }
 

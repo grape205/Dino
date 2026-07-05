@@ -118,7 +118,7 @@ body{
 const SUPA_URL='https://iizaesirhmhfwrjgabnw.supabase.co';
 const SUPA_KEY='sb_publishable_e5libYdUvxTNKMnBscUvSw_8gj3QxyY';
 const MAIN='https://grape205.github.io/Dino/dino-abc-final.html';
-const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+let sb=null;try{sb=supabase.createClient(SUPA_URL,SUPA_KEY);}catch(e){/* CDN 載入失敗時頁面仍可用 */}
 
 // 星星背景
 (function(){
@@ -132,6 +132,7 @@ const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 })();
 
 async function init(){
+  if(!sb)return; // 沒有連線元件就停在登入頁，仍可「先不登入」進入
   const hash=location.hash;
   const params=new URLSearchParams(location.search);
   // 同時支援 implicit flow (#access_token) 和 PKCE flow (?code=)
@@ -158,17 +159,37 @@ async function init(){
   // 沒登入就顯示登入頁（預設已顯示）
 }
 
+function showLoginError(msg){
+  const ld=document.getElementById('loading');
+  ld.style.display='block';ld.style.animation='none';ld.style.color='#ffab91';
+  ld.textContent=msg;
+  document.getElementById('loginBtn').style.display='';
+  document.getElementById('skipBtn').style.display='';
+}
 async function loginGoogle(){
+  if(!sb){showLoginError('⚠️ 網路連線元件載入失敗，請重新整理再試');return;}
   document.getElementById('loginBtn').style.display='none';
   document.getElementById('skipBtn').style.display='none';
-  document.getElementById('loading').style.display='block';
-  await sb.auth.signInWithOAuth({
+  const ld=document.getElementById('loading');
+  ld.style.display='block';ld.style.animation='';ld.style.color='';ld.textContent='⏳ 登入中...';
+  // 先確認伺服器活著（Supabase 免費方案閒置一週會被暫停，暫停後網址會完全連不上）
+  try{
+    const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),6000);
+    const res=await fetch(SUPA_URL+'/auth/v1/health',{signal:ctrl.signal,headers:{apikey:SUPA_KEY}});
+    clearTimeout(t);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+  }catch(e){
+    showLoginError('⚠️ 連不上遊戲伺服器！Supabase 專案可能被暫停了，請到 supabase.com/dashboard 按 Restore 恢復專案');
+    return;
+  }
+  const {error}=await sb.auth.signInWithOAuth({
     provider:'google',
     options:{
       redirectTo:'https://grape205.github.io/Dino/index.html',
       queryParams:{prompt:'select_account'}
     }
   });
+  if(error)showLoginError('⚠️ 登入失敗：'+error.message);
 }
 
 function goToMain(){

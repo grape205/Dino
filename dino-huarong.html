@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>🦖 恐龍華容道</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -441,14 +442,19 @@ function triggerWin(){
   document.getElementById('nxtBtn').style.display=curLv<LEVELS.length-1?'':'none';
   document.getElementById('wov').classList.add('show');
   confetti();
-  trySaveScore(stars*(10-curLv));
+  // 計分：全部關卡的星星總數 ×10（50 關全三星 = 1500 分）
+  trySaveScore(totalStars.reduce((a,b)=>a+(b||0),0)*10);
 }
+const SUPA_URL='https://iizaesirhmhfwrjgabnw.supabase.co';
+const SUPA_KEY='sb_publishable_e5libYdUvxTNKMnBscUvSw_8gj3QxyY';
+const sbLB=window.supabase?window.supabase.createClient(SUPA_URL,SUPA_KEY):null;
 async function trySaveScore(sc){
   try{
-    const sb=window._sb||window.supabase;
-    const u=window._currentUser;
-    if(!sb||!u)return;
-    await sb.from('leaderboard').insert({player_name:u.user_metadata?.full_name||u.email,game:'huarong',score:sc,user_id:u.id});
+    if(!sbLB||sc<=0)return;
+    const {data:{session}}=await sbLB.auth.getSession();
+    const u=session&&session.user;
+    if(!u)return;
+    await sbLB.from('leaderboard').insert({player_name:u.user_metadata?.full_name||u.email||'玩家',game:'huarong',score:sc,user_id:u.id});
   }catch(_){}
 }
 

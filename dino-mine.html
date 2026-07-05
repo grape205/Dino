@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>🥚 恐龍考古大冒險</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
@@ -317,6 +318,7 @@ body{
       </div>
       <div style="text-align:right">
         <div id="egg-info">🥚 0 / 1 顆蛋</div>
+        <div id="score-info" style="font-size:1rem;color:#ffe066;letter-spacing:.5px">⭐ 0 分</div>
         <div id="hint">點擊沙坑挖掘化石！</div>
       </div>
     </div>
@@ -353,8 +355,24 @@ body{
 </div>
 
 <script>
+// ══ 排行榜連線（與主頁共用 Google 登入，session 存在同網域 localStorage）══
+const SUPA_URL='https://iizaesirhmhfwrjgabnw.supabase.co';
+const SUPA_KEY='sb_publishable_e5libYdUvxTNKMnBscUvSw_8gj3QxyY';
+const sbLB=window.supabase?window.supabase.createClient(SUPA_URL,SUPA_KEY):null;
+async function submitScore(game,sc){
+  try{
+    if(!sbLB||sc<=0)return '';
+    const {data:{session}}=await sbLB.auth.getSession();
+    const u=session&&session.user;
+    if(!u)return '🏆 到主頁登入後，分數才能上排行榜喔！';
+    const {error}=await sbLB.from('leaderboard').insert({player_name:u.user_metadata?.full_name||u.email||'玩家',game,score:sc,user_id:u.id});
+    return error?'⚠️ 分數上傳失敗':'🏆 分數已上傳排行榜！';
+  }catch(e){return '⚠️ 分數上傳失敗';}
+}
+
 // ─── Game State ───────────────────────────────────────────────
 let level = 1;
+let score = 0;   // 計分：過第 N 關 +N×10，挖到蛋 −20（不會低於 0）
 let rows, cols, numEggs;
 let board = [];       // 2D array of cell objects
 let firstClick = true;
@@ -472,6 +490,14 @@ function placeEggs(safeR, safeC) {
     for (let c = 0; c < cols; c++)
       if (!safe.has(r * cols + c)) all.push([r, c]);
 
+  // 棋盤太小時（如 3×3 點中間），安全區縮小到只有點到的那格，確保放得下蛋
+  if (all.length < numEggs) {
+    all.length = 0;
+    for (let r = 0; r < rows; r++)
+      for (let c = 0; c < cols; c++)
+        if (!(r === safeR && c === safeC)) all.push([r, c]);
+  }
+
   // shuffle
   for (let i = all.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -479,10 +505,12 @@ function placeEggs(safeR, safeC) {
   }
 
   const count = Math.min(numEggs, all.length);
+  numEggs = count; // HUD 與勝利判定以實際放置的蛋數為準
   for (let i = 0; i < count; i++) {
     const [r, c] = all[i];
     board[r][c].isEgg = true;
   }
+  updateHUD();
 
   // recalc counts
   for (let r = 0; r < rows; r++) {
@@ -576,6 +604,7 @@ function updateHUD() {
   document.getElementById('level-label').textContent = `第 ${level} 關`;
   document.getElementById('grid-info').textContent = `${rows}×${cols} 沙坑`;
   document.getElementById('egg-info').textContent = `🥚 ${flagCount} / ${numEggs} 顆蛋`;
+  document.getElementById('score-info').textContent = `⭐ ${score} 分`;
 }
 
 function updateModeBtn() {
@@ -646,6 +675,7 @@ function flagCell(r, c) {
 }
 
 function reveal(r, c) {
+  if (gameOver) return;
   const cell = board[r][c];
   if (cell.revealed || cell.flagged) return;
 
@@ -679,6 +709,7 @@ function reveal(r, c) {
       }
     }
   }
+  checkWin(); // 連鎖翻開的格子也要檢查是否過關
 }
 
 // ─── Win / Lose ───────────────────────────────────────────────
@@ -703,16 +734,27 @@ function checkWin() {
 function triggerWin() {
   gameOver = true;
   soundWin();
+  const gained = level * 10;
+  score += gained;
+  updateHUD();
   setTimeout(() => {
     document.getElementById('win-title').textContent = `🦕 恭喜通關第 ${level} 關！`;
+    const msgEl = document.querySelector('#win-overlay .panel-msg');
+    msgEl.innerHTML = `太棒了！你找到了所有的恐龍蛋！<br>⭐ +${gained} 分，目前總分 ${score} 分！`;
     document.getElementById('win-overlay').classList.remove('hidden');
     startConfetti();
+    submitScore('mine', score).then(m => { if (m) msgEl.innerHTML += '<br>' + m; });
   }, 300);
 }
 
 function triggerLose(eggR, eggC) {
   gameOver = true;
   soundLose();
+  const lost = Math.min(score, 20);
+  score = Math.max(0, score - 20);
+  updateHUD();
+  document.querySelector('#lose-overlay .panel-msg').innerHTML =
+    (lost > 0 ? `💔 −${lost} 分，目前總分 ${score} 分<br>` : '') + '考古隊重新整隊再試一次吧！<br>下次小心一點喔！';
 
   // reveal all eggs after short delay
   setTimeout(() => {
