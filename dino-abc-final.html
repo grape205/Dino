@@ -666,13 +666,20 @@ const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 
 let currentUser=null;
 async function initAuth(){
+  sb.auth.onAuthStateChange((_,s)=>{if(s)setUser(s.user);else clearUser();});
+  // PKCE flow：?code= 時主動交換取得 session
+  const params=new URLSearchParams(location.search);
+  if(params.has('code')){
+    try{
+      await sb.auth.exchangeCodeForSession(location.search);
+    }catch(e){console.error('auth code exchange error',e);}
+    history.replaceState(null,'',location.pathname);
+  } else if(location.hash.includes('access_token')){
+    // Implicit flow（舊版相容）
+    history.replaceState(null,'',location.pathname);
+  }
   const {data:{session}}=await sb.auth.getSession();
   if(session)setUser(session.user);
-  sb.auth.onAuthStateChange((_,s)=>{if(s)setUser(s.user);else clearUser();});
-  if(location.hash.includes('access_token')){
-    const {data:{session:s2}}=await sb.auth.getSession();
-    if(s2){setUser(s2.user);history.replaceState(null,'',location.pathname);}
-  }
 }
 function setUser(u){
   currentUser=u;
