@@ -1277,11 +1277,60 @@ let vcCurrentWord=null;
 
 function saveVocabLocal(){localStorage.setItem('vocabWords',JSON.stringify(VOCAB));}
 
+// 預設詞庫：顏色 + 動物
+const PRESET_VOCAB=[
+  {word:'red',   zh_meaning:'紅色', phonetic:'/rɛd/',      emoji:'🔴'},
+  {word:'yellow',zh_meaning:'黃色', phonetic:'/ˈjeloʊ/',  emoji:'🟡'},
+  {word:'blue',  zh_meaning:'藍色', phonetic:'/bluː/',     emoji:'🔵'},
+  {word:'green', zh_meaning:'綠色', phonetic:'/ɡriːn/',    emoji:'🟢'},
+  {word:'purple',zh_meaning:'紫色', phonetic:'/ˈpɜːrpl/', emoji:'🟣'},
+  {word:'white', zh_meaning:'白色', phonetic:'/waɪt/',     emoji:'⬜'},
+  {word:'black', zh_meaning:'黑色', phonetic:'/blæk/',     emoji:'⬛'},
+  {word:'brown', zh_meaning:'棕色', phonetic:'/braʊn/',    emoji:'🟫'},
+  {word:'bear',  zh_meaning:'熊',   phonetic:'/bɛr/',      emoji:'🐻'},
+  {word:'bird',  zh_meaning:'鳥',   phonetic:'/bɜːrd/',    emoji:'🐦'},
+  {word:'duck',  zh_meaning:'鴨子', phonetic:'/dʌk/',      emoji:'🦆'},
+  {word:'horse', zh_meaning:'馬',   phonetic:'/hɔːrs/',    emoji:'🐴'},
+  {word:'frog',  zh_meaning:'青蛙', phonetic:'/frɒɡ/',     emoji:'🐸'},
+  {word:'cat',   zh_meaning:'貓',   phonetic:'/kæt/',      emoji:'🐱'},
+  {word:'dog',   zh_meaning:'狗',   phonetic:'/dɒɡ/',      emoji:'🐶'},
+  {word:'sheep', zh_meaning:'綿羊', phonetic:'/ʃiːp/',     emoji:'🐑'},
+];
+
+async function seedPresetVocab(){
+  if(!currentUser)return;
+  const seededKey='vocabSeeded_'+currentUser.id;
+  if(localStorage.getItem(seededKey))return;
+  const now=new Date();
+  const rows=PRESET_VOCAB.map((v,i)=>({
+    user_id:currentUser.id,
+    word:v.word,
+    zh_meaning:v.zh_meaning,
+    phonetic:v.phonetic,
+    emoji:v.emoji,
+    photo:'',
+    drawing:'',
+    // 讓顏色在上、動物在下，時間戳遞減讓 DESC 排序保持順序
+    created_at:new Date(now.getTime()-i*1000).toISOString()
+  }));
+  const {error}=await sb.from('vocab_words').insert(rows);
+  if(!error){
+    localStorage.setItem(seededKey,'1');
+    showToast('📚 已自動新增 '+rows.length+' 個預設單字！');
+  }
+}
+
 async function loadVocabFromDB(){
   if(!currentUser)return;
   try{
     const {data}=await sb.from('vocab_words').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
     if(data){
+      if(data.length===0){
+        // 第一次登入且 DB 空白，植入預設詞庫後重新載入
+        await seedPresetVocab();
+        loadVocabFromDB();
+        return;
+      }
       // 登入後完全以 DB 為主，取代本地資料，並去除重複單字
       const seenW=new Set();
       VOCAB=data.filter(r=>{if(seenW.has((r.word||'').toLowerCase()))return false;seenW.add((r.word||'').toLowerCase());return true;})
