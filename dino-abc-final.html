@@ -511,6 +511,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
         <div class="color-dot" style="background:#ef5350" onclick="setVColor(this,'#ef5350')"></div>
         <div class="color-dot" id="vocabEraserBtn" style="background:linear-gradient(135deg,#555,#888);font-size:.75rem;display:flex;align-items:center;justify-content:center;color:#fff;width:44px;height:24px;border-radius:8px" onclick="setVColor(this,'__eraser__')" title="橡皮擦">🧹擦</div>
         <input type="range" class="draw-size" min="2" max="20" value="5" id="vDrawSizeInput">
+        <button class="draw-clear" onclick="undoVDraw()" title="復原上一步">↩️復原</button>
         <button class="draw-clear" onclick="fillVDraw()" title="塗滿整頁同一色">🪣塗滿</button>
         <button class="draw-clear" onclick="clearVDraw()">清除</button>
       </div>
@@ -649,6 +650,7 @@ body{background:#0d1f0d;min-height:100vh;font-family:'Fredoka One',Arial Rounded
     <div class="color-dot" style="background:#ef5350;width:28px;height:28px" onclick="setVFullColor(this,'#ef5350')"></div>
     <div class="color-dot" style="background:linear-gradient(135deg,#555,#888);width:50px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#fff" onclick="setVFullColor(this,'__eraser__')">🧹擦</div>
     <input type="range" style="width:90px;accent-color:#42a5f5" min="2" max="30" value="8" id="vFullSizeInput">
+    <button onclick="undoVFullCanvas()" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:5px 10px;color:#aaa;font-family:'Fredoka One',Arial,sans-serif;font-size:.72rem;cursor:pointer">↩️復原</button>
     <button onclick="fillVFullCanvas()" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:5px 10px;color:#aaa;font-family:'Fredoka One',Arial,sans-serif;font-size:.72rem;cursor:pointer">🪣塗滿</button>
     <button onclick="clearVFullCanvas()" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:5px 10px;color:#aaa;font-family:'Fredoka One',Arial,sans-serif;font-size:.72rem;cursor:pointer">🗑️清除</button>
   </div>
@@ -1341,14 +1343,20 @@ async function loadVocabFromDB(){
   }catch(e){}
 }
 
+// ── 手繪「復原」功能：每畫一筆前先存一張快照，按復原就回到上一步 ──
+let vUndoStack=[];
+function pushVUndo(){if(!vCtx)return;try{vUndoStack.push(vCtx.getImageData(0,0,600,200));if(vUndoStack.length>25)vUndoStack.shift();}catch(e){}}
+function undoVDraw(){if(vCtx&&vUndoStack.length){vCtx.putImageData(vUndoStack.pop(),0,0);}else{showToast('沒有可以復原的了');}}
+
 function initVDraw(){
   const vc=document.getElementById('vDrawCanvas');
   vCtx=vc.getContext('2d');
   vCtx.fillStyle='#1a1a2e';vCtx.fillRect(0,0,600,200);
-  vc.ontouchstart=e=>{vIsDrawing=true;const p=getPos(e,vc);vCtx.beginPath();vCtx.moveTo(p.x,p.y);e.preventDefault();};
+  vUndoStack=[];
+  vc.ontouchstart=e=>{pushVUndo();vIsDrawing=true;const p=getPos(e,vc);vCtx.beginPath();vCtx.moveTo(p.x,p.y);e.preventDefault();};
   vc.ontouchmove=e=>{if(!vIsDrawing)return;const p=getPos(e,vc);vCtx.strokeStyle=vDrawColor;vCtx.lineWidth=vDrawSize;vCtx.lineCap='round';vCtx.lineTo(p.x,p.y);vCtx.stroke();e.preventDefault();};
   vc.ontouchend=()=>vIsDrawing=false;
-  vc.onmousedown=e=>{vIsDrawing=true;const p=getPos(e,vc);vCtx.beginPath();vCtx.moveTo(p.x,p.y);};
+  vc.onmousedown=e=>{pushVUndo();vIsDrawing=true;const p=getPos(e,vc);vCtx.beginPath();vCtx.moveTo(p.x,p.y);};
   vc.onmousemove=e=>{if(!vIsDrawing)return;const p=getPos(e,vc);vCtx.strokeStyle=vDrawColor;vCtx.lineWidth=vDrawSize;vCtx.lineCap='round';vCtx.lineTo(p.x,p.y);vCtx.stroke();};
   vc.onmouseup=()=>vIsDrawing=false;
   document.getElementById('vDrawSizeInput').oninput=e=>vDrawSize=parseInt(e.target.value);
@@ -1360,8 +1368,8 @@ function setVColor(el,c){
   else{_vocabEraserMode=false;vDrawColor=c;}
   document.querySelectorAll('.vocab-draw-tools .color-dot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');
 }
-function clearVDraw(){if(vCtx){vCtx.fillStyle='#1a1a2e';vCtx.fillRect(0,0,600,200);}}
-function fillVDraw(){if(vCtx){const c=_vocabEraserMode?'#1a1a2e':vDrawColor;vCtx.fillStyle=c;vCtx.fillRect(0,0,600,200);}}
+function clearVDraw(){if(vCtx){pushVUndo();vCtx.fillStyle='#1a1a2e';vCtx.fillRect(0,0,600,200);}}
+function fillVDraw(){if(vCtx){pushVUndo();const c=_vocabEraserMode?'#1a1a2e':vDrawColor;vCtx.fillStyle=c;vCtx.fillRect(0,0,600,200);}}
 
 function openVocabEditor(keepValues){
   const ed=document.getElementById('vocabEditor');ed.classList.add('open');
@@ -1406,8 +1414,13 @@ async function saveVocab(){
   if(editIdx!=null&&editIdx>=0&&editIdx<VOCAB.length){
     // 編輯模式：更新原本那筆
     const old=VOCAB[editIdx];
-    VOCAB[editIdx]={...old,word,zh,phonetic:phonetic||old.phonetic,emoji,photo:photo||old.photo,drawing:drawing||old.drawing};
+    const updated={...old,word,zh,phonetic:phonetic||old.phonetic,emoji,photo:photo||old.photo,drawing:drawing||old.drawing};
+    VOCAB[editIdx]=updated;
     saveVocabLocal();
+    // 同步更新雲端資料庫，否則重新登入後 loadVocabFromDB 會用舊資料覆蓋掉修改
+    if(currentUser&&old.id){
+      try{await sb.from('vocab_words').update({word:updated.word,zh_meaning:updated.zh,phonetic:updated.phonetic,emoji:updated.emoji,photo:updated.photo,drawing:updated.drawing}).eq('id',old.id).eq('user_id',currentUser.id);}catch(e){}
+    }
     window._editingVocabIdx=null;
     closeVocabEditor();renderVocabList();showToast('✅ 「'+word+'」已更新！');
   } else {
@@ -1415,7 +1428,11 @@ async function saveVocab(){
     const entry={id:Date.now(),word,zh,phonetic,emoji,photo,drawing};
     VOCAB.unshift(entry);saveVocabLocal();
     if(currentUser){
-      try{await sb.from('vocab_words').insert({user_id:currentUser.id,word,zh_meaning:zh,phonetic,emoji,photo,drawing,created_at:new Date().toISOString()});}catch(e){}
+      try{
+        // 用 select() 取回資料庫產生的真實 id，之後同一場次的編輯／刪除才能對應到正確那筆
+        const {data}=await sb.from('vocab_words').insert({user_id:currentUser.id,word,zh_meaning:zh,phonetic,emoji,photo,drawing,created_at:new Date().toISOString()}).select();
+        if(data&&data[0]&&data[0].id){entry.id=data[0].id;saveVocabLocal();}
+      }catch(e){}
     }
     closeVocabEditor();renderVocabList();showToast('📖 「'+word+'」儲存成功！');
   }
@@ -1843,15 +1860,20 @@ function openVDrawFull(){
   vFullCtx.fillStyle='#1a1a2e';vFullCtx.fillRect(0,0,W,H);
   const vc=document.getElementById('vDrawCanvas');
   try{vFullCtx.drawImage(vc,0,0,W,H);}catch(e){}
-  fc.ontouchstart=e=>{vFullDrawing=true;const p=getPos(e,fc);vFullCtx.beginPath();vFullCtx.moveTo(p.x/2,p.y/2);e.preventDefault();};
+  vFullUndoStack=[];
+  fc.ontouchstart=e=>{pushVFullUndo();vFullDrawing=true;const p=getPos(e,fc);vFullCtx.beginPath();vFullCtx.moveTo(p.x/2,p.y/2);e.preventDefault();};
   fc.ontouchmove=e=>{if(!vFullDrawing)return;const p=getPos(e,fc);vFullCtx.strokeStyle=vDrawColor;vFullCtx.lineWidth=parseInt(document.getElementById('vFullSizeInput').value);vFullCtx.lineCap='round';vFullCtx.lineTo(p.x/2,p.y/2);vFullCtx.stroke();e.preventDefault();};
   fc.ontouchend=()=>vFullDrawing=false;
-  fc.onmousedown=e=>{vFullDrawing=true;const p=getPos(e,fc);vFullCtx.beginPath();vFullCtx.moveTo(p.x/2,p.y/2);};
+  fc.onmousedown=e=>{pushVFullUndo();vFullDrawing=true;const p=getPos(e,fc);vFullCtx.beginPath();vFullCtx.moveTo(p.x/2,p.y/2);};
   fc.onmousemove=e=>{if(!vFullDrawing)return;const p=getPos(e,fc);vFullCtx.strokeStyle=vDrawColor;vFullCtx.lineWidth=parseInt(document.getElementById('vFullSizeInput').value);vFullCtx.lineCap='round';vFullCtx.lineTo(p.x/2,p.y/2);vFullCtx.stroke();};
   fc.onmouseup=()=>vFullDrawing=false;
 }
-function clearVFullCanvas(){if(vFullCtx){const fc=document.getElementById('vFullCanvas');vFullCtx.fillStyle='#1a1a2e';vFullCtx.fillRect(0,0,fc.width/2,fc.height/2);}}
-function fillVFullCanvas(){if(vFullCtx){const fc=document.getElementById('vFullCanvas');const c=_vocabEraserMode?'#1a1a2e':vDrawColor;vFullCtx.fillStyle=c;vFullCtx.fillRect(0,0,fc.width/2,fc.height/2);if(vCtx){vCtx.fillStyle=c;vCtx.fillRect(0,0,600,200);}}}
+// ── 放大畫布的「復原」：快照較大，堆疊上限設小一點避免手機記憶體吃太多 ──
+let vFullUndoStack=[];
+function pushVFullUndo(){if(!vFullCtx)return;const fc=document.getElementById('vFullCanvas');try{vFullUndoStack.push(vFullCtx.getImageData(0,0,fc.width,fc.height));if(vFullUndoStack.length>8)vFullUndoStack.shift();}catch(e){}}
+function undoVFullCanvas(){if(vFullCtx&&vFullUndoStack.length){vFullCtx.save();vFullCtx.setTransform(1,0,0,1,0,0);vFullCtx.putImageData(vFullUndoStack.pop(),0,0);vFullCtx.restore();}else{showToast('沒有可以復原的了');}}
+function clearVFullCanvas(){if(vFullCtx){const fc=document.getElementById('vFullCanvas');pushVFullUndo();vFullCtx.fillStyle='#1a1a2e';vFullCtx.fillRect(0,0,fc.width/2,fc.height/2);}}
+function fillVFullCanvas(){if(vFullCtx){const fc=document.getElementById('vFullCanvas');pushVFullUndo();const c=_vocabEraserMode?'#1a1a2e':vDrawColor;vFullCtx.fillStyle=c;vFullCtx.fillRect(0,0,fc.width/2,fc.height/2);if(vCtx){vCtx.fillStyle=c;vCtx.fillRect(0,0,600,200);}}}
 function closeVDrawFull(){
   const fc=document.getElementById('vFullCanvas');
   if(vCtx&&fc){vCtx.fillStyle='#1a1a2e';vCtx.fillRect(0,0,600,200);try{vCtx.drawImage(fc,0,0,600,200);}catch(e){}}
