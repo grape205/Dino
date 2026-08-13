@@ -12,4 +12,5 @@ export const DINOS = [
   { ch: 10, emoji: '🦕', name: '腕龍',     en: 'Brachiosaurus', fact: '像四層樓那麼高，是陸地上最大的恐龍之一。', color: '#f59e0b' },
   { ch: 11, emoji: '🌟', name: '黃金恐龍', en: 'Golden Dino',    fact: '傳說中的黃金恐龍，只有拼圖大師才能召喚出來！', color: '#fbbf24' },
   { ch: 12, emoji: '🏆', name: '冠軍恐龍', en: 'Champion Dino',  fact: '恭喜你！你已經是最厲害的七巧板拼圖冠軍啦！', color: '#f472b6' },
+  { ch: 13, emoji: '👑', name: '恐龍國王', en: 'Dino King',      fact: '集滿所有恐龍的傳說國王，向你這位拼圖大師致敬！', color: '#22d3ee' },
 ];
