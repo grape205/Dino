@@ -22,6 +22,7 @@
     <span class="big">🦕</span>
     <div class="h-title">恐龍<em>七巧板</em></div>
     <div class="h-sub">拖一拖、轉一轉，拼出恐龍世界！</div>
+    <button id="dexBadge" class="dex-badge" onclick="TG.showDex()">🦕 圖鑑 0/10</button>
   </div>
   <div id="chapterList"></div>
   <div class="ad-hint">恐龍學習世界・七巧板</div>
@@ -65,6 +66,7 @@
     <span class="win-dino">🦖</span>
     <div class="win-stars" id="winStars">★★★</div>
     <div class="win-title" id="winTitle">完成囉！</div>
+    <div class="win-unlock" id="winUnlock" style="display:none"></div>
     <div class="win-btns">
       <button class="win-btn" id="nextBtn">下一關 →</button>
       <button class="win-btn ghost" onclick="TG.showMenu()">回關卡選單</button>
@@ -72,11 +74,24 @@
   </div>
 </div>
 
+<!-- ===== 恐龍圖鑑 ===== -->
+<div id="dexOverlay">
+  <div class="dex-panel">
+    <div class="dex-hd">
+      <span>🦕 恐龍圖鑑</span>
+      <span class="dex-count" id="dexCount">0 / 10</span>
+      <button class="dex-close" onclick="TG.hideDex()">✕</button>
+    </div>
+    <div class="dex-tip">每破完一章，就解鎖一隻新恐龍！</div>
+    <div class="dex-grid" id="dexGrid"></div>
+  </div>
+</div>
+
 <script type="module">
-import { showMenu, startLevel, useHint, rotateSelected, flipSelected, submitT4 } from './js/game.js';
+import { showMenu, startLevel, useHint, rotateSelected, flipSelected, submitT4, showDex, hideDex } from './js/game.js';
 import { initAuth } from './js/supabase.js';
 
-window.TG = { showMenu, startLevel, useHint, rotateSelected, flipSelected, submitT4 };
+window.TG = { showMenu, startLevel, useHint, rotateSelected, flipSelected, submitT4, showDex, hideDex };
 
 // 星星背景
 (function(){
