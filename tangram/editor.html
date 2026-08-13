@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>七巧板關卡編輯器（開發用）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,'Microsoft JhengHei',sans-serif;background:#0f172a;color:#e2e8f0;display:flex;flex-direction:column;height:100vh}
+header{background:#1e293b;padding:8px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid #334155}
+header h1{font-size:1rem;color:#4ade80}
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+button{font-family:inherit;background:#334155;border:1px solid #475569;color:#e2e8f0;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:.82rem}
+button:hover{background:#475569}
+button.p{color:#fff}
+main{flex:1;display:flex;min-height:0}
+#canvasWrap{flex:1;display:flex;align-items:center;justify-content:center;background:#0b1224;min-width:0}
+svg{width:100%;height:100%;touch-action:none}
+aside{width:300px;background:#111827;border-left:1px solid #334155;padding:12px;overflow:auto;font-size:.82rem}
+.piece-poly{cursor:move}
+.piece-poly.sel{stroke:#fff;stroke-width:.14}
+.status{padding:8px;border-radius:8px;margin-bottom:10px;font-size:.85rem}
+.ok{background:#14532d;color:#86efac}.bad{background:#7f1d1d;color:#fecaca}
+textarea{width:100%;height:200px;background:#0b1224;color:#a5f3fc;border:1px solid #334155;border-radius:8px;padding:8px;font-family:monospace;font-size:.72rem}
+label{display:block;margin:6px 0 2px;color:#94a3b8}
+input,select{width:100%;background:#0b1224;color:#e2e8f0;border:1px solid #334155;border-radius:6px;padding:5px}
+.hint{color:#64748b;font-size:.72rem;margin-top:4px;line-height:1.5}
+.err{color:#fca5a5;font-size:.78rem}
+</style>
+</head>
+<body>
+<header>
+  <h1>🦖 七巧板編輯器</h1>
+  <div class="tools" id="palette"></div>
+  <div class="tools">
+    <button onclick="ED.rotate()">↻ 旋轉45°</button>
+    <button onclick="ED.flip()">⇄ 翻面(⑦)</button>
+    <button onclick="ED.remove()">🗑 刪除</button>
+    <button onclick="ED.clear()">清空</button>
+    <button class="p" style="background:#2563eb" onclick="ED.exportJSON()">⬇ 匯出 JSON</button>
+  </div>
+</header>
+<main>
+  <div id="canvasWrap"></div>
+  <aside>
+    <div class="status" id="status">—</div>
+    <label>關卡 id</label><input id="fId" type="number" value="101">
+    <label>章節 chapter</label><input id="fCh" type="number" value="1">
+    <label>名稱 name</label><input id="fName" value="新關卡">
+    <label>題型 type</label>
+    <select id="fType"><option>T1</option><option>T2</option><option>T3</option></select>
+    <label>教學 teach</label><input id="fTeach" value="">
+    <div class="hint">操作：點左上調色盤加入板 → 點選板 → 拖曳移動（吸附 0.5 格）→ ↻ 旋轉 / ⇄ 翻面。綠燈表示可匯出。</div>
+    <label>匯出結果</label>
+    <textarea id="out" readonly></textarea>
+  </aside>
+</main>
+<script type="module">
+import { PIECES, PIECE_ORDER } from './js/pieces.js';
+import { validateSolution } from './js/validator.js';
+import { unionOutline, centroid, rotatePoint } from './js/geometry.js';
+
+const SVGNS='http://www.w3.org/2000/svg';
+const VB=18, FLIP=16; // 顯示 0..16 座標，y 翻轉
+let pieces=[], sel=null, uid=0;
+const svg=document.createElementNS(SVGNS,'svg');
+svg.setAttribute('viewBox',`-1 -1 ${VB} ${VB}`);
+document.getElementById('canvasWrap').appendChild(svg);
+
+// 質心錨點模型
+function verts(p){
+  const base=PIECES[p.type].verts.map(([x,y])=>[p.flip?-x:x,y]);
+  const rot=base.map(v=>rotatePoint(v,p.rot));
+  const c=centroid(rot);
+  return rot.map(([x,y])=>[x-c[0]+p.cx, y-c[1]+p.cy]);
+}
+const ptsStr=(vs)=>vs.map(([x,y])=>`${x},${FLIP-y}`).join(' ');
+
+// 調色盤
+const pal=document.getElementById('palette');
+for(const k of PIECE_ORDER){
+  const b=document.createElement('button'); b.className='p'; b.style.background=PIECES[k].color;
+  b.textContent=PIECES[k].symbol; b.title=PIECES[k].name;
+  b.onclick=()=>{ pieces.push({id:++uid,type:k,rot:0,flip:false,cx:8,cy:8}); sel=uid; render(); };
+  pal.appendChild(b);
+}
+
+function render(){
+  svg.innerHTML='';
+  // 格線
+  for(let i=0;i<=16;i++){
+    for(const [x1,y1,x2,y2] of [[i,0,i,16],[0,i,16,i]]){
+      const l=document.createElementNS(SVGNS,'line');
+      l.setAttribute('x1',x1);l.setAttribute('y1',FLIP-y1);l.setAttribute('x2',x2);l.setAttribute('y2',FLIP-y2);
+      l.setAttribute('stroke', i%8===0?'#334155':'#1e293b');l.setAttribute('stroke-width',0.03);
+      svg.appendChild(l);
+    }
+  }
+  // 45° 輔助
+  for(let k=-16;k<=32;k+=2){
+    for(const [x1,y1,x2,y2] of [[k,0,k+16,16],[k,16,k+16,0]]){
+      const l=document.createElementNS(SVGNS,'line');
+      l.setAttribute('x1',x1);l.setAttribute('y1',FLIP-y1);l.setAttribute('x2',x2);l.setAttribute('y2',FLIP-y2);
+      l.setAttribute('stroke','#16233b');l.setAttribute('stroke-width',0.02);svg.appendChild(l);
+    }
+  }
+  // 聯集輪廓
+  if(pieces.length){
+    const o=unionOutline(pieces.map(verts));
+    if(o){ const pg=document.createElementNS(SVGNS,'polygon');pg.setAttribute('points',ptsStr(o));
+      pg.setAttribute('fill','none');pg.setAttribute('stroke','#4ade80');pg.setAttribute('stroke-width',0.12);pg.setAttribute('stroke-dasharray','0.3,0.2');svg.appendChild(pg);}
+  }
+  // 板
+  for(const p of pieces){
+    const pg=document.createElementNS(SVGNS,'polygon');
+    pg.setAttribute('points',ptsStr(verts(p)));
+    pg.setAttribute('fill',PIECES[p.type].color);
+    pg.setAttribute('opacity',0.9);pg.setAttribute('stroke','rgba(0,0,0,.4)');pg.setAttribute('stroke-width',0.06);
+    pg.setAttribute('class','piece-poly'+(p.id===sel?' sel':''));
+    pg.dataset.id=p.id; svg.appendChild(pg);
+  }
+  validate();
+}
+
+function toWorld(e){
+  const t=e.touches?e.touches[0]:e; const pt=svg.createSVGPoint();pt.x=t.clientX;pt.y=t.clientY;
+  const m=svg.getScreenCTM().inverse(); const s=pt.matrixTransform(m); return {x:s.x, y:FLIP-s.y};
+}
+let drag=null;
+svg.addEventListener('mousedown',down);svg.addEventListener('touchstart',down,{passive:false});
+window.addEventListener('mousemove',move);window.addEventListener('touchmove',move,{passive:false});
+window.addEventListener('mouseup',up);window.addEventListener('touchend',up);
+function down(e){const el=e.target.closest('[data-id]');if(!el)return;sel=+el.dataset.id;const w=toWorld(e);const p=pieces.find(x=>x.id===sel);drag={ox:w.x-p.cx,oy:w.y-p.cy};render();e.preventDefault();}
+function move(e){if(!drag||sel==null)return;const w=toWorld(e);const p=pieces.find(x=>x.id===sel);
+  const snap=v=>Math.round(v*2)/2; p.cx=snap(w.x-drag.ox);p.cy=snap(w.y-drag.oy);render();e.preventDefault();}
+function up(){drag=null;}
+
+function validate(){
+  const st=document.getElementById('status');
+  if(!pieces.length){st.className='status';st.textContent='—';return;}
+  const sol=pieces.map(p=>({piece:p.type,verts:verts(p).map(v=>[+v[0].toFixed(4),+v[1].toFixed(4)])}));
+  const r=validateSolution(sol);
+  st.className='status '+(r.ok?'ok':'bad');
+  st.innerHTML=r.ok?`✓ 合法拼圖　面積=${r.area.toFixed(1)}　輪廓 ${r.outline.length} 點`
+    :'✗ '+r.errors.map(e=>`<div class="err">${e}</div>`).join('');
+}
+
+window.ED={
+  rotate(){const p=pieces.find(x=>x.id===sel);if(p){p.rot=(p.rot+1)%8;render();}},
+  flip(){const p=pieces.find(x=>x.id===sel);if(p&&PIECES[p.type].flippable){p.flip=!p.flip;render();}},
+  remove(){pieces=pieces.filter(x=>x.id!==sel);sel=null;render();},
+  clear(){pieces=[];sel=null;render();},
+  exportJSON(){
+    const sol=pieces.map(p=>({piece:p.type,verts:verts(p).map(v=>[+v[0].toFixed(4),+v[1].toFixed(4)])}));
+    const r=validateSolution(sol);
+    const lv={id:+fId.value,chapter:+fCh.value,name:fName.value,type:fType.value,difficulty:1,teach:fTeach.value,solution:sol};
+    document.getElementById('out').value = (r.ok?'// ✓ 通過驗證\n':'// ✗ 尚未通過：'+r.errors.join('；')+'\n')+JSON.stringify(lv,null,1);
+  }
+};
+render();
+</script>
+</body>
+</html>

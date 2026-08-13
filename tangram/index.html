@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>🦖 恐龍七巧板</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tangram.css">
+</head>
+<body>
+<div class="stars" id="starsBg"></div>
+
+<!-- ===== 選單 ===== -->
+<div id="menu">
+  <div class="topbar">
+    <a class="icon-btn" href="../dino-abc-final.html" title="回主選單">🏠</a>
+    <div class="t-title">🦖 恐龍七巧板</div>
+    <button class="icon-btn" onclick="location.reload()" title="重新整理">↻</button>
+  </div>
+  <div class="hero">
+    <span class="big">🦕</span>
+    <div class="h-title">恐龍<em>七巧板</em></div>
+    <div class="h-sub">拖一拖、轉一轉，拼出恐龍世界！</div>
+  </div>
+  <div id="chapterList"></div>
+  <div class="ad-hint">恐龍學習世界・七巧板</div>
+</div>
+
+<!-- ===== 遊玩 ===== -->
+<div id="play">
+  <div class="topbar">
+    <button class="icon-btn" onclick="TG.showMenu()">← 關卡</button>
+    <div class="t-title" id="lvName">關卡</div>
+    <div class="pill" id="progressPill">0 / 0</div>
+  </div>
+  <div class="play-hd">
+    <div class="lv-teach" id="lvTeach"></div>
+  </div>
+  <div id="boardWrap"></div>
+
+  <!-- 拼圖控制列 -->
+  <div class="ctrlbar" id="ctrlbar">
+    <button class="cbtn" onclick="TG.rotateSelected()">↻ 旋轉</button>
+    <button class="cbtn" onclick="TG.flipSelected()">⇄ 翻面</button>
+    <button class="cbtn hint" onclick="TG.useHint()">💡 提示</button>
+  </div>
+
+  <!-- T4 作答列 -->
+  <div class="t4bar" id="t4bar">
+    <div class="t4-msg" id="t4msg"></div>
+    <div class="t4-nums" id="t4nums"></div>
+    <div class="t4-actions">
+      <button class="cbtn hint" style="flex:1" onclick="TG.useHint()">💡 提示</button>
+      <button class="cbtn" style="flex:2" onclick="TG.submitT4()">✓ 送出答案</button>
+    </div>
+  </div>
+</div>
+<span class="lv-title" style="display:none"></span>
+
+<!-- ===== 勝利 ===== -->
+<div id="winOverlay">
+  <div id="winFx"></div>
+  <div class="win-card">
+    <span class="win-dino">🦖</span>
+    <div class="win-stars" id="winStars">★★★</div>
+    <div class="win-title" id="winTitle">完成囉！</div>
+    <div class="win-btns">
+      <button class="win-btn" id="nextBtn">下一關 →</button>
+      <button class="win-btn ghost" onclick="TG.showMenu()">回關卡選單</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { showMenu, startLevel, useHint, rotateSelected, flipSelected, submitT4 } from './js/game.js';
+import { initAuth } from './js/supabase.js';
+
+window.TG = { showMenu, startLevel, useHint, rotateSelected, flipSelected, submitT4 };
+
+// 星星背景
+(function(){
+  const bg = document.getElementById('starsBg');
+  for (let i=0;i<45;i++){
+    const s=document.createElement('div');s.className='star';
+    const sz=Math.random()*2+.5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*5}s`;
+    bg.appendChild(s);
+  }
+})();
+
+initAuth().finally(showMenu);
+</script>
+</body>
+</html>
