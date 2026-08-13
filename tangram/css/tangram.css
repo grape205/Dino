@@ -103,5 +103,37 @@ button{font-family:inherit;cursor:pointer}
 .confetti{position:absolute;top:-10%;animation:fall 2.4s linear forwards}
 @keyframes fall{to{transform:translateY(120vh) rotate(360deg);opacity:0}}
 
+/* 圖鑑徽章（選單） */
+.dex-badge{margin-top:14px;background:rgba(74,222,128,.12);border:1.5px solid rgba(74,222,128,.4);border-radius:99px;padding:8px 18px;color:#86efac;font-size:.9rem;box-shadow:0 3px 12px rgba(74,222,128,.2)}
+.dex-badge:active{transform:scale(.95)}
+
+/* 勝利：解鎖恐龍卡 */
+.win-unlock{border:2px solid #4ade80;border-radius:18px;padding:14px 12px;margin-bottom:16px;background:rgba(255,255,255,.05);animation:popIn .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes popIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.unlock-tag{font-size:.85rem;color:#fde047;margin-bottom:6px}
+.unlock-emoji{font-size:3.2rem;animation:bob 1.5s ease-in-out infinite}
+.unlock-name{font-size:1.2rem;color:#fff;margin-top:4px}
+.unlock-name span{font-size:.7rem;color:#86efac;display:block}
+.unlock-fact{font-size:.78rem;color:#a5d6a7;margin-top:6px;line-height:1.4}
+
+/* 圖鑑總覽 */
+#dexOverlay{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(7,26,7,.86);backdrop-filter:blur(4px);padding:16px}
+#dexOverlay.show{display:flex;animation:fade .3s}
+.dex-panel{background:linear-gradient(160deg,#0f3d1a,#071a07);border:2px solid rgba(74,222,128,.4);border-radius:22px;width:min(440px,94vw);max-height:88vh;display:flex;flex-direction:column;padding:16px}
+.dex-hd{display:flex;align-items:center;gap:10px;font-size:1.2rem;color:#4ade80;margin-bottom:4px}
+.dex-hd .dex-count{margin-left:auto;font-size:.85rem;color:#86efac;background:rgba(74,222,128,.15);border-radius:99px;padding:3px 12px}
+.dex-close{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);border-radius:50%;width:34px;height:34px;color:#fff;font-size:1rem}
+.dex-tip{font-size:.76rem;color:#81c784;opacity:.8;margin-bottom:12px}
+.dex-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;overflow:auto;padding:2px}
+.dex-card{background:rgba(0,0,0,.35);border:1.5px solid rgba(255,255,255,.1);border-radius:16px;padding:14px 10px;text-align:center}
+.dex-card.got{background:rgba(74,222,128,.08)}
+.dex-emoji{font-size:2.6rem}
+.dex-emoji.locked{opacity:.4;filter:grayscale(1)}
+.dex-name{font-size:1.05rem;color:#fff;margin-top:4px}
+.dex-en{font-size:.66rem;color:#86efac;letter-spacing:.5px}
+.dex-fact{font-size:.72rem;color:#a5d6a7;margin-top:6px;line-height:1.4;min-height:2.6em}
+.dex-ch{font-size:.64rem;color:rgba(134,239,172,.5);margin-top:6px}
+.dex-lock{font-size:.72rem;color:rgba(255,255,255,.4);margin-top:8px}
+
 /* AADS 橫幅預留 */
 .ad-hint{text-align:center;font-size:.62rem;color:rgba(129,199,132,.4);padding:6px}

@@ -5,6 +5,14 @@ import { centroid, bboxOf, vertsEqualSet, unionOutline } from './geometry.js';
 import { el, ptsToStr, drawPiece, drawTargetSlot, pieceVerts } from './render.js';
 import { attachPointer } from './input.js';
 import { getProgress, getStars, recordClear } from './supabase.js';
+import { DINOS } from './dinos.js';
+
+// 某章是否全破（每關至少 1 星）
+function chapterCleared(ch) {
+  const lvls = LEVELS.filter((l) => l.chapter === ch);
+  return lvls.length > 0 && lvls.every((l) => getStars(l.id) > 0);
+}
+export function unlockedCount() { return DINOS.filter((d) => chapterCleared(d.ch)).length; }
 
 const $ = (id) => document.getElementById(id);
 const SNAP_R = 1.9;      // 吸附半徑（world 單位）
@@ -38,7 +46,8 @@ let t4Selected = new Set(), t4HintTier = 0;
 export function showMenu() {
   $('play').style.display = 'none';
   $('menu').style.display = 'block';
-  const prog = getProgress();
+  const dexBadge = $('dexBadge');
+  if (dexBadge) dexBadge.textContent = `🦕 圖鑑 ${unlockedCount()}/${DINOS.length}`;
   const wrap = $('chapterList');
   wrap.innerHTML = '';
   for (const ch of CHAPTERS) {
@@ -65,6 +74,32 @@ export function showMenu() {
     wrap.appendChild(card);
   }
 }
+
+// ---------- 恐龍圖鑑 ----------
+export function showDex() {
+  const ov = $('dexOverlay');
+  const grid = $('dexGrid');
+  grid.innerHTML = '';
+  for (const d of DINOS) {
+    const got = chapterCleared(d.ch);
+    const card = document.createElement('div');
+    card.className = 'dex-card' + (got ? ' got' : '');
+    if (got) card.style.borderColor = d.color + '99';
+    card.innerHTML = got
+      ? `<div class="dex-emoji">${d.emoji}</div>
+         <div class="dex-name">${d.name}</div>
+         <div class="dex-en">${d.en}</div>
+         <div class="dex-fact">${d.fact}</div>
+         <div class="dex-ch">第 ${d.ch} 章</div>`
+      : `<div class="dex-emoji locked">❓</div>
+         <div class="dex-name">？？？</div>
+         <div class="dex-lock">🔒 破完第 ${d.ch} 章解鎖</div>`;
+    grid.appendChild(card);
+  }
+  $('dexCount').textContent = `${unlockedCount()} / ${DINOS.length}`;
+  ov.classList.add('show');
+}
+export function hideDex() { $('dexOverlay').classList.remove('show'); }
 
 // ---------- 開始關卡 ----------
 export function startLevel(id) {
@@ -259,25 +294,43 @@ function updateStarPreview() {
   $('progressPill').textContent = `${filled} / ${slots.length}`;
 }
 function win() {
-  const ms = Date.now() - startTime;
-  const stars = starsFor();
-  recordClear(level.id, stars, ms, hintTier);
+  finishLevel(starsFor(), Date.now() - startTime, hintTier);
+}
+
+// 共用結算：記錄成績、偵測破章解鎖、顯示勝利畫面
+function finishLevel(stars, ms, hints) {
+  const wasCleared = chapterCleared(level.chapter);
+  recordClear(level.id, stars, ms, hints);
+  const justUnlocked = !wasCleared && chapterCleared(level.chapter)
+    ? DINOS.find((d) => d.ch === level.chapter) : null;
   sndWin();
-  const ov = $('winOverlay');
   $('winStars').textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
   $('winTitle').textContent = stars === 3 ? '太棒了！完美通關！' : '完成囉！';
+
+  const unlockBox = $('winUnlock');
+  if (justUnlocked) {
+    unlockBox.style.display = 'block';
+    unlockBox.style.borderColor = justUnlocked.color;
+    unlockBox.innerHTML = `<div class="unlock-tag">🎉 解鎖新恐龍！</div>
+      <div class="unlock-emoji">${justUnlocked.emoji}</div>
+      <div class="unlock-name">${justUnlocked.name} <span>${justUnlocked.en}</span></div>
+      <div class="unlock-fact">${justUnlocked.fact}</div>`;
+    setTimeout(() => [660, 880, 1046, 1318].forEach((f, i) => beep(f, 0.18, 'triangle', 0.2, 0.4 + i * 0.12)), 300);
+  } else unlockBox.style.display = 'none';
+
   const next = LEVELS.find((l) => l.id === level.id + 1);
   $('nextBtn').style.display = next ? 'inline-block' : 'none';
   $('nextBtn').onclick = () => next && startLevel(next.id);
-  ov.classList.add('show');
-  // 撒星星
+  $('winOverlay').classList.add('show');
+
   const fx = $('winFx'); fx.innerHTML = '';
-  for (let i = 0; i < 18; i++) {
+  const glyphs = justUnlocked ? ['⭐', '🌟', justUnlocked.emoji, '✨', '🎉'] : ['⭐', '🌟', '✨', '🦖', '🥚'];
+  for (let i = 0; i < (justUnlocked ? 28 : 18); i++) {
     const s = document.createElement('div');
     s.className = 'confetti';
-    s.textContent = ['⭐', '🌟', '✨', '🦖', '🥚'][i % 5];
+    s.textContent = glyphs[i % glyphs.length];
     s.style.left = Math.random() * 100 + '%';
-    s.style.animationDelay = (Math.random() * 0.5) + 's';
+    s.style.animationDelay = (Math.random() * 0.6) + 's';
     s.style.fontSize = (0.8 + Math.random()) + 'rem';
     fx.appendChild(s);
   }
@@ -343,15 +396,8 @@ export function submitT4() {
   if (sel.length === 0) { $('t4msg').textContent = '先點選你覺得移動的塊喔！'; sndTry(); return; }
   if (JSON.stringify(sel) === JSON.stringify(ans)) {
     const stars = t4HintTier === 0 ? 3 : t4HintTier <= 2 ? 2 : 1;
-    recordClear(level.id, stars, Date.now() - startTime, t4HintTier);
-    sndWin();
-    $('winStars').textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
+    finishLevel(stars, Date.now() - startTime, t4HintTier);
     $('winTitle').textContent = '答對了！';
-    const next = LEVELS.find((l) => l.id === level.id + 1);
-    $('nextBtn').style.display = next ? 'inline-block' : 'none';
-    $('nextBtn').onclick = () => next && startLevel(next.id);
-    $('winFx').innerHTML = '';
-    $('winOverlay').classList.add('show');
   } else {
     $('t4msg').textContent = '再想想看～提示：先找出「沒有動」的塊！';
     sndTry();
