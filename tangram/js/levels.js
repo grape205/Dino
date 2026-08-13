@@ -1,7 +1,7 @@
-// levels.js — 100 關卡資料（皆通過 validator.js 驗證，由編輯器/產生器輸出）
+// levels.js — 112 關卡資料（皆通過 validator.js 驗證）
 // T1/T2/T3：solution = [{piece, verts}]，外輪廓由 geometry.unionOutline 自動導出
 // T4：from / to / answer（移動的塊序號）
-export const CHAPTERS = [{id:1,name:"蛋巢區",emoji:"🥚",dino:"🦖",color:"#4caf50"},{id:2,name:"蕨葉森林",emoji:"🌿",dino:"🦕",color:"#22c55e"},{id:3,name:"草食龍谷",emoji:"🏞️",dino:"🦕",color:"#16a34a"},{id:4,name:"化石挖掘場",emoji:"🦴",dino:"🦴",color:"#a16207"},{id:5,name:"翼龍崖",emoji:"🪽",dino:"🦅",color:"#0ea5e9"},{id:6,name:"遠古海洋",emoji:"🌊",dino:"🐋",color:"#0891b2"},{id:7,name:"火山地帶",emoji:"🌋",dino:"🦎",color:"#ea580c"},{id:8,name:"暴龍領域",emoji:"🦖",dino:"🦖",color:"#dc2626"},{id:9,name:"隕石之夜",emoji:"☄️",dino:"🌠",color:"#7c3aed"},{id:10,name:"恐龍博物館",emoji:"🏛️",dino:"🦕",color:"#f59e0b"}];
+export const CHAPTERS = [{id:1,name:"蛋巢區",emoji:"🥚",dino:"🦖",color:"#4caf50"},{id:2,name:"蕨葉森林",emoji:"🌿",dino:"🦕",color:"#22c55e"},{id:3,name:"草食龍谷",emoji:"🏞️",dino:"🦕",color:"#16a34a"},{id:4,name:"化石挖掘場",emoji:"🦴",dino:"🦴",color:"#a16207"},{id:5,name:"翼龍崖",emoji:"🪽",dino:"🦅",color:"#0ea5e9"},{id:6,name:"遠古海洋",emoji:"🌊",dino:"🐋",color:"#0891b2"},{id:7,name:"火山地帶",emoji:"🌋",dino:"🦎",color:"#ea580c"},{id:8,name:"暴龍領域",emoji:"🦖",dino:"🦖",color:"#dc2626"},{id:9,name:"隕石之夜",emoji:"☄️",dino:"🌠",color:"#7c3aed"},{id:10,name:"恐龍博物館",emoji:"🏛️",dino:"🦕",color:"#f59e0b"},{id:11,name:"恐龍剪影館",emoji:"🖼️",dino:"🌟",color:"#fbbf24"}];
 
 export const LEVELS = [
   // ── 第 1 章 蛋巢區 ──
@@ -233,4 +233,29 @@ export const LEVELS = [
   { id: 100, chapter: 10, name: '鎮館之寶', type: 'T4', difficulty: 4, answer: [1,7], teach: '有 2 塊搬家了，找找看！',
     from: [ { piece: 'LT_A', verts: [[0,0],[8,0],[4,4]] }, { piece: 'LT_B', verts: [[8,0],[16,0],[12,4]] }, { piece: 'MT', verts: [[4,4],[8,8],[8,4]] }, { piece: 'SQ', verts: [[8,0],[10,2],[8,4],[6,2]] }, { piece: 'ST_A', verts: [[4,4],[6,2],[8,4]] }, { piece: 'ST_B', verts: [[10,6],[12,4],[10,2]] }, { piece: 'PG', verts: [[8,4],[8,8],[10,6],[10,2]] } ],
     to:   [ { piece: 'LT_A', verts: [[0,0],[8,0],[4,-4]] }, { piece: 'LT_B', verts: [[8,0],[16,0],[12,4]] }, { piece: 'MT', verts: [[4,4],[8,8],[8,4]] }, { piece: 'SQ', verts: [[8,0],[10,2],[8,4],[6,2]] }, { piece: 'ST_A', verts: [[4,4],[6,2],[8,4]] }, { piece: 'ST_B', verts: [[10,6],[12,4],[10,2]] }, { piece: 'PG', verts: [[12,8],[8,8],[10,6],[14,6]] } ] },
+  // ── 第 11 章 恐龍剪影館 ──
+  { id: 101, chapter: 11, name: '展翅翼龍', type: 'T3', difficulty: 5, teach: '用完整七塊板，拼出這個圖案！',
+    solution: [ { piece: 'MT', verts: [[10,0],[14,0],[10,4]] }, { piece: 'LT_A', verts: [[10,2],[10,10],[6,6]] }, { piece: 'PG', verts: [[12,10],[12,6],[10,4],[10,8]] }, { piece: 'ST_A', verts: [[10,4],[14,4],[12,6]] }, { piece: 'SQ', verts: [[8,0],[10,2],[8,4],[6,2]] }, { piece: 'ST_B', verts: [[12,12],[12,8],[14,10]] }, { piece: 'LT_B', verts: [[0,4],[8,4],[4,8]] } ] },
+  { id: 102, chapter: 11, name: '奔跑小龍', type: 'T3', difficulty: 5, teach: '用完整七塊板，拼出這個圖案！',
+    solution: [ { piece: 'ST_A', verts: [[6,8],[6,4],[8,6]] }, { piece: 'SQ', verts: [[8,6],[10,8],[8,10],[6,8]] }, { piece: 'LT_A', verts: [[10,12],[2,12],[6,8]] }, { piece: 'ST_B', verts: [[8,12],[12,12],[10,14]] }, { piece: 'MT', verts: [[6,8],[2,8],[6,4]] }, { piece: 'PG', verts: [[6,4],[2,4],[0,6],[4,6]] }, { piece: 'LT_B', verts: [[10,0],[10,8],[6,4]] } ] },
+  { id: 103, chapter: 11, name: '乖乖坐', type: 'T3', difficulty: 5, teach: '用完整七塊板，拼出這個圖案！',
+    solution: [ { piece: 'MT', verts: [[6,10],[2,10],[6,6]] }, { piece: 'LT_A', verts: [[4,8],[4,0],[8,4]] }, { piece: 'ST_A', verts: [[4,10],[8,10],[6,12]] }, { piece: 'ST_B', verts: [[10,12],[6,12],[8,10]] }, { piece: 'PG', verts: [[8,12],[12,12],[14,14],[10,14]] }, { piece: 'SQ', verts: [[8,12],[10,14],[8,16],[6,14]] }, { piece: 'LT_B', verts: [[4,0],[4,8],[0,4]] } ] },
+  { id: 104, chapter: 11, name: '長腳鳥', type: 'T3', difficulty: 5, teach: '用完整七塊板，拼出這個圖案！',
+    solution: [ { piece: 'ST_A', verts: [[10,8],[6,8],[8,6]] }, { piece: 'LT_A', verts: [[4,8],[12,8],[8,12]] }, { piece: 'SQ', verts: [[6,10],[8,12],[6,14],[4,12]] }, { piece: 'ST_B', verts: [[14,8],[10,8],[12,6]] }, { piece: 'MT', verts: [[2,10],[2,6],[6,10]] }, { piece: 'PG', verts: [[8,12],[8,16],[6,18],[6,14]] }, { piece: 'LT_B', verts: [[4,0],[4,8],[0,4]] } ] },
+  { id: 105, chapter: 11, name: '鴨嘴龍', type: 'T3', difficulty: 5, teach: '用完整七塊板，拼出這個圖案！',
+    solution: [ { piece: 'LT_A', verts: [[10,6],[2,6],[6,2]] }, { piece: 'ST_A', verts: [[6,6],[10,6],[8,8]] }, { piece: 'PG', verts: [[8,12],[8,8],[6,6],[6,10]] }, { piece: 'MT', verts: [[10,2],[10,6],[6,2]] }, { piece: 'ST_B', verts: [[4,4],[4,0],[6,2]] }, { piece: 'SQ', verts: [[2,2],[4,4],[2,6],[0,4]] }, { piece: 'LT_B', verts: [[6,6],[6,14],[2,10]] } ] },
+  { id: 106, chapter: 11, name: '展翅起飛', type: 'T3', difficulty: 5, teach: '用完整七塊板，拼出這個圖案！',
+    solution: [ { piece: 'ST_A', verts: [[8,6],[12,6],[10,8]] }, { piece: 'PG', verts: [[6,4],[10,4],[12,6],[8,6]] }, { piece: 'LT_A', verts: [[10,4],[2,4],[6,0]] }, { piece: 'ST_B', verts: [[10,4],[14,4],[12,6]] }, { piece: 'MT', verts: [[0,4],[4,4],[0,8]] }, { piece: 'SQ', verts: [[12,6],[14,8],[12,10],[10,8]] }, { piece: 'LT_B', verts: [[16,6],[16,14],[12,10]] } ] },
+  { id: 107, chapter: 11, name: '火箭升空', type: 'T3', difficulty: 5, teach: '用完整七塊板，拼出這個圖案！',
+    solution: [ { piece: 'LT_A', verts: [[10,6],[2,6],[6,2]] }, { piece: 'ST_A', verts: [[4,4],[4,0],[6,2]] }, { piece: 'MT', verts: [[10,6],[10,10],[6,6]] }, { piece: 'SQ', verts: [[2,2],[4,4],[2,6],[0,4]] }, { piece: 'PG', verts: [[12,14],[12,10],[10,8],[10,12]] }, { piece: 'ST_B', verts: [[2,6],[6,6],[4,8]] }, { piece: 'LT_B', verts: [[4,0],[12,0],[8,4]] } ] },
+  { id: 108, chapter: 11, name: '機器恐龍', type: 'T3', difficulty: 5, teach: '用完整七塊板，拼出這個圖案！',
+    solution: [ { piece: 'LT_A', verts: [[8,0],[8,8],[4,4]] }, { piece: 'ST_A', verts: [[8,10],[8,6],[10,8]] }, { piece: 'MT', verts: [[8,0],[12,0],[8,4]] }, { piece: 'ST_B', verts: [[4,8],[4,4],[6,6]] }, { piece: 'PG', verts: [[4,4],[4,8],[2,10],[2,6]] }, { piece: 'SQ', verts: [[10,4],[12,6],[10,8],[8,6]] }, { piece: 'LT_B', verts: [[8,12],[0,12],[4,8]] } ] },
+  { id: 109, chapter: 11, name: '閃電龍', type: 'T3', difficulty: 5, teach: '用完整七塊板，拼出這個圖案！',
+    solution: [ { piece: 'SQ', verts: [[6,2],[8,4],[6,6],[4,4]] }, { piece: 'ST_A', verts: [[8,0],[8,4],[6,2]] }, { piece: 'PG', verts: [[10,6],[10,2],[8,0],[8,4]] }, { piece: 'LT_A', verts: [[4,12],[4,4],[8,8]] }, { piece: 'MT', verts: [[10,2],[14,2],[10,6]] }, { piece: 'ST_B', verts: [[4,2],[4,6],[2,4]] }, { piece: 'LT_B', verts: [[0,10],[0,2],[4,6]] } ] },
+  { id: 110, chapter: 11, name: '雙角龍', type: 'T3', difficulty: 5, teach: '用完整七塊板，拼出這個圖案！',
+    solution: [ { piece: 'ST_A', verts: [[6,4],[6,8],[4,6]] }, { piece: 'SQ', verts: [[4,6],[6,8],[4,10],[2,8]] }, { piece: 'PG', verts: [[8,10],[8,6],[6,4],[6,8]] }, { piece: 'LT_A', verts: [[10,0],[10,8],[6,4]] }, { piece: 'MT', verts: [[8,10],[8,6],[12,10]] }, { piece: 'ST_B', verts: [[6,12],[6,8],[8,10]] }, { piece: 'LT_B', verts: [[0,10],[0,2],[4,6]] } ] },
+  { id: 111, chapter: 11, name: '小樹苗', type: 'T3', difficulty: 5, teach: '用完整七塊板，拼出這個圖案！',
+    solution: [ { piece: 'MT', verts: [[6,8],[6,4],[10,8]] }, { piece: 'SQ', verts: [[10,4],[12,6],[10,8],[8,6]] }, { piece: 'PG', verts: [[10,0],[10,4],[8,6],[8,2]] }, { piece: 'ST_A', verts: [[10,4],[14,4],[12,6]] }, { piece: 'LT_A', verts: [[6,2],[6,10],[2,6]] }, { piece: 'ST_B', verts: [[0,4],[4,4],[2,6]] }, { piece: 'LT_B', verts: [[4,16],[4,8],[8,12]] } ] },
+  { id: 112, chapter: 11, name: '小勇士', type: 'T3', difficulty: 5, teach: '用完整七塊板，拼出這個圖案！',
+    solution: [ { piece: 'ST_A', verts: [[10,8],[6,8],[8,6]] }, { piece: 'PG', verts: [[8,8],[4,8],[2,10],[6,10]] }, { piece: 'LT_A', verts: [[2,4],[10,4],[6,8]] }, { piece: 'MT', verts: [[6,4],[6,0],[10,4]] }, { piece: 'SQ', verts: [[10,0],[12,2],[10,4],[8,2]] }, { piece: 'ST_B', verts: [[4,4],[0,4],[2,2]] }, { piece: 'LT_B', verts: [[0,10],[8,10],[4,14]] } ] },
 ];
