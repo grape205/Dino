@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>七巧板 · 幾何測試</title>
+<style>
+body{font-family:monospace;background:#0b1020;color:#cbd5e1;padding:20px;line-height:1.6}
+.ok{color:#4ade80}.bad{color:#f87171}h2{color:#fbbf24}
+pre{white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h1>🦖 七巧板幾何 / 關卡驗證測試</h1>
+<pre id="out"></pre>
+<script type="module">
+import { area, unionOutline, overlapArea, vertsEqualSet, transformPiece } from './js/geometry.js';
+import { validateSolution, validateT4 } from './js/validator.js';
+import { LEVELS } from './js/levels.js';
+const out = document.getElementById('out');
+let pass=0, fail=0;
+function log(ok,msg){ out.innerHTML += `<span class="${ok?'ok':'bad'}">${ok?'✓':'✗'}</span> ${msg}\n`; ok?pass++:fail++; }
+function h(t){ out.innerHTML += `\n<h2>${t}</h2>\n`; }
+
+// §1.2 大正方形
+h('§1.2 基準排法一：大正方形');
+const sq=[
+ [[0,8],[8,8],[4,4]],[[8,8],[8,0],[4,4]],[[0,0],[0,4],[4,0]],
+ [[0,4],[0,8],[2,6]],[[0,4],[2,6],[4,4],[2,2]],[[2,2],[4,4],[6,2]],[[2,2],[6,2],[8,0],[4,0]]];
+const sqArea=sq.reduce((a,p)=>a+area(p),0);
+log(Math.abs(sqArea-64)<1e-6, `總面積 = ${sqArea} (應為 64)`);
+let ov=0; for(let i=0;i<sq.length;i++)for(let j=i+1;j<sq.length;j++)ov=Math.max(ov,overlapArea(sq[i],sq[j]));
+log(ov<1e-6, `最大重疊 = ${ov.toFixed(6)} (應為 0)`);
+const sqOut=unionOutline(sq);
+log(sqOut && Math.abs(area(sqOut)-64)<1e-3 && sqOut.length===4, `聯集為 8×8 正方形 (輪廓 ${sqOut?sqOut.length:0} 點, 面積 ${sqOut?area(sqOut).toFixed(1):'?'})`);
+
+// §1.3 大三角形
+h('§1.3 基準排法二：大三角形');
+const tr=[
+ [[0,0],[8,0],[4,4]],[[8,0],[16,0],[12,4]],[[4,4],[8,8],[8,4]],
+ [[8,0],[10,2],[8,4],[6,2]],[[4,4],[6,2],[8,4]],[[10,6],[12,4],[10,2]],[[8,4],[8,8],[10,6],[10,2]]];
+const trArea=tr.reduce((a,p)=>a+area(p),0);
+log(Math.abs(trArea-64)<1e-6, `總面積 = ${trArea} (應為 64)`);
+let ov2=0; for(let i=0;i<tr.length;i++)for(let j=i+1;j<tr.length;j++)ov2=Math.max(ov2,overlapArea(tr[i],tr[j]));
+log(ov2<1e-6, `最大重疊 = ${ov2.toFixed(6)} (應為 0)`);
+const trOut=unionOutline(tr);
+log(trOut && Math.abs(area(trOut)-64)<1e-3 && trOut.length===3, `聯集為斜邊 16 的等腰直角三角形 (輪廓 ${trOut?trOut.length:0} 點)`);
+
+// 旋轉 / 翻面
+h('變換');
+const rot90=transformPiece([[4,0],[2,2],[0,2]],{rot:2});
+log(vertsEqualSet(rot90,[[0,4],[-2,2],[-2,0]]), '旋轉 90° 正確');
+const flip=transformPiece([[0,0],[4,0],[6,2],[2,2]],{flip:true});
+log(vertsEqualSet(flip,[[0,0],[-4,0],[-6,2],[-2,2]]), '⑦ 翻面正確');
+
+// 補充：T4 可驗證範例
+h('補充：T4 範例');
+const from=sq.map((v,i)=>({piece:['LT_A','LT_B','MT','ST_A','SQ','ST_B','PG'][i],verts:v}));
+const to=from.map(p=>p.piece==='ST_A'?{piece:'ST_A',verts:[[0,4],[0,8],[-2,6]]}:p);
+const t4=validateT4(from,to);
+log(JSON.stringify(t4.answer)==='[4]', `移動 1 塊：answer = ${JSON.stringify(t4.answer)} (應為 [4])`);
+const to2=to.map(p=>p.piece==='MT'?{piece:'MT',verts:[[0,0],[0,-4],[4,0]]}:p);
+const t4b=validateT4(from,to2);
+log(JSON.stringify(t4b.answer)==='[3,4]', `移動 2 塊：answer = ${JSON.stringify(t4b.answer)} (應為 [3,4])`);
+
+// 全關卡驗證
+h(`全 ${LEVELS.length} 關驗證`);
+for(const lv of LEVELS){
+  if(lv.type==='T4'){
+    const r=validateT4(lv.from,lv.to);
+    log(r.ok && JSON.stringify(r.answer)===JSON.stringify([...lv.answer].sort((a,b)=>a-b)), `#${lv.id} ${lv.name} [T4] answer=${JSON.stringify(r.answer)}`);
+  }else{
+    const r=validateSolution(lv.solution);
+    log(r.ok, `#${lv.id} ${lv.name} [${lv.type}] ${r.errors.join(';')||'面積 '+r.area.toFixed(0)}`);
+  }
+}
+
+out.innerHTML += `\n<h2>結果：${pass} 通過 / ${fail} 失敗</h2>`;
+document.title = fail===0 ? '✅ 全部通過' : `❌ ${fail} 失敗`;
+</script>
+</body>
+</html>
