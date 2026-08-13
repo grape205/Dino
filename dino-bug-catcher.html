@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>🦕 恐龍抓蟲數線</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+body{
+  font-family:'Fredoka One',Arial,sans-serif;
+  background:#071a07;
+  min-height:100vh;
+  overflow-x:hidden;
+  user-select:none;
+  display:flex;flex-direction:column;align-items:center;
+  color:#fff;
+}
+/* 叢林漸層背景 */
+.skybg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,#0d2a10 0%,#123d18 45%,#071a07 100%);
+}
+.skybg::before{
+  content:'';position:absolute;inset:0;opacity:.5;
+  background-image:
+    radial-gradient(2px 2px at 12% 14%,rgba(180,255,180,.5),transparent),
+    radial-gradient(1.5px 1.5px at 28% 8%,rgba(180,255,180,.4),transparent),
+    radial-gradient(2px 2px at 52% 12%,rgba(180,255,180,.5),transparent),
+    radial-gradient(1.5px 1.5px at 74% 6%,rgba(180,255,180,.4),transparent),
+    radial-gradient(2px 2px at 88% 16%,rgba(180,255,180,.5),transparent);
+}
+
+/* 返回鍵 */
+.back-btn{
+  position:fixed;top:12px;left:12px;z-index:999;
+  background:rgba(0,0,0,.6);
+  border:1.5px solid rgba(74,222,128,.4);
+  border-radius:99px;padding:8px 16px;
+  color:#fff;font-family:'Fredoka One',Arial,sans-serif;
+  font-size:.85rem;text-decoration:none;transition:background .2s;
+}
+.back-btn:active{background:rgba(0,0,0,.85)}
+
+/* 靜音鍵 */
+.mute-btn{
+  position:fixed;top:12px;right:12px;z-index:999;
+  background:rgba(0,0,0,.6);
+  border:1.5px solid rgba(74,222,128,.4);
+  border-radius:99px;padding:8px 14px;
+  color:#fff;font-family:'Fredoka One',Arial,sans-serif;
+  font-size:.85rem;cursor:pointer;transition:background .2s;
+}
+
+#app{
+  position:relative;z-index:1;
+  width:100%;max-width:520px;
+  padding:60px 12px 40px;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+
+/* 計分列 */
+.scorebar{
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  background:rgba(0,0,0,.32);border:1.5px solid rgba(74,222,128,.2);
+  border-radius:16px;padding:10px 16px;
+}
+.score-item{display:flex;flex-direction:column;align-items:center;gap:2px}
+.score-item .lbl{font-size:.68rem;color:#86efac;opacity:.85}
+.score-item .val{font-size:1.35rem;color:#4ade80}
+
+/* 提示 */
+.prompt{
+  text-align:center;line-height:1.3;
+}
+.prompt .big{font-size:1.15rem;color:#fbbf24}
+.prompt .sub{font-size:.8rem;color:#86efac;margin-top:2px}
+
+/* 收集到的蟲 */
+.caught-tray{
+  min-height:30px;font-size:1.5rem;letter-spacing:2px;text-align:center;
+}
+
+/* 數線 */
+.numline-wrap{
+  width:100%;background:rgba(255,255,255,.05);
+  border:1.5px solid rgba(74,222,128,.18);
+  border-radius:18px;padding:16px 8px 10px;
+  overflow:hidden;
+}
+.numline{
+  position:relative;height:120px;margin:0 4px;
+}
+/* 蟲子 / 恐龍 停在數字上方 */
+.bug,.dino{
+  position:absolute;bottom:52px;transform:translateX(-50%);
+  transition:left .45s cubic-bezier(.34,1.56,.64,1);
+  font-size:2rem;line-height:1;pointer-events:none;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.5));
+}
+.dino{font-size:2.4rem;bottom:50px;z-index:3}
+.dino.hop{animation:hop .45s ease}
+@keyframes hop{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-22px)}}
+.bug.flee{animation:flee .5s ease forwards}
+@keyframes flee{to{transform:translateX(-50%) translateY(-70px) rotate(40deg);opacity:0}}
+.bug.eaten{animation:eaten .3s ease forwards}
+@keyframes eaten{to{transform:translateX(-50%) scale(0);opacity:0}}
+
+/* 軸線 */
+.axis{position:absolute;left:0;right:0;bottom:40px;height:4px;background:#4ade80;border-radius:4px}
+.tick{position:absolute;bottom:30px;transform:translateX(-50%);width:3px;height:14px;background:#4ade80;border-radius:2px}
+.tlabel{position:absolute;bottom:6px;transform:translateX(-50%);font-size:1rem;color:#d1fae5}
+
+/* 算式選項 */
+.opts{
+  width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+}
+.opt{
+  background:linear-gradient(135deg,#14532d,#22c55e);
+  border:none;border-radius:16px;padding:16px 4px;
+  color:#fff;font-family:'Fredoka One',Arial,sans-serif;
+  font-size:1.3rem;cursor:pointer;
+  box-shadow:0 4px 14px rgba(34,197,94,.35);
+  transition:transform .12s,box-shadow .12s,opacity .2s;
+}
+.opt:active{transform:scale(.93)}
+.opt.correct{background:linear-gradient(135deg,#166534,#4ade80);animation:pop .4s ease}
+.opt.wrong{background:linear-gradient(135deg,#7f1d1d,#ef4444);animation:shake .4s ease}
+.opt.dim{opacity:.35;pointer-events:none}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+/* 結果訊息 */
+.result{
+  min-height:26px;text-align:center;font-size:1.05rem;
+}
+.result.good{color:#4ade80}
+.result.bad{color:#fca5a5}
+
+@media(max-width:360px){
+  .opt{font-size:1.1rem;padding:13px 2px}
+  .tlabel{font-size:.85rem}
+}
+</style>
+</head>
+<body>
+
+<div class="skybg"></div>
+<a href="dino-abc-final.html" class="back-btn">⬅️ 返回</a>
+<button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
+
+<div id="app">
+
+  <div class="scorebar">
+    <div class="score-item"><span class="lbl">🐛 抓到</span><span class="val" id="caughtCount">0</span></div>
+    <div class="score-item"><span class="lbl">🔥 連續</span><span class="val" id="streak">0</span></div>
+    <div class="score-item"><span class="lbl">🏆 最佳</span><span class="val" id="best">0</span></div>
+  </div>
+
+  <div class="caught-tray" id="tray"></div>
+
+  <div class="prompt">
+    <div class="big">幫恐龍移到蟲蟲身邊！</div>
+    <div class="sub" id="promptSub">選出能讓恐龍走到蟲蟲位置的算式</div>
+  </div>
+
+  <div class="numline-wrap">
+    <div class="numline" id="numline">
+      <span class="dino" id="dino">🦕</span>
+      <span class="bug" id="bug">🐛</span>
+      <div class="axis"></div>
+    </div>
+  </div>
+
+  <div class="result" id="result"></div>
+
+  <div class="opts" id="opts"></div>
+
+</div>
+
+<script>
+const BUGS=['🐛','🦋','🐞','🐝','🦗','🐜','🪲','🦟'];
+const MAX=10;
+let dinoPos=5, bugPos=5, curBug='🐛';
+let caught=0, streak=0, best=0, locked=false;
+
+/* localStorage 最佳紀錄 */
+try{ best=parseInt(localStorage.getItem('bugCatcherBest')||'0',10)||0; }catch(e){}
+document.getElementById('best').textContent=best;
+
+const numline=document.getElementById('numline');
+const dinoEl=document.getElementById('dino');
+const bugEl=document.getElementById('bug');
+const optsEl=document.getElementById('opts');
+const resultEl=document.getElementById('result');
+
+/* 建立刻度 0~10 */
+function buildTicks(){
+  for(let i=0;i<=MAX;i++){
+    const p=posPct(i);
+    const t=document.createElement('div');t.className='tick';t.style.left=p+'%';numline.appendChild(t);
+    const l=document.createElement('div');l.className='tlabel';l.style.left=p+'%';l.textContent=i;numline.appendChild(l);
+  }
+}
+function posPct(n){ return (n/MAX)*100; }
+
+/* 音效（Web Audio，可靜音） */
+let muted=false, actx=null;
+function beep(freq,dur,type){
+  if(muted)return;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(),g=actx.createGain();
+    o.type=type||'sine';o.frequency.value=freq;
+    o.connect(g);g.connect(actx.destination);
+    g.gain.setValueAtTime(.001,actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.25,actx.currentTime+.02);
+    g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+dur);
+    o.start();o.stop(actx.currentTime+dur);
+  }catch(e){}
+}
+function playCorrect(){ beep(660,.12,'square'); setTimeout(()=>beep(880,.16,'square'),110); }
+function playWrong(){ beep(200,.2,'sawtooth'); }
+function toggleMute(){ muted=!muted; document.getElementById('muteBtn').textContent=muted?'🔇':'🔊'; }
+
+/* 產生一回合 */
+function newRound(keepDino){
+  locked=false;
+  resultEl.textContent=''; resultEl.className='result';
+  bugEl.className='bug'; bugEl.style.opacity='1';
+
+  if(!keepDino){ dinoPos=rand(0,MAX); }
+  // 蟲蟲位置：與恐龍不同，且移動距離 1~5
+  let t;
+  do{
+    const dist=rand(1,5);
+    const dir=Math.random()<.5?-1:1;
+    t=dinoPos+dir*dist;
+  }while(t<0||t>MAX||t===dinoPos);
+  bugPos=t;
+  curBug=BUGS[rand(0,BUGS.length-1)];
+  bugEl.textContent=curBug;
+
+  dinoEl.style.left=posPct(dinoPos)+'%';
+  bugEl.style.left=posPct(bugPos)+'%';
+
+  buildOptions();
+}
+
+/* 建立 6 個算式，1 正確 + 5 干擾 */
+function buildOptions(){
+  const diff=bugPos-dinoPos; // 正確位移
+  const correct=makeEq(dinoPos,diff);
+  const set=new Set([correct.key]);
+  const list=[correct];
+
+  let guard=0;
+  while(list.length<6 && guard++<200){
+    const d=rand(-dinoPos,MAX-dinoPos); // 讓結果落在 0~10
+    if(d===0) continue;
+    const eq=makeEq(dinoPos,d);
+    if(eq.result===bugPos) continue;   // 不能也是正解
+    if(set.has(eq.key)) continue;
+    set.add(eq.key); list.push(eq);
+  }
+  shuffle(list);
+
+  optsEl.innerHTML='';
+  list.forEach(eq=>{
+    const b=document.createElement('button');
+    b.className='opt';
+    b.textContent=eq.text;
+    b.onclick=()=>choose(b,eq);
+    optsEl.appendChild(b);
+  });
+}
+
+/* 由起點與位移做出算式物件 */
+function makeEq(start,delta){
+  const result=start+delta;
+  const sign=delta>=0?'+':'−';
+  const text=start+' '+sign+' '+Math.abs(delta);
+  return {result,text,key:text};
+}
+
+function choose(btn,eq){
+  if(locked)return;
+  locked=true;
+  if(eq.result===bugPos){
+    // 正確：恐龍跳到蟲蟲位置吃掉
+    btn.classList.add('correct');
+    playCorrect();
+    dinoEl.classList.add('hop');
+    dinoEl.style.left=posPct(bugPos)+'%';
+    setTimeout(()=>{
+      bugEl.classList.add('eaten');
+      dinoEl.classList.remove('hop');
+    },420);
+    caught++; streak++;
+    if(streak>best){ best=streak; try{localStorage.setItem('bugCatcherBest',best);}catch(e){} }
+    updateScore();
+    addToTray(curBug);
+    resultEl.textContent='🎉 抓到了！好好吃～'; resultEl.className='result good';
+    dinoPos=bugPos;
+    setTimeout(()=>newRound(true),1000);
+  }else{
+    // 錯誤：蟲蟲飛走，重新出題
+    btn.classList.add('wrong');
+    playWrong();
+    streak=0; updateScore();
+    Array.from(optsEl.children).forEach(c=>{ if(c!==btn)c.classList.add('dim'); });
+    bugEl.classList.add('flee');
+    resultEl.textContent='😮 蟲蟲飛走了！再試一次'; resultEl.className='result bad';
+    setTimeout(()=>newRound(true),1050);
+  }
+}
+
+function addToTray(b){
+  const tray=document.getElementById('tray');
+  tray.textContent=(tray.textContent+b).slice(-16); // 最多顯示最近 8 隻
+}
+
+function updateScore(){
+  document.getElementById('caughtCount').textContent=caught;
+  document.getElementById('streak').textContent=streak;
+  document.getElementById('best').textContent=best;
+}
+
+/* utils */
+function rand(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } }
+
+buildTicks();
+newRound(false);
+</script>
+</body>
+</html>
