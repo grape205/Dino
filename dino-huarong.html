@@ -135,7 +135,14 @@ body{background:#1a3a1a;font-family:'Fredoka One',cursive;display:flex;flex-dire
 
 <canvas class="confcv" id="cv"></canvas>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPA_URL='https://iizaesirhmhfwrjgabnw.supabase.co';
+const SUPA_KEY='sb_publishable_e5libYdUvxTNKMnBscUvSw_8gj3QxyY';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+let currentUser=null;
+sb.auth.getSession().then(({data:{session}})=>{if(session)currentUser=session.user;});
+
 // ── Audio ──
 let AC;
 function initAC(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();}
@@ -444,11 +451,10 @@ function triggerWin(){
   trySaveScore(stars*(10-curLv));
 }
 async function trySaveScore(sc){
+  if(!currentUser||sc<=0)return;
   try{
-    const sb=window._sb||window.supabase;
-    const u=window._currentUser;
-    if(!sb||!u)return;
-    await sb.from('leaderboard').insert({player_name:u.user_metadata?.full_name||u.email,game:'huarong',score:sc,user_id:u.id});
+    const name=currentUser.user_metadata?.full_name||currentUser.email||'玩家';
+    await sb.from('leaderboard').insert({player_name:name,game:'huarong',score:sc,user_id:currentUser.id});
   }catch(_){}
 }
 
